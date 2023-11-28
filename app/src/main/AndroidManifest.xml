@@ -2,7 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.NFC" />
+
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+
     <uses-permission android:name="com.xiaomi.mi_connect_service.permission.RECEIVE_ENDPOINT" />
 
     <uses-feature
@@ -73,9 +77,11 @@
             android:name=".service.NfcNotificationListenerService"
             android:description="@string/nfc_notification_service_description"
             android:exported="false"
+            android:foregroundServiceType="connectedDevice"
             android:label="@string/nfc_notification_service"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
-            android:process=":nfc_notification">
+            android:process=":nfc_notification"
+            android:stopWithTask="false">
             <intent-filter>
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>

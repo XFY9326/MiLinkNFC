@@ -12,10 +12,7 @@ object HuaweiNfc {
 
     @Suppress("SpellCheckingInspection")
     private const val MIME_NDEF_MSG = "application/vnd.huawei.handoff.ndefmsg"
-    private const val NFC_URI_AUTHORITY = "consumer.huawei.com"
-    private const val NFC_URI_PATH = "/en/support/huaweisharewelcome/"
-
-    const val NFC_URI_CONTENT = "$NFC_URI_AUTHORITY$NFC_URI_PATH"
+    const val NFC_URI_CONTENT = "consumer.huawei.com/en/support/huaweisharewelcome/"
 
     fun parseBtMac(intent: Intent): String? =
         IntentCompat.getParcelableArrayExtra(intent, NfcAdapter.EXTRA_NDEF_MESSAGES, NdefMessage::class.java)
