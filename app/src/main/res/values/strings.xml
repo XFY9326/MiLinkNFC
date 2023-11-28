@@ -1,0 +1,66 @@
+<resources>
+    <string name="app_name">MiLink NFC</string>
+    <string name="about">关于</string>
+    <string name="author">作者：%1$s</string>
+    <string name="open_source">本项目开源在\u0020</string>
+    <string name="write_nfc">NFC标签</string>
+    <string name="write_nfc_desc">向NFC标签中覆盖写入小米碰一碰的数据。\n\n如果出现连接失败，可以尝试重启小米电脑管家或重启设备。</string>
+    <string name="put_and_write_nfc_tag">靠近NFC标签以写入数据</string>
+    <string name="nfc_write_bytes">写入数据：%1$d字节</string>
+    <string name="nfc_using_conflict">NFC设备正在使用中</string>
+    <string name="nfc_write_success">NFC标签写入成功</string>
+    <string name="nfc_connect_failed">NFC标签连接失败</string>
+    <string name="nfc_ndef_not_supported">不支持NDEF的NFC标签</string>
+    <string name="nfc_write_error">NFC标签写入失败</string>
+    <string name="nfc_write_error_unknown">未知NFC标签写入错误</string>
+    <string name="nfc_write_error_read_only">NFC标签设置只读失败</string>
+    <string name="nfc_write_error_max_size">NFC标签写入空间不足</string>
+    <string name="nfc_write_error_no_read_only">NFC标签不可设为只读</string>
+    <string name="nfc_write_error_not_writeable">NFC标签不可写入</string>
+    <string name="put_and_write_nfc_tag_read_only">靠近NFC标签以写入只读数据</string>
+    <string name="bt_screen_mirror">测试屏幕镜像</string>
+    <string name="bt_screen_mirror_desc">模拟NFC碰一碰，向指定蓝牙Mac地址的设备发送屏幕镜像（对应设备需安装小米电脑管家）。</string>
+    <string name="tiles_screen_mirror">通知栏磁贴快捷操作</string>
+    <string name="tiles_screen_mirror_desc">使用预设的触发方式，在通知栏磁贴中触发屏幕镜像（在系统应用中选择图片或文件可以触发碰一碰）。</string>
+    <string name="tiles_add_success">磁贴添加成功</string>
+    <string name="tiles_already_added">磁贴已添加</string>
+    <string name="tiles_add_failed">磁贴添加失败</string>
+    <string name="huawei_nfc_redirect">转发华为NFC碰一碰</string>
+    <string name="huawei_nfc_redirect_desc">使用小米碰一碰处理华为电脑的一碰传所指向的蓝牙Mac地址的设备（对应设备需安装小米电脑管家）。\n\n默认情况下需要主动打开NFC弹出的网址通知才能触发，如果启用“通知监听服务”并打开本应用的“自启动”以保证后台运行，即可自动处理此类事件。\n\n本应用开源并且无联网权限。</string>
+    <string name="open_app_settings_for_autostart">打开“自启动”</string>
+    <string name="open_notification_service_settings">打开“通知监听服务”设置</string>
+    <string name="add_tiles">添加磁贴</string>
+    <string name="set_nfc_read_only">设置NFC标签为只读（危险）</string>
+    <string name="dangerous_action_alert">危险操作</string>
+    <string name="set_nfc_read_only_desc">将NFC标签设置为只读是不可逆的，请确认操作是否正确并充分确认写入的数据无误！</string>
+    <string name="save">保存</string>
+    <string name="save_success">保存成功！</string>
+    <string name="clear">清空</string>
+    <string name="write_tag">写入</string>
+    <string name="screen_mirror">投屏</string>
+    <string name="nfc_xiaomi_device_type">设备类型</string>
+    <string name="device_type_tv">电视</string>
+    <string name="device_type_pc">电脑</string>
+    <string name="device_type_car">车机</string>
+    <string name="device_type_pad">平板</string>
+    <string name="nfc_mirror_intent_type">触发方式</string>
+    <string name="mirror_intent_fake_nfc_tag">虚拟NFC标签</string>
+    <string name="mirror_intent_mi_connect_service">互联互通服务</string>
+    <string name="enter_mac_address">Mac地址</string>
+    <string name="empty_mac_address">Mac地址为空！</string>
+    <string name="invalid_mac_address">Mac地址格式错误！</string>
+    <string name="bt_mac_not_found">无法解析蓝牙Mac地址</string>
+    <string name="bt_mac_not_set">未设置蓝牙Mac地址</string>
+    <string name="mi_share_tile_service">碰一碰</string>
+    <string name="nfc_notification_service">NFC通知监听服务</string>
+    <string name="nfc_notification_service_description">监听并自动打开来自可被转为碰一碰NFC标签的NFC通知</string>
+    <string name="not_supported_os">不支持的系统</string>
+    <string name="not_supported_os_desc">当前设备并非小米Hyper OS系统，本应用不保证运行稳定性。</string>
+    <string name="exit">退出</string>
+
+    <string name="version" translatable="false">%1$s (%2$d)</string>
+    <string name="author_name" translatable="false">XFY9326</string>
+    <string name="code_platform" translatable="false">Github</string>
+    <string name="code_url" translatable="false">https://github.com/XFY9326/MiLinkNFC</string>
+    <string name="placeholder_mac_address" translatable="false">00:00:00:00:00:00</string>
+</resources>

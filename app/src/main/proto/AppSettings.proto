@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package proto;
+
+option java_package = "tool.xfy9326.milink.nfc.proto";
+option java_outer_classname = "AppSettingsProto";
+option java_multiple_files = false;
+
+enum NfcDevice {
+  UNKNOWN_NFC_DEVICE = 0;
+  TV = 1;
+  PC = 2;
+  CAR = 3;
+  PAD = 4;
+}
+
+enum MirrorIntent {
+  UNKNOWN_MIRROR_INTENT = 0;
+  FAKE_NFC_TAG = 1;
+  MI_CONNECT_SERVICE = 2;
+}
+
+message GlobalSettings {
+  string tilesNfcBtMac = 1;
+  NfcDevice tilesNfcDevice = 2;
+  MirrorIntent tilesMirrorIntent = 3;
+  NfcDevice huaweiRedirectNfcDevice = 4;
+  MirrorIntent huaweiRedirectMirrorIntent = 5;
+  bool confirmedNotSupportedOSAlert = 6;
+}

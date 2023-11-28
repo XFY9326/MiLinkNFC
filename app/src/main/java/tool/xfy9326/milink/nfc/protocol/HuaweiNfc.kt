@@ -1,0 +1,30 @@
+package tool.xfy9326.milink.nfc.protocol
+
+import android.content.Intent
+import android.nfc.NdefMessage
+import android.nfc.NfcAdapter
+import androidx.core.content.IntentCompat
+import tool.xfy9326.milink.nfc.utils.toHexString
+
+object HuaweiNfc {
+    private const val BT_MAC_START_IDX = 2
+    private const val BT_MAC_END_IDX = 8
+
+    @Suppress("SpellCheckingInspection")
+    private const val MIME_NDEF_MSG = "application/vnd.huawei.handoff.ndefmsg"
+    private const val NFC_URI_AUTHORITY = "consumer.huawei.com"
+    private const val NFC_URI_PATH = "/en/support/huaweisharewelcome/"
+
+    const val NFC_URI_CONTENT = "$NFC_URI_AUTHORITY$NFC_URI_PATH"
+
+    fun parseBtMac(intent: Intent): String? =
+        IntentCompat.getParcelableArrayExtra(intent, NfcAdapter.EXTRA_NDEF_MESSAGES, NdefMessage::class.java)
+            ?.filterIsInstance<NdefMessage>()?.asSequence()?.flatMap {
+                it.records.asSequence()
+            }?.filterNotNull()?.find {
+                it.toMimeType() == MIME_NDEF_MSG
+            }?.payload?.let(this::getBluetoothMac)?.toHexString(true)
+
+    private fun getBluetoothMac(payload: ByteArray) =
+        payload.copyOfRange(BT_MAC_START_IDX, BT_MAC_END_IDX)
+}
