@@ -63,63 +63,64 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun writeNfcTag(tag: Tag, writeData: NdefWriteData) {
-        try {
-            Ndef.get(tag)?.use {
-                try {
-                    it.connect()
-                    require(it.isConnected)
-                } catch (e: Exception) {
-                    showToastOnUiThread(getString(R.string.nfc_connect_failed))
-                    return@use
-                }
-                if (!it.isWritable) {
-                    showToastOnUiThread(getString(R.string.nfc_write_error_not_writeable))
-                    return@use
-                }
-                if (writeData.readOnly && !it.canMakeReadOnly()) {
-                    showToastOnUiThread(getString(R.string.nfc_write_error_no_read_only))
-                    return@use
-                }
-                if (writeData.ndefMsg.byteArrayLength > it.maxSize) {
-                    showToastOnUiThread(getString(R.string.nfc_write_error_max_size))
-                    return@use
-                }
-                try {
-                    it.writeNdefMessage(writeData.ndefMsg)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    showToastOnUiThread(getString(R.string.nfc_write_error))
-                    return@use
-                }
-                if (writeData.readOnly) {
+        val ndef = Ndef.get(tag)
+        if (ndef != null) {
+            try {
+                ndef.use {
                     try {
-                        if (!it.makeReadOnly()) {
-                            showToastOnUiThread(getString(R.string.nfc_write_error_read_only))
-                            return@use
-                        }
+                        it.connect()
+                        require(it.isConnected)
                     } catch (e: Exception) {
-                        e.printStackTrace()
-                        showToastOnUiThread(getString(R.string.nfc_write_error))
-                        return@use
+                        showToastOnUiThread(getString(R.string.nfc_connect_failed))
+                        return
                     }
-                }
-                nfcAdapter.ignoreTagUntilRemoved(tag)
-                if (writeData.readOnly) {
-                    viewModel.closeNfcWriteDialog()
+                    if (!it.isWritable) {
+                        showToastOnUiThread(getString(R.string.nfc_write_error_not_writeable))
+                        return
+                    }
+                    if (writeData.readOnly && !it.canMakeReadOnly()) {
+                        showToastOnUiThread(getString(R.string.nfc_write_error_no_read_only))
+                        return
+                    }
+                    if (writeData.ndefMsg.byteArrayLength > it.maxSize) {
+                        showToastOnUiThread(getString(R.string.nfc_write_error_max_size))
+                        return
+                    }
+                    try {
+                        it.writeNdefMessage(writeData.ndefMsg)
+                    } catch (e: Exception) {
+                        showToastOnUiThread(getString(R.string.nfc_write_error))
+                        return
+                    }
+                    if (writeData.readOnly) {
+                        try {
+                            if (!it.makeReadOnly()) {
+                                showToastOnUiThread(getString(R.string.nfc_write_error_read_only))
+                                return
+                            }
+                        } catch (e: Exception) {
+                            showToastOnUiThread(getString(R.string.nfc_write_error_read_only))
+                            return
+                        }
+                    }
                 }
                 showToastOnUiThread(getString(R.string.nfc_write_success))
-            } ?: showToastOnUiThread(getString(R.string.nfc_ndef_not_supported))
-        } catch (e: Exception) {
-            e.printStackTrace()
-            showToastOnUiThread(
-                buildString {
-                    append(getString(R.string.nfc_write_error_unknown))
-                    e.message?.let {
-                        appendLine()
-                        append(it)
+                nfcAdapter.ignoreTagUntilRemoved(tag)
+                if (writeData.readOnly) viewModel.closeNfcWriteDialog()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                showToastOnUiThread(
+                    buildString {
+                        append(getString(R.string.nfc_write_error_unknown))
+                        e.message.takeUnless { it.isNullOrBlank() }?.let {
+                            appendLine()
+                            append(it)
+                        }
                     }
-                }
-            )
+                )
+            }
+        } else {
+            showToastOnUiThread(getString(R.string.nfc_ndef_not_supported))
         }
     }
 

@@ -4,8 +4,6 @@ import android.app.StatusBarManager
 import android.content.ComponentName
 import android.content.Context
 import android.graphics.drawable.Icon
-import android.nfc.NdefMessage
-import android.nfc.NdefRecord
 import android.os.Build
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
@@ -38,6 +36,7 @@ import tool.xfy9326.milink.nfc.db.AppSettings
 import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
 import tool.xfy9326.milink.nfc.service.MiShareTileService
 import tool.xfy9326.milink.nfc.utils.EMPTY
+import tool.xfy9326.milink.nfc.utils.EmptyNdefMessage
 import tool.xfy9326.milink.nfc.utils.isValidMacAddress
 import tool.xfy9326.milink.nfc.utils.isXiaomiHyperOS
 
@@ -161,7 +160,7 @@ class MainViewModel : ViewModel() {
                 _uiState.update {
                     it.copy(
                         ndefWriteDialogData = NdefWriteData(
-                            ndefMsg = NdefMessage(NdefRecord(NdefRecord.TNF_EMPTY, null, null, null)),
+                            ndefMsg = EmptyNdefMessage,
                             readOnly = false
                         )
                     )

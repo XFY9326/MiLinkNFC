@@ -1,7 +1,5 @@
 package tool.xfy9326.milink.nfc.ui.dialog
 
-import android.nfc.NdefMessage
-import android.nfc.NdefRecord
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -31,6 +29,7 @@ import tool.xfy9326.milink.nfc.data.NdefWriteData
 import tool.xfy9326.milink.nfc.ui.common.DialogContentSurface
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.theme.LocalAppThemeTypography
+import tool.xfy9326.milink.nfc.utils.EmptyNdefMessage
 
 @Preview(showBackground = true)
 @Composable
@@ -38,7 +37,7 @@ private fun Preview() {
     AppTheme {
         NdefWriterDialog(
             ndefData = NdefWriteData(
-                ndefMsg = NdefMessage(NdefRecord(NdefRecord.TNF_EMPTY, null, null, null)),
+                ndefMsg = EmptyNdefMessage,
                 readOnly = false
             ),
             onOpenReader = {},

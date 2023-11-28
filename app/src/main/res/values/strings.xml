@@ -12,7 +12,7 @@
     <string name="nfc_connect_failed">NFC标签连接失败</string>
     <string name="nfc_ndef_not_supported">不支持NDEF的NFC标签</string>
     <string name="nfc_write_error">NFC标签写入失败</string>
-    <string name="nfc_write_error_unknown">未知NFC标签写入错误</string>
+    <string name="nfc_write_error_unknown">NFC标签未知错误</string>
     <string name="nfc_write_error_read_only">NFC标签设置只读失败</string>
     <string name="nfc_write_error_max_size">NFC标签写入空间不足</string>
     <string name="nfc_write_error_no_read_only">NFC标签不可设为只读</string>
