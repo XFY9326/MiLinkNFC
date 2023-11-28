@@ -111,7 +111,15 @@ class MainActivity : ComponentActivity() {
             } ?: showToastOnUiThread(getString(R.string.nfc_ndef_not_supported))
         } catch (e: Exception) {
             e.printStackTrace()
-            showToastOnUiThread(getString(R.string.nfc_write_error_unknown))
+            showToastOnUiThread(
+                buildString {
+                    append(getString(R.string.nfc_write_error_unknown))
+                    e.message?.let {
+                        appendLine()
+                        append(it)
+                    }
+                }
+            )
         }
     }
 
