@@ -5,6 +5,7 @@ import android.nfc.NdefMessage
 import android.nfc.NdefRecord
 import android.nfc.NfcAdapter
 import android.nfc.Tag
+import android.nfc.tech.TagTechnology
 import androidx.core.os.bundleOf
 
 private const val NFC_TAG_IGNORE_MILLS = 1000
@@ -26,3 +27,9 @@ fun NfcAdapter.ignoreTagUntilRemoved(tag: Tag) =
     runCatching {
         ignore(tag, NFC_TAG_IGNORE_MILLS, null, null)
     }.getOrDefault(false)
+
+fun <T : TagTechnology> T.tryConnect(): Result<T> = runCatching {
+    if (!isConnected) connect()
+    require(isConnected)
+    this
+}

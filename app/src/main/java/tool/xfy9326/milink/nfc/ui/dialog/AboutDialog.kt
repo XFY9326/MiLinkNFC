@@ -32,6 +32,7 @@ import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.ui.common.DialogContentSurface
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.theme.LocalAppThemeTypography
+import tool.xfy9326.milink.nfc.utils.SPACE
 
 @Preview(showBackground = true)
 @Composable
@@ -41,7 +42,8 @@ private fun Preview() {
     }
 }
 
-private const val TAG_URL = "URL"
+private const val TAG_GITHUB_URL = "URL"
+private const val TAG_GITEE_URL = "GITEE_URL"
 
 @Composable
 fun AboutDialog(onDismissRequest: () -> Unit) {
@@ -50,9 +52,15 @@ fun AboutDialog(onDismissRequest: () -> Unit) {
 
     val openSourceText = buildAnnotatedString {
         append(stringResource(id = R.string.open_source))
-        pushStringAnnotation(tag = TAG_URL, annotation = stringResource(id = R.string.code_url))
+        pushStringAnnotation(tag = TAG_GITHUB_URL, annotation = stringResource(id = R.string.code_url_github))
         withStyle(style = SpanStyle(color = Color.Blue, textDecoration = TextDecoration.Underline)) {
-            append(stringResource(id = R.string.code_platform))
+            append(stringResource(id = R.string.code_platform_github))
+        }
+        append(SPACE)
+        append(SPACE)
+        pushStringAnnotation(tag = TAG_GITEE_URL, annotation = stringResource(id = R.string.code_url_gitee))
+        withStyle(style = SpanStyle(color = Color.Blue, textDecoration = TextDecoration.Underline)) {
+            append(stringResource(id = R.string.code_platform_gitee))
         }
         pop()
     }
@@ -89,10 +97,14 @@ fun AboutDialog(onDismissRequest: () -> Unit) {
                         text = openSourceText,
                         style = typography.bodyMedium
                     ) { offset ->
-                        openSourceText.getStringAnnotations(tag = TAG_URL, start = offset, end = offset).firstOrNull()?.let {
+                        openSourceText.getStringAnnotations(tag = TAG_GITHUB_URL, start = offset, end = offset).firstOrNull()?.let {
+                            uriHandler.openUri(it.item)
+                        }
+                        openSourceText.getStringAnnotations(tag = TAG_GITEE_URL, start = offset, end = offset).firstOrNull()?.let {
                             uriHandler.openUri(it.item)
                         }
                     }
+                    Text(text = stringResource(id = R.string.open_source_license), style = typography.bodyMedium)
                 }
             }
         }

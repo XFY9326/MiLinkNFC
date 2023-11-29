@@ -9,8 +9,12 @@ import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
+import java.io.Closeable
 
 const val EMPTY = ""
+const val SPACE = " "
+
+inline fun <T : Closeable?, R> T.useCatching(block: T.() -> R): Result<R> = runCatching { use(block) }
 
 val Context.packageUri: Uri
     get() = Uri.parse("package:${packageName}")
