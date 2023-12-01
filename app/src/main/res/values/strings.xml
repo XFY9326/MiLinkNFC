@@ -60,6 +60,9 @@
     <string name="nfc_notification_service_description">监听并自动打开来自可被转为一碰妙享NFC标签的NFC通知</string>
     <string name="not_supported_os">不支持的系统</string>
     <string name="not_supported_os_desc">当前设备并非小米Hyper OS系统，本应用不保证运行稳定性。</string>
+    <string name="local_app_versions">本机应用版本</string>
+    <string name="local_app_versions_desc">一碰妙享镜像投屏功能需要设备上对应应用版本升级到最新版</string>
+    <string name="missing_package">缺少应用：%1$s</string>
     <string name="exit">退出</string>
 
     <string name="version" translatable="false">%1$s (%2$d)</string>

@@ -47,6 +47,11 @@ object XiaomiNfc {
     private const val NFC_EXTERNAL_TYPE = "com.xiaomi.mi_connect_service:externaltype"
     private val nfcExternalUri by lazy { "vnd.android.nfc://ext/$NFC_EXTERNAL_TYPE".toUri() }
 
+    val MI_LINK_PACKAGE_NAMES = arrayOf(
+        "com.xiaomi.mi_connect_service",
+        "com.milink.service",
+    )
+
     fun createNdefMsg(nfcDeviceType: NfcDeviceType, btMac: String): NdefMessage {
         val payload = buildNfcPayload(nfcDeviceType, btMac)
         val record = NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE, NFC_EXTERNAL_TYPE.toByteArray(Charsets.US_ASCII), null, payload)

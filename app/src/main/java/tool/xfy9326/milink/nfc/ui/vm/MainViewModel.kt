@@ -21,9 +21,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
+import tool.xfy9326.milink.nfc.AppContext
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.data.HuaweiRedirectData
 import tool.xfy9326.milink.nfc.data.NdefWriteData
+import tool.xfy9326.milink.nfc.data.PackageData
 import tool.xfy9326.milink.nfc.data.XiaomiDeviceType
 import tool.xfy9326.milink.nfc.data.XiaomiMirrorData
 import tool.xfy9326.milink.nfc.data.XiaomiMirrorType
@@ -37,6 +39,7 @@ import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
 import tool.xfy9326.milink.nfc.service.MiShareTileService
 import tool.xfy9326.milink.nfc.utils.EMPTY
 import tool.xfy9326.milink.nfc.utils.EmptyNdefMessage
+import tool.xfy9326.milink.nfc.utils.getPackageData
 import tool.xfy9326.milink.nfc.utils.isValidMacAddress
 import tool.xfy9326.milink.nfc.utils.isXiaomiHyperOS
 
@@ -72,7 +75,8 @@ class MainViewModel : ViewModel() {
             AppSettings.GlobalDefaults.huaweiRedirectMirrorIntent.toXiaomiMirrorType(),
         ),
         val ndefWriteDialogData: NdefWriteData? = null,
-        val showNotSupportedOSDialog: Boolean = false
+        val showNotSupportedOSDialog: Boolean = false,
+        val miLinkPackageDialogData: Map<String, PackageData?>? = null,
     )
 
     private val nfcUsing = Semaphore(1)
@@ -171,7 +175,7 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun closeNfcWriteDialog() {
+    fun cancelWriteNfc() {
         viewModelScope.launch {
             try {
                 nfcUsing.release()
@@ -193,6 +197,26 @@ class MainViewModel : ViewModel() {
     fun onCloseNfcReader() {
         viewModelScope.launch {
             _nfcWriteData.update { null }
+        }
+    }
+
+    fun openMiLinkVersionDialog() {
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    miLinkPackageDialogData = XiaomiNfc.MI_LINK_PACKAGE_NAMES.associateWith { pkgName ->
+                        AppContext.getPackageData(pkgName)
+                    }
+                )
+            }
+        }
+    }
+
+    fun closeMiLinkVersionDialog() {
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(miLinkPackageDialogData = null)
+            }
         }
     }
 

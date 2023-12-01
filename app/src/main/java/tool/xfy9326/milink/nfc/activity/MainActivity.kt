@@ -134,7 +134,7 @@ class MainActivity : ComponentActivity() {
             }.onSuccess {
                 makeToast(getString(R.string.nfc_write_success))
                 nfcAdapter.ignoreTagUntilRemoved(ndef.tag)
-                if (writeData.readOnly) viewModel.closeNfcWriteDialog()
+                if (writeData.readOnly) viewModel.cancelWriteNfc()
             }.onFailure { throwable ->
                 makeToast(
                     buildString {

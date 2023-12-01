@@ -98,7 +98,7 @@ protobuf {
 }
 
 dependencies {
-    // KotlinX Coroutines
+    // Kotlin
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
     // Protocol Buffer
@@ -109,7 +109,6 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
 
     // AndroidX
-    implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.datastore:datastore:1.0.0")
     implementation("androidx.activity:activity-compose:1.8.1")
 
@@ -120,6 +119,10 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
+
+    // Compose Accompanist
+    val accompanist = "0.33.2-alpha"
+    implementation("com.google.accompanist:accompanist-drawablepainter:$accompanist")
 
     // AndroidX Compose Lifecycle
     val lifecycleVersion = "2.6.2"

@@ -1,28 +1,22 @@
 package tool.xfy9326.milink.nfc.ui.screen
 
 import android.os.Build
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AppShortcut
 import androidx.compose.material.icons.filled.BluetoothSearching
 import androidx.compose.material.icons.filled.Cast
 import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Save
@@ -31,7 +25,6 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -53,7 +46,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -68,17 +60,18 @@ import tool.xfy9326.milink.nfc.data.XiaomiDeviceType
 import tool.xfy9326.milink.nfc.data.XiaomiMirrorData
 import tool.xfy9326.milink.nfc.data.XiaomiNFCTagData
 import tool.xfy9326.milink.nfc.service.NfcNotificationListenerService
+import tool.xfy9326.milink.nfc.ui.common.FunctionCard
 import tool.xfy9326.milink.nfc.ui.common.IconTextButton
 import tool.xfy9326.milink.nfc.ui.common.MacAddressTextField
 import tool.xfy9326.milink.nfc.ui.common.MiConnectActionSettings
 import tool.xfy9326.milink.nfc.ui.common.MirrorDataController
 import tool.xfy9326.milink.nfc.ui.common.SelectorTextField
 import tool.xfy9326.milink.nfc.ui.dialog.AboutDialog
+import tool.xfy9326.milink.nfc.ui.dialog.MiLinkVersionDialog
 import tool.xfy9326.milink.nfc.ui.dialog.NdefWriterDialog
 import tool.xfy9326.milink.nfc.ui.dialog.NotSupportedOSDialog
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.theme.LocalAppThemeColorScheme
-import tool.xfy9326.milink.nfc.ui.theme.LocalAppThemeTypography
 import tool.xfy9326.milink.nfc.ui.vm.MainViewModel
 import tool.xfy9326.milink.nfc.utils.openAppSettings
 import tool.xfy9326.milink.nfc.utils.openNotificationServiceSettings
@@ -108,45 +101,40 @@ fun MainScreen(
         topBar = { TopBar() },
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
     ) { innerPadding ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(contentScrollState),
-            contentAlignment = Alignment.TopCenter
+                .verticalScroll(contentScrollState)
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+                .displayCutoutPadding()
+                .padding(horizontal = 8.dp, vertical = 4.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding)
-                    .displayCutoutPadding()
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                WriteNfcFunctionCard(
-                    nfcTagData = uiState.value.defaultNFCTagData,
-                    onRequestWriteNfc = viewModel::requestWriteNfc,
-                    onRequestClearNfc = viewModel::requestClearNfc
-                )
-                ScreenMirrorFunctionCard(
-                    mirrorData = uiState.value.defaultScreenMirrorData,
-                    onSendScreenMirror = { viewModel.sendScreenMirror(context, it) }
-                )
-                TilesFunctionCard(
-                    mirrorData = uiState.value.tilesMirrorData,
-                    onChanged = viewModel::updateTilesMirrorData,
-                    onRequestAddTiles = { viewModel.requestAddTiles(context) },
-                    onSave = viewModel::saveTilesMirrorData
-                )
-                HuaweiRedirectFunctionCard(
-                    redirectData = uiState.value.huaweiRedirectData,
-                    onChanged = viewModel::updateHuaweiRedirectData,
-                    onSave = viewModel::saveHuaweiRedirectData
-                )
-            }
+            WriteNfcFunctionCard(
+                nfcTagData = uiState.value.defaultNFCTagData,
+                onRequestWriteNfc = viewModel::requestWriteNfc,
+                onRequestClearNfc = viewModel::requestClearNfc
+            )
+            ScreenMirrorFunctionCard(
+                mirrorData = uiState.value.defaultScreenMirrorData,
+                onOpenMiLinkVersionDialog = viewModel::openMiLinkVersionDialog,
+                onSendScreenMirror = { viewModel.sendScreenMirror(context, it) }
+            )
+            TilesFunctionCard(
+                mirrorData = uiState.value.tilesMirrorData,
+                onChanged = viewModel::updateTilesMirrorData,
+                onRequestAddTiles = { viewModel.requestAddTiles(context) },
+                onSave = viewModel::saveTilesMirrorData
+            )
+            HuaweiRedirectFunctionCard(
+                redirectData = uiState.value.huaweiRedirectData,
+                onChanged = viewModel::updateHuaweiRedirectData,
+                onSave = viewModel::saveHuaweiRedirectData
+            )
         }
     }
-    MsgHandler(
+    EventHandler(
         snackBarHostState = snackBarHostState,
         viewModel = viewModel
     )
@@ -155,7 +143,13 @@ fun MainScreen(
             ndefData = it,
             onOpenReader = viewModel::onOpenNFCReader,
             onCloseReader = viewModel::onCloseNfcReader,
-            onDismissRequest = viewModel::closeNfcWriteDialog
+            onDismissRequest = viewModel::cancelWriteNfc
+        )
+    }
+    uiState.value.miLinkPackageDialogData?.let {
+        MiLinkVersionDialog(
+            packageData = it,
+            onDismissRequest = viewModel::closeMiLinkVersionDialog
         )
     }
     if (uiState.value.showNotSupportedOSDialog) {
@@ -167,7 +161,7 @@ fun MainScreen(
 }
 
 @Composable
-private fun MsgHandler(
+private fun EventHandler(
     snackBarHostState: SnackbarHostState,
     viewModel: MainViewModel,
 ) {
@@ -320,6 +314,7 @@ private fun WriteNfcFunctionCard(
 @Composable
 private fun ScreenMirrorFunctionCard(
     mirrorData: XiaomiMirrorData,
+    onOpenMiLinkVersionDialog: () -> Unit,
     onSendScreenMirror: (XiaomiMirrorData) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
@@ -332,6 +327,9 @@ private fun ScreenMirrorFunctionCard(
             .padding(8.dp),
         icon = Icons.Default.BluetoothSearching,
         iconDescription = stringResource(id = R.string.bt_screen_mirror),
+        helpIcon = Icons.Default.HelpOutline,
+        helpIconDescription = stringResource(id = R.string.local_app_versions),
+        onClickHelpIcon = onOpenMiLinkVersionDialog,
         title = stringResource(id = R.string.bt_screen_mirror),
         description = stringResource(id = R.string.bt_screen_mirror_desc)
     ) {
@@ -464,63 +462,6 @@ private fun HuaweiRedirectFunctionCard(
                 icon = Icons.Default.Save,
                 onClick = onSave
             )
-        }
-    }
-}
-
-@Composable
-private fun FunctionCard(
-    modifier: Modifier = Modifier,
-    icon: ImageVector,
-    iconDescription: String,
-    title: String,
-    description: String? = null,
-    innerPadding: PaddingValues = PaddingValues(18.dp),
-    onClick: () -> Unit = {},
-    content: (@Composable () -> Unit)? = null
-) {
-    val colorScheme = LocalAppThemeColorScheme.current
-    val typography = LocalAppThemeTypography.current
-
-    Card(
-        modifier = modifier,
-        onClick = onClick
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(innerPadding)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(14.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = iconDescription,
-                    modifier = Modifier
-                        .size(38.dp)
-                        .background(color = colorScheme.onSurfaceVariant, shape = CircleShape)
-                        .padding(8.dp),
-                    tint = colorScheme.inverseOnSurface
-                )
-                Text(text = title, style = typography.titleLarge)
-            }
-            if (description != null) {
-                Spacer(modifier = Modifier.height(20.dp))
-                Text(
-                    text = description,
-                    modifier = Modifier.padding(horizontal = 4.dp),
-                    style = typography.bodyMedium
-                )
-            }
-            if (content != null) {
-                Spacer(modifier = Modifier.height(20.dp))
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    content()
-                }
-            }
         }
     }
 }
