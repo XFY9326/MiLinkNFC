@@ -28,7 +28,7 @@
     <string name="tiles_add_success">磁贴添加成功</string>
     <string name="tiles_already_added">磁贴已添加</string>
     <string name="tiles_add_failed">磁贴添加失败</string>
-    <string name="huawei_nfc_redirect">转发华为NFC一碰妙享</string>
+    <string name="huawei_nfc_redirect">转发华为NFC一碰传</string>
     <string name="huawei_nfc_redirect_desc">使用小米一碰妙享处理华为电脑的一碰传所指向的蓝牙Mac地址的设备（需安装小米电脑管家）。\n\n默认情况下需要主动打开NFC弹出的网址通知才能触发，如果启用“通知监听服务”即可自动处理此类事件。\n\n由于系统后台运行限制，必须在应用设置中打开本应用的“自启动”功能，并将“省电策略”设置为“无限制”才可以保证后台运行时响应通知消息（将应用锁定在后台可以有更好的效果）。\n\n如果弹出“正在运行中”的通知，可以将此通知设置为不再显示（并不影响后台运行）。\n\n本应用开源并且无联网权限，后台运行时只会处理指定NFC标签的通知，并不会产生大量耗电。</string>
     <string name="open_app_settings_for_autostart">打开应用设置</string>
     <string name="open_notification_service_settings">打开“通知监听服务”设置</string>
