@@ -5,6 +5,7 @@ import android.nfc.Tag
 import android.nfc.tech.Ndef
 import android.nfc.tech.NdefFormatable
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -16,6 +17,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import tool.xfy9326.milink.nfc.AppContext
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.data.NdefWriteData
 import tool.xfy9326.milink.nfc.ui.screen.MainScreen
@@ -29,7 +31,11 @@ import tool.xfy9326.milink.nfc.utils.useCatching
 
 class MainActivity : ComponentActivity() {
     private val nfcAdapter by lazy {
-        NfcAdapter.getDefaultAdapter(this)
+        NfcAdapter.getDefaultAdapter(this).also {
+            if (it == null) {
+                Toast.makeText(AppContext, R.string.no_nfc, Toast.LENGTH_LONG).show()
+            }
+        }
     }
     private val viewModel by viewModels<MainViewModel>()
 
@@ -39,9 +45,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AppTheme {
-                MainScreen {
-                    finishAndRemoveTask()
-                }
+                MainScreen(onExit = { finishAndRemoveTask() })
             }
         }
         setupNfcReaderListener()
@@ -63,7 +67,7 @@ class MainActivity : ComponentActivity() {
         }
 
     private fun openNdefReader(writeData: NdefWriteData) {
-        nfcAdapter.enableNdefReaderMode(this) {
+        nfcAdapter?.enableNdefReaderMode(this) {
             handleNfcTag(it, writeData)
         }
     }
@@ -89,7 +93,7 @@ class MainActivity : ComponentActivity() {
             it.useCatching {
                 format(null)
             }.onSuccess {
-                nfcAdapter.ignoreTagUntilRemoved(ndefFormatable.tag)
+                nfcAdapter?.ignoreTagUntilRemoved(ndefFormatable.tag)
                 makeToast(getString(R.string.nfc_ndef_format_success))
             }.onFailure {
                 makeToast(getString(R.string.nfc_ndef_format_failed))
@@ -133,7 +137,7 @@ class MainActivity : ComponentActivity() {
                 }
             }.onSuccess {
                 makeToast(getString(R.string.nfc_write_success))
-                nfcAdapter.ignoreTagUntilRemoved(ndef.tag)
+                nfcAdapter?.ignoreTagUntilRemoved(ndef.tag)
                 if (writeData.readOnly) viewModel.cancelWriteNfc()
             }.onFailure { throwable ->
                 makeToast(
@@ -152,6 +156,6 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun closeNdefReader() {
-        nfcAdapter.disableReaderMode(this)
+        nfcAdapter?.disableReaderMode(this)
     }
 }

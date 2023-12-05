@@ -15,6 +15,7 @@
 
     <style name="AppTheme.LaunchScreen.Base" parent="Theme.SplashScreen">
         <item name="postSplashScreenTheme">@style/AppTheme</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_round</item>
     </style>
 
     <style name="AppTheme.LaunchScreen.DayNight" parent="AppTheme.LaunchScreen.Base">
