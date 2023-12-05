@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package proto;
 
+import "google/protobuf/wrappers.proto";
+
 option java_package = "tool.xfy9326.milink.nfc.proto";
 option java_outer_classname = "AppSettingsProto";
 option java_multiple_files = false;
@@ -27,4 +29,6 @@ message GlobalSettings {
   NfcDevice huaweiRedirectNfcDevice = 4;
   MirrorIntent huaweiRedirectMirrorIntent = 5;
   bool confirmedNotSupportedOSAlert = 6;
+  google.protobuf.BoolValue tilesEnableLyra = 7;
+  google.protobuf.BoolValue huaweiRedirectEnableLyra = 8;
 }

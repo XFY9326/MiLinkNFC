@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -37,27 +38,35 @@ private fun Preview() {
 
     AppTheme {
         MiLinkVersionDialog(
-            packageData = mapOf(
-                "com.example.app1" to PackageData(
-                    applicationName = "Example",
-                    packageName = "com.example.app1",
-                    versionCode = 1234,
-                    versionName = "1.0.0",
-                    icon = ContextCompat.getDrawable(context, R.drawable.ic_logo_24)!!
-                ),
-                "com.example.app2" to null
+            dialogData = MiLinkVersionDialogData(
+                lyraSupported = false,
+                packageData = mapOf(
+                    "com.example.app1" to PackageData(
+                        applicationName = "Example",
+                        packageName = "com.example.app1",
+                        versionCode = 1234,
+                        versionName = "1.0.0",
+                        icon = ContextCompat.getDrawable(context, R.drawable.ic_logo_24)!!
+                    ),
+                    "com.example.app2" to null
+                )
             ),
             onDismissRequest = {}
         )
     }
 }
 
+data class MiLinkVersionDialogData(
+    val lyraSupported: Boolean,
+    val packageData: Map<String, PackageData?>,
+)
+
 @Composable
 fun MiLinkVersionDialog(
-    packageData: Map<String, PackageData?>,
+    dialogData: MiLinkVersionDialogData,
     onDismissRequest: () -> Unit
 ) {
-    if (packageData.isNotEmpty()) {
+    if (dialogData.packageData.isNotEmpty()) {
         val typography = LocalAppThemeTypography.current
 
         val scrollState = rememberScrollState()
@@ -68,18 +77,24 @@ fun MiLinkVersionDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(text = stringResource(id = R.string.local_app_versions), style = typography.titleLarge)
+                    Spacer(modifier = Modifier.height(12.dp))
                     Text(text = stringResource(id = R.string.local_app_versions_desc), style = typography.bodyMedium)
-                    Spacer(modifier = Modifier.height(2.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = stringResource(id = if (dialogData.lyraSupported) R.string.has_lyra_ability else R.string.no_lyra_ability),
+                        color = if (dialogData.lyraSupported) LocalContentColor.current else Color.Red,
+                        style = typography.bodyMedium
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .verticalScroll(scrollState),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        for ((name, data) in packageData) {
+                        for ((name, data) in dialogData.packageData) {
                             PackageDataCard(name, data)
                         }
                     }

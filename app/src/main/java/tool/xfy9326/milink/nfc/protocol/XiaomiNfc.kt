@@ -11,7 +11,10 @@ import android.util.Base64
 import androidx.core.net.toUri
 import com.google.protobuf.ByteString
 import org.json.JSONObject
+import tool.xfy9326.milink.nfc.data.PackageData
 import tool.xfy9326.milink.nfc.proto.MiConnectProto
+import tool.xfy9326.milink.nfc.utils.getPackageData
+import tool.xfy9326.milink.nfc.utils.getPackageMetaData
 import java.io.ByteArrayOutputStream
 
 object XiaomiNfc {
@@ -42,24 +45,32 @@ object XiaomiNfc {
 
     private const val TAG_DISCOVERED_KEY_ACTION_SUFFIX = 101
     private const val TAG_DISCOVERED_KEY_BT_MAC = 1
+    private const val TAG_DISCOVERED_KEY_EXT_ABILITY = 121
+
+    private const val FLAG_ABILITY_LYRA = 0x00000001
 
     @Suppress("SpellCheckingInspection")
     private const val NFC_EXTERNAL_TYPE = "com.xiaomi.mi_connect_service:externaltype"
     private val nfcExternalUri by lazy { "vnd.android.nfc://ext/$NFC_EXTERNAL_TYPE".toUri() }
 
-    val MI_LINK_PACKAGE_NAMES = arrayOf(
-        "com.xiaomi.mi_connect_service",
-        "com.milink.service",
+    private const val PKG_MI_LINK_SERVICE = "com.milink.service"
+    private const val PKG_MI_CONNECT_SERVICE = "com.xiaomi.mi_connect_service"
+
+    private const val PKG_META_DATA_XIAOMI_CONTINUITY_VERSION_NAME = "com.xiaomi.continuity.VERSION_NAME"
+
+    private val ONE_HOP_RELATED_PACKAGE_NAMES = arrayOf(
+        PKG_MI_LINK_SERVICE,
+        PKG_MI_CONNECT_SERVICE,
     )
 
-    fun createNdefMsg(nfcDeviceType: NfcDeviceType, btMac: String): NdefMessage {
-        val payload = buildNfcPayload(nfcDeviceType, btMac)
+    fun createNdefMsg(nfcDeviceType: NfcDeviceType, btMac: String, enableLyra: Boolean): NdefMessage {
+        val payload = buildNfcPayload(nfcDeviceType, btMac, enableLyra)
         val record = NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE, NFC_EXTERNAL_TYPE.toByteArray(Charsets.US_ASCII), null, payload)
         return NdefMessage(record)
     }
 
-    fun newNdefActivityIntent(tag: Tag?, id: ByteArray?, nfcDeviceType: NfcDeviceType, btMac: String): Intent {
-        val messages = arrayOf(createNdefMsg(nfcDeviceType, btMac))
+    fun newNdefActivityIntent(tag: Tag?, id: ByteArray?, nfcDeviceType: NfcDeviceType, btMac: String, enableLyra: Boolean): Intent {
+        val messages = arrayOf(createNdefMsg(nfcDeviceType, btMac, enableLyra))
         return Intent(NfcAdapter.ACTION_NDEF_DISCOVERED).apply {
             data = nfcExternalUri
             putExtra(NfcAdapter.EXTRA_TAG, tag)
@@ -69,8 +80,8 @@ object XiaomiNfc {
     }
 
     @SuppressLint("WrongConstant")
-    fun sendConnectServiceBroadcast(context: Context, nfcDeviceType: NfcDeviceType, btMac: String) {
-        val payload = buildNfcMirrorPayload(btMac)
+    fun sendConnectServiceBroadcast(context: Context, nfcDeviceType: NfcDeviceType, btMac: String, enableLyra: Boolean) {
+        val payload = buildNfcMirrorPayload(btMac, enableLyra)
         val jsonObject = JSONObject().apply {
             put(KEY_DEVICE_TYPE, nfcDeviceType.value)
             put(KEY_PROTOCOL_PAYLOAD, Base64.encodeToString(payload, Base64.DEFAULT))
@@ -86,7 +97,16 @@ object XiaomiNfc {
         }
     }
 
-    private fun buildNfcPayload(nfcDeviceType: NfcDeviceType, btMac: String): ByteArray {
+    fun getRelatedPackageDataMap(context: Context): Map<String, PackageData?> =
+        ONE_HOP_RELATED_PACKAGE_NAMES.associateWith { pkgName ->
+            context.getPackageData(pkgName)
+        }
+
+    fun isLocalDeviceSupportLyra(context: Context): Boolean {
+        return context.getPackageMetaData(PKG_MI_CONNECT_SERVICE)?.getString(PKG_META_DATA_XIAOMI_CONTINUITY_VERSION_NAME) != null
+    }
+
+    private fun buildNfcPayload(nfcDeviceType: NfcDeviceType, btMac: String, enableLyra: Boolean): ByteArray {
         val advData = MiConnectProto.AttrAdvData.newBuilder()
             .setVersionMajor(MI_CONNECT_MAJOR_VERSION)
             .setVersionMinor(MI_CONNECT_MINOR_VERSION)
@@ -94,7 +114,7 @@ object XiaomiNfc {
             .setName(MI_CONNECT_NAME)
             .setDeviceType(MI_CONNECT_DEVICE_TYPE)
             .addAppIds(MI_CONNECT_APP_ID)
-            .addAppsData(ByteString.copyFrom(buildNfcMirrorAppsData(nfcDeviceType, btMac)))
+            .addAppsData(ByteString.copyFrom(buildNfcMirrorAppsData(nfcDeviceType, btMac, enableLyra)))
             .build()
         return MiConnectProto.AttrOps.newBuilder()
             .setAdvData(advData)
@@ -102,7 +122,7 @@ object XiaomiNfc {
             .toByteArray()
     }
 
-    private fun buildNfcMirrorAppsData(nfcDeviceType: NfcDeviceType, btMac: String): ByteArray =
+    private fun buildNfcMirrorAppsData(nfcDeviceType: NfcDeviceType, btMac: String, enableLyra: Boolean): ByteArray =
         ByteArrayOutputStream().use {
             it.write(APPS_DATA_MAJOR_VERSION)
             it.write(APPS_DATA_MINOR_VERSION)
@@ -110,26 +130,30 @@ object XiaomiNfc {
             it.write(0)
             it.write(ACTION_SUFFIX_TAG_DISCOVERED.length)
             it.write(ACTION_SUFFIX_TAG_DISCOVERED.toByteArray(Charsets.UTF_8))
-            it.writeMap(buildNfcMirrorMap(btMac))
+            it.writeMap(buildNfcMirrorMap(btMac, enableLyra))
             it.toByteArray()
         }
 
-    private fun buildNfcMirrorPayload(btMac: String): ByteArray =
+    private fun buildNfcMirrorPayload(btMac: String, enableLyra: Boolean): ByteArray =
         ByteArrayOutputStream().use {
-            it.writeMap(buildNfcMirrorMap(btMac))
+            it.writeMap(buildNfcMirrorMap(btMac, enableLyra))
             it.toByteArray()
         }
 
-    private fun buildNfcMirrorMap(btMac: String): Map<Int, String> = mapOf(
-        TAG_DISCOVERED_KEY_ACTION_SUFFIX to ACTION_SUFFIX_MIRROR,
-        TAG_DISCOVERED_KEY_BT_MAC to btMac
-    )
+    private fun buildNfcMirrorMap(btMac: String, enableLyra: Boolean): Map<Int, BytesValue> = mutableMapOf(
+        TAG_DISCOVERED_KEY_ACTION_SUFFIX to BytesValue(ACTION_SUFFIX_MIRROR),
+        TAG_DISCOVERED_KEY_BT_MAC to BytesValue(btMac)
+    ).also {
+        if (enableLyra) {
+            it[TAG_DISCOVERED_KEY_EXT_ABILITY] = BytesValue(FLAG_ABILITY_LYRA)
+        }
+    }
 
-    private fun ByteArrayOutputStream.writeMap(map: Map<Int, String>) {
+    private fun ByteArrayOutputStream.writeMap(map: Map<Int, BytesValue>) {
         for ((key, value) in map) {
             write(key)
             write(value.length)
-            write(value.toByteArray(Charsets.UTF_8))
+            write(value.bytes)
         }
     }
 
@@ -138,6 +162,16 @@ object XiaomiNfc {
         write(value shr 16)
         write(value shr 8)
         write(value shr 0)
+    }
+
+    @JvmInline
+    private value class BytesValue(val bytes: ByteArray) {
+        constructor(byte: Int) : this(byte.toByte())
+        constructor(byte: Byte) : this(byteArrayOf(byte))
+        constructor(str: String) : this(str.toByteArray(Charsets.UTF_8))
+
+        val length: Int
+            get() = bytes.size
     }
 
     enum class NfcDeviceType(val value: Int) {

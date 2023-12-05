@@ -40,5 +40,7 @@ object AppSettings {
         val tilesMirrorIntent = MirrorIntent.MI_CONNECT_SERVICE
         val huaweiRedirectNfcDevice = NfcDevice.PC
         val huaweiRedirectMirrorIntent = MirrorIntent.FAKE_NFC_TAG
+        const val tilesEnableLyra = true
+        const val huaweiRedirectEnableLyra = true
     }
 }

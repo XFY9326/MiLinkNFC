@@ -7,11 +7,13 @@ import tool.xfy9326.milink.nfc.proto.AppSettingsProto
 
 data class HuaweiRedirectData(
     val deviceType: XiaomiDeviceType,
-    val mirrorType: XiaomiMirrorType
+    val mirrorType: XiaomiMirrorType,
+    val enableLyra: Boolean
 )
 
 fun Flow<AppSettingsProto.GlobalSettings>.getHuaweiRedirectData(): Flow<HuaweiRedirectData> = map {
     val deviceType = it.huaweiRedirectNfcDevice.toXiaomiDeviceType(AppSettings.GlobalDefaults.huaweiRedirectNfcDevice)
     val mirrorIntent = it.huaweiRedirectMirrorIntent.toXiaomiMirrorType(AppSettings.GlobalDefaults.huaweiRedirectMirrorIntent)
-    HuaweiRedirectData(deviceType, mirrorIntent)
+    val enableLyra = if (it.hasHuaweiRedirectEnableLyra()) it.huaweiRedirectEnableLyra.value else AppSettings.GlobalDefaults.huaweiRedirectEnableLyra
+    HuaweiRedirectData(deviceType, mirrorIntent, enableLyra)
 }

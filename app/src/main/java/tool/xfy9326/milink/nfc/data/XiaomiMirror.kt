@@ -14,7 +14,8 @@ import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
 data class XiaomiMirrorData(
     val deviceType: XiaomiDeviceType,
     val mirrorType: XiaomiMirrorType,
-    val btMac: String
+    val btMac: String,
+    val enableLyra: Boolean
 ) : Parcelable
 
 enum class XiaomiDeviceType(
@@ -40,7 +41,8 @@ fun Flow<AppSettingsProto.GlobalSettings>.getTilesXiaomiMirrorData(): Flow<Xiaom
     val deviceType = it.tilesNfcDevice.toXiaomiDeviceType(AppSettings.GlobalDefaults.tilesNfcDevice)
     val mirrorIntent = it.tilesMirrorIntent.toXiaomiMirrorType(AppSettings.GlobalDefaults.tilesMirrorIntent)
     val btMac = it.tilesNfcBtMac
-    XiaomiMirrorData(deviceType, mirrorIntent, btMac)
+    val enableLyra = if (it.hasTilesEnableLyra()) it.tilesEnableLyra.value else AppSettings.GlobalDefaults.tilesEnableLyra
+    XiaomiMirrorData(deviceType, mirrorIntent, btMac, enableLyra)
 }
 
 fun AppSettingsProto.MirrorIntent.toXiaomiMirrorType(default: AppSettingsProto.MirrorIntent? = null): XiaomiMirrorType {

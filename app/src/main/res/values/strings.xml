@@ -4,7 +4,7 @@
     <string name="author">作者：%1$s</string>
     <string name="open_source">项目开源：</string>
     <string name="open_source_license">开源协议：MIT</string>
-    <string name="write_nfc">NFC标签</string>
+    <string name="write_nfc">写入NFC标签</string>
     <string name="write_nfc_desc">向NFC标签中覆盖写入小米一碰妙享的数据，仅支持NDEF格式的NFC标签。\n\n如果写入失败，可能是因为写入NFC标签时连接断开，请多尝试几次。\n\n如果投屏时多次出现连接失败，可以使用“测试屏幕镜像”功能并尝试重启小米电脑管家。\n\n“清空”功能不会完全抹除旧数据，依然有数据残留。</string>
     <string name="put_and_write_nfc_tag">靠近NFC标签以写入数据</string>
     <string name="put_and_write_nfc_tag_read_only">靠近NFC标签以写入只读数据</string>
@@ -22,7 +22,7 @@
     <string name="nfc_write_error_no_read_only">不可设为只读</string>
     <string name="nfc_write_error_not_writeable">不可写入</string>
     <string name="bt_screen_mirror">测试屏幕镜像</string>
-    <string name="bt_screen_mirror_desc">模拟NFC一碰妙享，向指定蓝牙Mac地址的设备发送屏幕镜像（需安装小米电脑管家）。\n\n触发方式：\n“虚拟NFC标签”：可能使投屏服务出错，但不受系统版本限制。\n“互联互通服务”：直接控制投屏服务，但可能因为系统版本不符无法触发。</string>
+    <string name="bt_screen_mirror_desc">模拟NFC一碰妙享，向指定蓝牙Mac地址的设备发送屏幕镜像（需安装小米电脑管家）。\n\n触发方式：\n“虚拟NFC标签”：可能使投屏服务出错，但不受系统版本限制。\n“互联互通服务”：直接控制投屏服务，但可能因为系统版本不符无法触发。\n\nLyra连接：\n可以提高查找连接设备的速度并避免设备重复显示，但是并非所有设备的版本都支持。\n无特殊需求建议启用，但是使用前最好先测试一下。</string>
     <string name="tiles_screen_mirror">通知栏磁贴快捷操作</string>
     <string name="tiles_screen_mirror_desc">使用预设的触发方式，通过点击通知栏中的“一碰妙享”磁贴触发屏幕镜像。\n\n如果处于系统“文件”或“相册”应用中并选择了文件或图片，则可以触发文件发送功能。</string>
     <string name="tiles_add_success">磁贴添加成功</string>
@@ -55,6 +55,9 @@
     <string name="invalid_mac_address">Mac地址格式错误！</string>
     <string name="bt_mac_not_found">无法解析蓝牙Mac地址</string>
     <string name="bt_mac_not_set">未设置蓝牙Mac地址</string>
+    <string name="enable_lyra_ability">启用Lyra连接</string>
+    <string name="no_lyra_ability">本机当前版本不支持Lyra连接</string>
+    <string name="has_lyra_ability">本机当前版本支持Lyra连接</string>
     <string name="mi_share_tile_service">一碰妙享</string>
     <string name="nfc_notification_service">NFC通知监听服务</string>
     <string name="nfc_notification_service_description">监听并自动打开来自可被转为一碰妙享NFC标签的NFC通知</string>

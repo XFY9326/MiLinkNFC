@@ -111,15 +111,15 @@ fun MainScreen(
                 .padding(horizontal = 8.dp, vertical = 4.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
+            TestScreenMirrorFunctionCard(
+                mirrorData = uiState.value.defaultScreenMirrorData,
+                onOpenMiLinkVersionDialog = viewModel::openMiLinkVersionDialog,
+                onSendScreenMirror = { viewModel.sendScreenMirror(context, it) }
+            )
             WriteNfcFunctionCard(
                 nfcTagData = uiState.value.defaultNFCTagData,
                 onRequestWriteNfc = viewModel::requestWriteNfc,
                 onRequestClearNfc = viewModel::requestClearNfc
-            )
-            ScreenMirrorFunctionCard(
-                mirrorData = uiState.value.defaultScreenMirrorData,
-                onOpenMiLinkVersionDialog = viewModel::openMiLinkVersionDialog,
-                onSendScreenMirror = { viewModel.sendScreenMirror(context, it) }
             )
             TilesFunctionCard(
                 mirrorData = uiState.value.tilesMirrorData,
@@ -148,7 +148,7 @@ fun MainScreen(
     }
     uiState.value.miLinkPackageDialogData?.let {
         MiLinkVersionDialog(
-            packageData = it,
+            dialogData = it,
             onDismissRequest = viewModel::closeMiLinkVersionDialog
         )
     }
@@ -177,7 +177,6 @@ private fun EventHandler(
 @Composable
 private fun TopBar() {
     var openAboutDialog by remember { mutableStateOf(false) }
-
     TopAppBar(
         title = { Text(text = stringResource(id = R.string.app_name)) },
         actions = {
@@ -192,6 +191,52 @@ private fun TopBar() {
     if (openAboutDialog) {
         AboutDialog {
             openAboutDialog = false
+        }
+    }
+}
+
+@Composable
+private fun TestScreenMirrorFunctionCard(
+    mirrorData: XiaomiMirrorData,
+    onOpenMiLinkVersionDialog: () -> Unit,
+    onSendScreenMirror: (XiaomiMirrorData) -> Unit
+) {
+    val focusManager = LocalFocusManager.current
+
+    var editMirrorData by rememberSaveable { mutableStateOf(mirrorData) }
+
+    FunctionCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        icon = Icons.Default.BluetoothSearching,
+        iconDescription = stringResource(id = R.string.bt_screen_mirror),
+        helpIcon = Icons.Default.HelpOutline,
+        helpIconDescription = stringResource(id = R.string.local_app_versions),
+        onClickHelpIcon = onOpenMiLinkVersionDialog,
+        title = stringResource(id = R.string.bt_screen_mirror),
+        description = stringResource(id = R.string.bt_screen_mirror_desc)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 6.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            MirrorDataController(
+                modifier = Modifier.fillMaxWidth(),
+                mirrorData = editMirrorData,
+                onChanged = { editMirrorData = it },
+            )
+            IconTextButton(
+                modifier = Modifier.align(Alignment.End),
+                text = stringResource(id = R.string.screen_mirror),
+                icon = Icons.Default.Cast,
+                onClick = {
+                    focusManager.clearFocus()
+                    onSendScreenMirror(editMirrorData.copy())
+                }
+            )
         }
     }
 }
@@ -224,7 +269,7 @@ private fun WriteNfcFunctionCard(
                     .padding(bottom = 10.dp),
                 label = stringResource(id = R.string.nfc_xiaomi_device_type),
                 selectKey = editNfcTagData.deviceType.name,
-                keyTextMap = XiaomiDeviceType.values().associate { it.name to stringResource(id = it.resId) },
+                keyTextMap = XiaomiDeviceType.entries.associate { it.name to stringResource(id = it.resId) },
                 onKeySelected = {
                     editNfcTagData = editNfcTagData.copy(deviceType = XiaomiDeviceType.valueOf(it))
                 }
@@ -236,6 +281,16 @@ private fun WriteNfcFunctionCard(
                 value = editNfcTagData.btMac,
                 onValueChange = { editNfcTagData = editNfcTagData.copy(btMac = it) }
             )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Checkbox(
+                    checked = editNfcTagData.enableLyra,
+                    onCheckedChange = { editNfcTagData = editNfcTagData.copy(enableLyra = it) }
+                )
+                Text(text = stringResource(id = R.string.enable_lyra_ability))
+            }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -312,52 +367,6 @@ private fun WriteNfcFunctionCard(
 }
 
 @Composable
-private fun ScreenMirrorFunctionCard(
-    mirrorData: XiaomiMirrorData,
-    onOpenMiLinkVersionDialog: () -> Unit,
-    onSendScreenMirror: (XiaomiMirrorData) -> Unit
-) {
-    val focusManager = LocalFocusManager.current
-
-    var editMirrorData by rememberSaveable { mutableStateOf(mirrorData) }
-
-    FunctionCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        icon = Icons.Default.BluetoothSearching,
-        iconDescription = stringResource(id = R.string.bt_screen_mirror),
-        helpIcon = Icons.Default.HelpOutline,
-        helpIconDescription = stringResource(id = R.string.local_app_versions),
-        onClickHelpIcon = onOpenMiLinkVersionDialog,
-        title = stringResource(id = R.string.bt_screen_mirror),
-        description = stringResource(id = R.string.bt_screen_mirror_desc)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 6.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            MirrorDataController(
-                modifier = Modifier.fillMaxWidth(),
-                mirrorData = editMirrorData,
-                onChanged = { editMirrorData = it },
-            )
-            IconTextButton(
-                modifier = Modifier.align(Alignment.End),
-                text = stringResource(id = R.string.screen_mirror),
-                icon = Icons.Default.Cast,
-                onClick = {
-                    focusManager.clearFocus()
-                    onSendScreenMirror(editMirrorData.copy())
-                }
-            )
-        }
-    }
-}
-
-@Composable
 private fun TilesFunctionCard(
     mirrorData: XiaomiMirrorData,
     onChanged: (XiaomiMirrorData) -> Unit,
@@ -379,7 +388,7 @@ private fun TilesFunctionCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 6.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             MirrorDataController(
                 modifier = Modifier.fillMaxWidth(),
@@ -456,6 +465,18 @@ private fun HuaweiRedirectFunctionCard(
                 onDeviceTypeChanged = { onChanged(redirectData.copy(deviceType = it)) },
                 onMirrorTypeChanged = { onChanged(redirectData.copy(mirrorType = it)) }
             )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Checkbox(
+                    checked = redirectData.enableLyra,
+                    onCheckedChange = { onChanged(redirectData.copy(enableLyra = it)) }
+                )
+                Text(text = stringResource(id = R.string.enable_lyra_ability))
+            }
             IconTextButton(
                 modifier = Modifier.align(Alignment.End),
                 text = stringResource(id = R.string.save),

@@ -1,12 +1,11 @@
 package tool.xfy9326.milink.nfc.utils
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Bundle
 import tool.xfy9326.milink.nfc.data.PackageData
 
-@SuppressLint("QueryPermissionsNeeded")
 fun Context.getPackageData(packageName: String): PackageData? =
     runCatching {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -25,3 +24,17 @@ fun Context.getPackageData(packageName: String): PackageData? =
     }?.onFailure {
         it.printStackTrace()
     }?.getOrNull()
+
+fun Context.getPackageMetaData(packageName: String): Bundle? =
+    runCatching {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            packageManager.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(PackageManager.GET_META_DATA.toLong()))
+        } else {
+            packageManager.getPackageInfo(packageName, PackageManager.GET_META_DATA)
+        }
+    }.getOrNull()?.runCatching {
+        applicationInfo.metaData
+    }?.onFailure {
+        it.printStackTrace()
+    }?.getOrNull()
+

@@ -25,7 +25,6 @@ import tool.xfy9326.milink.nfc.AppContext
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.data.HuaweiRedirectData
 import tool.xfy9326.milink.nfc.data.NdefWriteData
-import tool.xfy9326.milink.nfc.data.PackageData
 import tool.xfy9326.milink.nfc.data.XiaomiDeviceType
 import tool.xfy9326.milink.nfc.data.XiaomiMirrorData
 import tool.xfy9326.milink.nfc.data.XiaomiMirrorType
@@ -37,9 +36,9 @@ import tool.xfy9326.milink.nfc.data.toXiaomiMirrorType
 import tool.xfy9326.milink.nfc.db.AppSettings
 import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
 import tool.xfy9326.milink.nfc.service.MiShareTileService
+import tool.xfy9326.milink.nfc.ui.dialog.MiLinkVersionDialogData
 import tool.xfy9326.milink.nfc.utils.EMPTY
 import tool.xfy9326.milink.nfc.utils.EmptyNdefMessage
-import tool.xfy9326.milink.nfc.utils.getPackageData
 import tool.xfy9326.milink.nfc.utils.isValidMacAddress
 import tool.xfy9326.milink.nfc.utils.isXiaomiHyperOS
 
@@ -56,27 +55,31 @@ class MainViewModel : ViewModel() {
 
     data class UiState(
         val defaultNFCTagData: XiaomiNFCTagData = XiaomiNFCTagData(
-            XiaomiDeviceType.PC,
-            EMPTY,
-            false
+            deviceType = XiaomiDeviceType.PC,
+            btMac = EMPTY,
+            readOnly = false,
+            enableLyra = true
         ),
         val defaultScreenMirrorData: XiaomiMirrorData = XiaomiMirrorData(
-            XiaomiDeviceType.PC,
-            XiaomiMirrorType.FAKE_NFC_TAG,
-            EMPTY
+            deviceType = XiaomiDeviceType.PC,
+            mirrorType = XiaomiMirrorType.FAKE_NFC_TAG,
+            btMac = EMPTY,
+            enableLyra = true
         ),
         val tilesMirrorData: XiaomiMirrorData = XiaomiMirrorData(
-            AppSettings.GlobalDefaults.tilesNfcDevice.toXiaomiDeviceType(),
-            AppSettings.GlobalDefaults.tilesMirrorIntent.toXiaomiMirrorType(),
-            EMPTY
+            deviceType = AppSettings.GlobalDefaults.tilesNfcDevice.toXiaomiDeviceType(),
+            mirrorType = AppSettings.GlobalDefaults.tilesMirrorIntent.toXiaomiMirrorType(),
+            btMac = EMPTY,
+            enableLyra = AppSettings.GlobalDefaults.tilesEnableLyra
         ),
         val huaweiRedirectData: HuaweiRedirectData = HuaweiRedirectData(
-            AppSettings.GlobalDefaults.huaweiRedirectNfcDevice.toXiaomiDeviceType(),
-            AppSettings.GlobalDefaults.huaweiRedirectMirrorIntent.toXiaomiMirrorType(),
+            deviceType = AppSettings.GlobalDefaults.huaweiRedirectNfcDevice.toXiaomiDeviceType(),
+            mirrorType = AppSettings.GlobalDefaults.huaweiRedirectMirrorIntent.toXiaomiMirrorType(),
+            enableLyra = AppSettings.GlobalDefaults.huaweiRedirectEnableLyra
         ),
         val ndefWriteDialogData: NdefWriteData? = null,
         val showNotSupportedOSDialog: Boolean = false,
-        val miLinkPackageDialogData: Map<String, PackageData?>? = null,
+        val miLinkPackageDialogData: MiLinkVersionDialogData? = null,
     )
 
     private val nfcUsing = Semaphore(1)
@@ -146,7 +149,7 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch {
             if (validateBtMac(nfcTagData.btMac)) {
                 if (nfcUsing.tryAcquire()) {
-                    val ndefMsg = XiaomiNfc.createNdefMsg(nfcTagData.deviceType.nfcType, nfcTagData.btMac)
+                    val ndefMsg = XiaomiNfc.createNdefMsg(nfcTagData.deviceType.nfcType, nfcTagData.btMac, nfcTagData.enableLyra)
                     val data = NdefWriteData(ndefMsg, nfcTagData.readOnly)
                     _uiState.update {
                         it.copy(ndefWriteDialogData = data)
@@ -203,11 +206,11 @@ class MainViewModel : ViewModel() {
     fun openMiLinkVersionDialog() {
         viewModelScope.launch {
             _uiState.update {
-                it.copy(
-                    miLinkPackageDialogData = XiaomiNfc.MI_LINK_PACKAGE_NAMES.associateWith { pkgName ->
-                        AppContext.getPackageData(pkgName)
-                    }
+                val data = MiLinkVersionDialogData(
+                    lyraSupported = XiaomiNfc.isLocalDeviceSupportLyra(AppContext),
+                    packageData = XiaomiNfc.getRelatedPackageDataMap(AppContext)
                 )
+                it.copy(miLinkPackageDialogData = data)
             }
         }
     }
@@ -225,11 +228,22 @@ class MainViewModel : ViewModel() {
             if (validateBtMac(mirrorData.btMac)) {
                 val nfcDeviceType = mirrorData.deviceType.nfcType
                 when (mirrorData.mirrorType) {
-                    XiaomiMirrorType.FAKE_NFC_TAG -> XiaomiNfc.newNdefActivityIntent(null, null, nfcDeviceType, mirrorData.btMac).also {
+                    XiaomiMirrorType.FAKE_NFC_TAG -> XiaomiNfc.newNdefActivityIntent(
+                        null,
+                        null,
+                        nfcDeviceType,
+                        mirrorData.btMac,
+                        mirrorData.enableLyra
+                    ).also {
                         ContextCompat.startActivity(context, it, null)
                     }
 
-                    XiaomiMirrorType.MI_CONNECT_SERVICE -> XiaomiNfc.sendConnectServiceBroadcast(context, nfcDeviceType, mirrorData.btMac)
+                    XiaomiMirrorType.MI_CONNECT_SERVICE -> XiaomiNfc.sendConnectServiceBroadcast(
+                        context,
+                        nfcDeviceType,
+                        mirrorData.btMac,
+                        mirrorData.enableLyra
+                    )
                 }
             }
         }

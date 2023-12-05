@@ -31,15 +31,20 @@ class HuaweiShareNfcActivity : Activity() {
 
                 val globalSettings = runBlocking { AppSettings.global.data.first() }
                 val deviceType = globalSettings.huaweiRedirectNfcDevice.toXiaomiDeviceType(AppSettings.GlobalDefaults.huaweiRedirectNfcDevice)
+                val enableLyra = if (globalSettings.hasHuaweiRedirectEnableLyra()) {
+                    globalSettings.huaweiRedirectEnableLyra.value
+                } else {
+                    AppSettings.GlobalDefaults.huaweiRedirectEnableLyra
+                }
                 when (globalSettings.huaweiRedirectMirrorIntent.toXiaomiMirrorType(AppSettings.GlobalDefaults.huaweiRedirectMirrorIntent)) {
                     XiaomiMirrorType.FAKE_NFC_TAG -> {
-                        XiaomiNfc.newNdefActivityIntent(tag, id, deviceType.nfcType, btMac).also {
+                        XiaomiNfc.newNdefActivityIntent(tag, id, deviceType.nfcType, btMac, enableLyra).also {
                             ContextCompat.startActivity(this, it, null)
                         }
                     }
 
                     XiaomiMirrorType.MI_CONNECT_SERVICE -> {
-                        XiaomiNfc.sendConnectServiceBroadcast(this, deviceType.nfcType, btMac)
+                        XiaomiNfc.sendConnectServiceBroadcast(this, deviceType.nfcType, btMac, enableLyra)
                     }
                 }
             }

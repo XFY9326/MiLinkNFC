@@ -7,5 +7,6 @@ import kotlinx.parcelize.Parcelize
 data class XiaomiNFCTagData(
     val deviceType: XiaomiDeviceType,
     val btMac: String,
-    val readOnly: Boolean
+    val readOnly: Boolean,
+    val enableLyra: Boolean
 ) : Parcelable
