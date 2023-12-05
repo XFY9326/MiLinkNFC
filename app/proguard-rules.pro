@@ -23,6 +23,7 @@
 # Global
 -repackageclasses cls
 -keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
 
 # ProtoBuf
 -keepclassmembers class * extends com.google.protobuf.GeneratedMessageLite {
