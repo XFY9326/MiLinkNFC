@@ -66,6 +66,7 @@
     <string name="local_app_versions">本机应用版本</string>
     <string name="local_app_versions_desc">一碰妙享镜像投屏功能需要设备上对应应用版本升级到最新版</string>
     <string name="missing_package">缺少应用：%1$s</string>
+    <string name="check_update">检查更新</string>
     <string name="exit">退出</string>
 
     <string name="version" translatable="false">%1$s (%2$d)</string>
@@ -74,5 +75,6 @@
     <string name="code_url_github" translatable="false">https://github.com/XFY9326/MiLinkNFC</string>
     <string name="code_platform_gitee" translatable="false">Gitee</string>
     <string name="code_url_gitee" translatable="false">https://gitee.com/XFY9326/MiLinkNFC</string>
+    <string name="app_releases_url">https://gitee.com/XFY9326/MiLinkNFC/releases</string>
     <string name="placeholder_mac_address" translatable="false">00:00:00:00:00:00</string>
 </resources>

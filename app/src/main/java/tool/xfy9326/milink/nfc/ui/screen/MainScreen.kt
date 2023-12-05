@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Transform
+import androidx.compose.material.icons.filled.Update
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.AlertDialog
@@ -48,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -176,10 +178,19 @@ private fun EventHandler(
 
 @Composable
 private fun TopBar() {
+    val uriHandler = LocalUriHandler.current
+    val context = LocalContext.current
+
     var openAboutDialog by remember { mutableStateOf(false) }
+
     TopAppBar(
         title = { Text(text = stringResource(id = R.string.app_name)) },
         actions = {
+            IconButton(onClick = {
+                uriHandler.openUri(context.getString(R.string.app_releases_url))
+            }) {
+                Icon(imageVector = Icons.Default.Update, contentDescription = stringResource(id = R.string.check_update))
+            }
             IconButton(onClick = {
                 openAboutDialog = true
             }) {

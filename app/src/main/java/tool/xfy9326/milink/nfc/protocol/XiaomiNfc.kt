@@ -166,8 +166,7 @@ object XiaomiNfc {
 
     @JvmInline
     private value class BytesValue(val bytes: ByteArray) {
-        constructor(byte: Int) : this(byte.toByte())
-        constructor(byte: Byte) : this(byteArrayOf(byte))
+        constructor(byte: Int) : this(byteArrayOf(byte.toByte()))
         constructor(str: String) : this(str.toByteArray(Charsets.UTF_8))
 
         val length: Int
