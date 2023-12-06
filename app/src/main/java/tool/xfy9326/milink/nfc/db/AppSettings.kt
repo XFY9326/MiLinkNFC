@@ -4,11 +4,15 @@ import android.content.Context
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
 import androidx.datastore.dataStore
+import com.google.protobuf.BoolValue
 import com.google.protobuf.InvalidProtocolBufferException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import tool.xfy9326.milink.nfc.AppContext
 import tool.xfy9326.milink.nfc.proto.AppSettingsProto
 import tool.xfy9326.milink.nfc.proto.AppSettingsProto.MirrorIntent
 import tool.xfy9326.milink.nfc.proto.AppSettingsProto.NfcDevice
+import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -42,5 +46,20 @@ object AppSettings {
         val huaweiRedirectMirrorIntent = MirrorIntent.FAKE_NFC_TAG
         const val tilesEnableLyra = true
         const val huaweiRedirectEnableLyra = true
+    }
+
+    suspend fun initValues(context: Context): Unit = withContext(Dispatchers.IO) {
+        val isDeviceSupportLyra = XiaomiNfc.isLocalDeviceSupportLyra(context)
+
+        global.updateData {
+            it.toBuilder().apply {
+                if (!it.hasTilesEnableLyra() && !isDeviceSupportLyra) {
+                    tilesEnableLyra = BoolValue.of(false)
+                }
+                if (!it.hasHuaweiRedirectEnableLyra() && !isDeviceSupportLyra) {
+                    huaweiRedirectEnableLyra = BoolValue.of(false)
+                }
+            }.build()
+        }
     }
 }

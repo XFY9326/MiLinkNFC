@@ -11,6 +11,7 @@ import androidx.core.content.getSystemService
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -94,8 +95,11 @@ class MainViewModel : ViewModel() {
     val snackbarMsg: SharedFlow<SnackbarMsg> = _snackbarMsg.asSharedFlow()
 
     init {
-        checkNotSupportedOS()
-        initDataStoreListeners()
+        viewModelScope.launch(Dispatchers.IO) {
+            checkNotSupportedOS()
+            checkLyraSupport()
+            initDataStoreListeners()
+        }
     }
 
     private suspend fun validateBtMac(btMac: String): Boolean {
@@ -109,25 +113,34 @@ class MainViewModel : ViewModel() {
         return false
     }
 
-    private fun initDataStoreListeners() {
-        viewModelScope.launch(Dispatchers.IO) {
+    private suspend fun initDataStoreListeners() = coroutineScope {
+        launch {
             AppSettings.global.data.getTilesXiaomiMirrorData().collect { data ->
                 _uiState.update { it.copy(tilesMirrorData = data) }
             }
         }
-        viewModelScope.launch(Dispatchers.IO) {
+        launch {
             AppSettings.global.data.getHuaweiRedirectData().collect { data ->
                 _uiState.update { it.copy(huaweiRedirectData = data) }
             }
         }
     }
 
-    private fun checkNotSupportedOS() {
-        viewModelScope.launch {
-            if (!isXiaomiHyperOS() && !AppSettings.global.data.first().confirmedNotSupportedOSAlert) {
-                _uiState.update {
-                    it.copy(showNotSupportedOSDialog = true)
-                }
+    private suspend fun checkNotSupportedOS() {
+        if (!isXiaomiHyperOS() && !AppSettings.global.data.first().confirmedNotSupportedOSAlert) {
+            _uiState.update {
+                it.copy(showNotSupportedOSDialog = true)
+            }
+        }
+    }
+
+    private fun checkLyraSupport() {
+        if (!XiaomiNfc.isLocalDeviceSupportLyra(AppContext)) {
+            _uiState.update {
+                it.copy(
+                    defaultNFCTagData = it.defaultNFCTagData.copy(enableLyra = false),
+                    defaultScreenMirrorData = it.defaultScreenMirrorData.copy(enableLyra = false)
+                )
             }
         }
     }
