@@ -15,8 +15,8 @@ android {
         applicationId = "tool.xfy9326.milink.nfc"
         minSdk = 29
         targetSdk = 34
-        versionCode = 4
-        versionName = "1.3"
+        versionCode = 5
+        versionName = "1.4"
 
         resourceConfigurations += "zh"
 
@@ -121,7 +121,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
 
     // Compose Accompanist
-    val accompanist = "0.33.2-alpha"
+    val accompanist = "0.32.0"
     implementation("com.google.accompanist:accompanist-drawablepainter:$accompanist")
 
     // AndroidX Compose Lifecycle
