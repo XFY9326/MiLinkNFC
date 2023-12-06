@@ -9,7 +9,8 @@ import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AppShortcut
 import androidx.compose.material.icons.filled.BluetoothSearching
@@ -92,6 +93,7 @@ fun MainScreen(
 ) {
     val context = LocalContext.current
 
+    val contentScrollState = rememberScrollState()
     val snackBarHostState = remember { SnackbarHostState() }
 
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
@@ -101,44 +103,37 @@ fun MainScreen(
         topBar = { TopBar() },
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
     ) { innerPadding ->
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(contentScrollState)
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
                 .displayCutoutPadding()
                 .padding(horizontal = 8.dp, vertical = 4.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            item {
-                TestScreenMirrorFunctionCard(
-                    mirrorData = uiState.value.defaultScreenMirrorData,
-                    onOpenMiLinkVersionDialog = viewModel::openMiLinkVersionDialog,
-                    onSendScreenMirror = { viewModel.sendScreenMirror(context, it) }
-                )
-            }
-            item {
-                WriteNfcFunctionCard(
-                    nfcTagData = uiState.value.defaultNFCTagData,
-                    onRequestWriteNfc = viewModel::requestWriteNfc,
-                    onRequestClearNfc = viewModel::requestClearNfc
-                )
-            }
-            item {
-                TilesFunctionCard(
-                    mirrorData = uiState.value.tilesMirrorData,
-                    onChanged = viewModel::updateTilesMirrorData,
-                    onRequestAddTiles = { viewModel.requestAddTiles(context) },
-                    onSave = viewModel::saveTilesMirrorData
-                )
-            }
-            item {
-                HuaweiRedirectFunctionCard(
-                    redirectData = uiState.value.huaweiRedirectData,
-                    onChanged = viewModel::updateHuaweiRedirectData,
-                    onSave = viewModel::saveHuaweiRedirectData
-                )
-            }
+            TestScreenMirrorFunctionCard(
+                mirrorData = uiState.value.defaultScreenMirrorData,
+                onOpenMiLinkVersionDialog = viewModel::openMiLinkVersionDialog,
+                onSendScreenMirror = { viewModel.sendScreenMirror(context, it) }
+            )
+            WriteNfcFunctionCard(
+                nfcTagData = uiState.value.defaultNFCTagData,
+                onRequestWriteNfc = viewModel::requestWriteNfc,
+                onRequestClearNfc = viewModel::requestClearNfc
+            )
+            TilesFunctionCard(
+                mirrorData = uiState.value.tilesMirrorData,
+                onChanged = viewModel::updateTilesMirrorData,
+                onRequestAddTiles = { viewModel.requestAddTiles(context) },
+                onSave = viewModel::saveTilesMirrorData
+            )
+            HuaweiRedirectFunctionCard(
+                redirectData = uiState.value.huaweiRedirectData,
+                onChanged = viewModel::updateHuaweiRedirectData,
+                onSave = viewModel::saveHuaweiRedirectData
+            )
         }
     }
     EventHandler(
