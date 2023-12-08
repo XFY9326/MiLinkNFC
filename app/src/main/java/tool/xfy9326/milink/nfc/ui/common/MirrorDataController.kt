@@ -64,6 +64,7 @@ fun MirrorDataController(
         MacAddressTextField(
             modifier = Modifier.fillMaxWidth(),
             value = mirrorData.btMac,
+            upperCase = true,
             onValueChange = { onChanged(mirrorData.copy(btMac = it)) }
         )
         Row(

@@ -290,6 +290,7 @@ private fun WriteNfcFunctionCard(
                     .fillMaxWidth()
                     .padding(horizontal = 6.dp),
                 value = editNfcTagData.btMac,
+                upperCase = true,
                 onValueChange = { editNfcTagData = editNfcTagData.copy(btMac = it) }
             )
             Row(

@@ -12,7 +12,7 @@
     <string name="nfc_using_conflict">设备正在使用中</string>
     <string name="nfc_write_success">写入成功</string>
     <string name="nfc_connect_failed">连接失败</string>
-    <string name="nfc_ndef_not_supported">不支持NDEF格式</string>
+    <string name="nfc_ndef_not_supported">不支持NDEF格式\n%1$s</string>
     <string name="nfc_write_error">写入失败</string>
     <string name="nfc_write_error_unknown">未知错误</string>
     <string name="nfc_write_error_read_only">设置只读失败</string>

@@ -20,27 +20,33 @@ import androidx.compose.ui.tooling.preview.Preview
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.utils.EMPTY
+import java.util.Locale
 
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
     AppTheme {
-        MacAddressTextField(value = "", onValueChange = {})
+        MacAddressTextField(
+            value = "",
+            upperCase = true,
+            onValueChange = {}
+        )
     }
 }
 
 @Composable
 fun MacAddressTextField(
     modifier: Modifier = Modifier,
+    upperCase: Boolean = false,
     value: String,
     onValueChange: (String) -> Unit,
 ) {
     var isError by remember { mutableStateOf(value.isInputError()) }
 
     OutlinedTextField(
-        value = value,
+        value = value.toMacUpperCase(upperCase),
         onValueChange = {
-            val newValue = it.reformatMacAddressCharacter()
+            val newValue = it.reformatMacAddressCharacter().toMacUpperCase(upperCase)
             isError = newValue.isInputError()
             onValueChange(newValue)
         },
@@ -84,6 +90,9 @@ private fun String.validateIncompleteMacAddressRegex(): Boolean = incompleteMacA
 
 private fun Char.isValidMacAddressCharacter(): Boolean =
     this == ':' || macAddressCharacterRanges.any { this in it }
+
+private fun String.toMacUpperCase(enabled: Boolean): String =
+    if (enabled && isNotEmpty()) uppercase(Locale.US) else this
 
 private fun String.reformatMacAddressCharacter(): String =
     this@reformatMacAddressCharacter.filter { it.isValidMacAddressCharacter() }
