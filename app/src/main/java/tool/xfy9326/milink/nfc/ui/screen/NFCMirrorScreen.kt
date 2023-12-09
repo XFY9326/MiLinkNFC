@@ -73,6 +73,7 @@ import tool.xfy9326.milink.nfc.ui.dialog.NdefWriterDialog
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.theme.LocalAppThemeColorScheme
 import tool.xfy9326.milink.nfc.ui.vm.MainViewModel
+import tool.xfy9326.milink.nfc.ui.vm.NFCMirrorViewModel
 import tool.xfy9326.milink.nfc.utils.openAppSettings
 import tool.xfy9326.milink.nfc.utils.openNotificationServiceSettings
 
@@ -80,13 +81,14 @@ import tool.xfy9326.milink.nfc.utils.openNotificationServiceSettings
 @Composable
 private fun Preview() {
     AppTheme {
-        MainScreen {}
+        NFCMirrorScreen {}
     }
 }
 
 @Composable
-fun MainScreen(
-    viewModel: MainViewModel = viewModel(),
+fun NFCMirrorScreen(
+    mainViewModel: MainViewModel = viewModel(),
+    viewModel: NFCMirrorViewModel = viewModel(),
     onExit: () -> Unit
 ) {
     val context = LocalContext.current
@@ -141,8 +143,9 @@ fun MainScreen(
     uiState.value.ndefWriteDialogData?.let {
         NdefWriterDialog(
             ndefData = it,
-            onOpenReader = viewModel::onOpenNFCReader,
-            onCloseReader = viewModel::onCloseNfcReader,
+            onOpenReader = mainViewModel::openNFCWriter,
+            onCloseReader = mainViewModel::closeNfcWriter,
+            onNfcDeviceUsing = viewModel::reportNfcDeviceUsing,
             onDismissRequest = viewModel::cancelWriteNfc
         )
     }
@@ -171,7 +174,7 @@ fun MainScreen(
 @Composable
 private fun EventHandler(
     snackBarHostState: SnackbarHostState,
-    viewModel: MainViewModel,
+    viewModel: NFCMirrorViewModel,
 ) {
     val context = LocalContext.current
 

@@ -1,5 +1,6 @@
 package tool.xfy9326.milink.nfc.ui.common
 
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -14,7 +15,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import tool.xfy9326.milink.nfc.R
@@ -41,6 +44,8 @@ fun MacAddressTextField(
     value: String,
     onValueChange: (String) -> Unit,
 ) {
+    val focusManager = LocalFocusManager.current
+
     var isError by remember { mutableStateOf(value.isInputError()) }
 
     OutlinedTextField(
@@ -73,7 +78,11 @@ fun MacAddressTextField(
         },
         keyboardOptions = KeyboardOptions(
             autoCorrect = false,
-            keyboardType = KeyboardType.Ascii
+            keyboardType = KeyboardType.Ascii,
+            imeAction = ImeAction.Done
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = { focusManager.clearFocus() }
         ),
         singleLine = true
     )
@@ -95,7 +104,7 @@ private fun String.toMacUpperCase(enabled: Boolean): String =
     if (enabled && isNotEmpty()) uppercase(Locale.US) else this
 
 private fun String.reformatMacAddressCharacter(): String =
-    this@reformatMacAddressCharacter.filter { it.isValidMacAddressCharacter() }
+    asSequence().take(17).filter { it.isValidMacAddressCharacter() }.joinToString(separator = EMPTY)
 
 private fun String.isInputError(): Boolean =
     isNotBlank() && !validateIncompleteMacAddressRegex()

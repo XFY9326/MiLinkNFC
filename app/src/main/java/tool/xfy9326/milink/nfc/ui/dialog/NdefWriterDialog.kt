@@ -40,8 +40,9 @@ private fun Preview() {
                 ndefMsg = EmptyNdefMessage,
                 readOnly = false
             ),
-            onOpenReader = {},
+            onOpenReader = { true },
             onCloseReader = {},
+            onNfcDeviceUsing = {},
             onDismissRequest = {}
         )
     }
@@ -50,8 +51,9 @@ private fun Preview() {
 @Composable
 fun NdefWriterDialog(
     ndefData: NdefWriteData,
-    onOpenReader: (NdefWriteData) -> Unit,
+    onOpenReader: (NdefWriteData) -> Boolean,
     onCloseReader: () -> Unit,
+    onNfcDeviceUsing: () -> Unit,
     onDismissRequest: () -> Unit
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -60,7 +62,10 @@ fun NdefWriterDialog(
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                onOpenReader(ndefData)
+                if (!onOpenReader(ndefData)) {
+                    onNfcDeviceUsing()
+                    onDismissRequest()
+                }
             } else if (event == Lifecycle.Event.ON_PAUSE) {
                 onCloseReader()
             }
