@@ -24,13 +24,10 @@ import androidx.compose.material.icons.filled.Transform
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -53,6 +50,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -69,9 +67,9 @@ import tool.xfy9326.milink.nfc.ui.common.MiConnectActionSettings
 import tool.xfy9326.milink.nfc.ui.common.MirrorDataController
 import tool.xfy9326.milink.nfc.ui.common.SelectorTextField
 import tool.xfy9326.milink.nfc.ui.dialog.AboutDialog
+import tool.xfy9326.milink.nfc.ui.dialog.MessageAlertDialog
 import tool.xfy9326.milink.nfc.ui.dialog.MiLinkVersionDialog
 import tool.xfy9326.milink.nfc.ui.dialog.NdefWriterDialog
-import tool.xfy9326.milink.nfc.ui.dialog.NotSupportedOSDialog
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.theme.LocalAppThemeColorScheme
 import tool.xfy9326.milink.nfc.ui.vm.MainViewModel
@@ -155,9 +153,17 @@ fun MainScreen(
         )
     }
     if (uiState.value.showNotSupportedOSDialog) {
-        NotSupportedOSDialog(
-            onConfirmed = viewModel::confirmNotSupportedOS,
-            onExit = onExit
+        MessageAlertDialog(
+            title = stringResource(id = R.string.not_supported_os),
+            message = stringResource(id = R.string.not_supported_os_desc),
+            icon = Icons.Default.Warning,
+            iconTint = Color.Red,
+            onConfirm = viewModel::confirmNotSupportedOS,
+            showCancel = true,
+            addMessagePrefixSpaces = true,
+            cancelText = stringResource(id = R.string.exit),
+            properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+            onDismissRequest = onExit
         )
     }
 }
@@ -222,9 +228,11 @@ private fun TestScreenMirrorFunctionCard(
             .padding(8.dp),
         icon = Icons.Default.BluetoothSearching,
         iconDescription = stringResource(id = R.string.bt_screen_mirror),
-        helpIcon = Icons.Default.HelpOutline,
-        helpIconDescription = stringResource(id = R.string.local_app_versions),
-        onClickHelpIcon = onOpenMiLinkVersionDialog,
+        extraIconContent = {
+            IconButton(onClick = onOpenMiLinkVersionDialog) {
+                Icon(imageVector = Icons.Default.HelpOutline, contentDescription = stringResource(id = R.string.local_app_versions))
+            }
+        },
         title = stringResource(id = R.string.bt_screen_mirror),
         description = stringResource(id = R.string.bt_screen_mirror_desc)
     ) {
@@ -268,9 +276,9 @@ private fun WriteNfcFunctionCard(
             .fillMaxWidth()
             .padding(8.dp),
         icon = Icons.Default.Nfc,
-        iconDescription = stringResource(id = R.string.write_nfc),
-        title = stringResource(id = R.string.write_nfc),
-        description = stringResource(id = R.string.write_nfc_desc)
+        iconDescription = stringResource(id = R.string.write_mirror_nfc),
+        title = stringResource(id = R.string.write_mirror_nfc),
+        description = stringResource(id = R.string.write_mirror_nfc_desc)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             SelectorTextField(
@@ -344,36 +352,18 @@ private fun WriteNfcFunctionCard(
         }
     }
     if (readOnlyAlert) {
-        AlertDialog(
-            onDismissRequest = { readOnlyAlert = false },
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.Warning,
-                    contentDescription = stringResource(id = R.string.dangerous_action_alert),
-                    tint = Color.Red
-                )
+        MessageAlertDialog(
+            title = stringResource(id = R.string.dangerous_action_alert),
+            message = stringResource(id = R.string.set_nfc_read_only_desc),
+            icon = Icons.Default.Warning,
+            iconTint = Color.Red,
+            onConfirm = {
+                editNfcTagData = editNfcTagData.copy(readOnly = true)
+                readOnlyAlert = false
             },
-            title = {
-                Text(text = stringResource(id = R.string.dangerous_action_alert))
-            },
-            text = {
-                Text(text = stringResource(id = R.string.set_nfc_read_only_desc))
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        editNfcTagData = editNfcTagData.copy(readOnly = true)
-                        readOnlyAlert = false
-                    }
-                ) {
-                    Text(text = stringResource(id = android.R.string.ok))
-                }
-            },
-            dismissButton = {
-                OutlinedButton(onClick = { readOnlyAlert = false }) {
-                    Text(text = stringResource(id = android.R.string.cancel))
-                }
-            }
+            addMessagePrefixSpaces = true,
+            showCancel = true,
+            onDismissRequest = { readOnlyAlert = false }
         )
     }
 }

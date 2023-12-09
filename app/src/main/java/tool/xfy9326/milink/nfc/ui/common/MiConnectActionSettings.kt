@@ -48,7 +48,7 @@ fun MiConnectActionSettings(
             modifier = Modifier.weight(0.4f),
             label = stringResource(id = R.string.nfc_xiaomi_device_type),
             selectKey = deviceType.name,
-            keyTextMap = XiaomiDeviceType.values().associate { it.name to stringResource(id = it.resId) },
+            keyTextMap = XiaomiDeviceType.entries.associate { it.name to stringResource(id = it.resId) },
             onKeySelected = {
                 onDeviceTypeChanged(XiaomiDeviceType.valueOf(it))
             }
@@ -57,7 +57,7 @@ fun MiConnectActionSettings(
             modifier = Modifier.weight(0.6f),
             label = stringResource(id = R.string.nfc_mirror_intent_type),
             selectKey = mirrorType.name,
-            keyTextMap = XiaomiMirrorType.values().associate { it.name to stringResource(id = it.resId) },
+            keyTextMap = XiaomiMirrorType.entries.associate { it.name to stringResource(id = it.resId) },
             onKeySelected = {
                 onMirrorTypeChanged(XiaomiMirrorType.valueOf(it))
             }

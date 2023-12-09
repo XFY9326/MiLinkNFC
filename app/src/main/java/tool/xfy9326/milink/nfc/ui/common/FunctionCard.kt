@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -37,9 +38,11 @@ private fun Preview() {
             icon = Icons.Default.Android,
             iconDescription = null,
             title = "Function",
-            helpIcon = Icons.Default.HelpOutline,
-            helpIconDescription = null,
-            onClickHelpIcon = {},
+            extraIconContent = {
+                IconButton(onClick = {}) {
+                    Icon(imageVector = Icons.Default.HelpOutline, contentDescription = null)
+                }
+            },
             description = "Description line 1\n\nDescription line 2\n\nDescription line 3"
         ) {
             Text(text = "Content")
@@ -53,9 +56,7 @@ fun FunctionCard(
     icon: ImageVector,
     iconDescription: String?,
     title: String,
-    helpIcon: ImageVector? = null,
-    helpIconDescription: String? = null,
-    onClickHelpIcon: (() -> Unit)? = null,
+    extraIconContent: (@Composable RowScope.() -> Unit)? = null,
     description: String? = null,
     innerPadding: PaddingValues = PaddingValues(18.dp),
     onClick: () -> Unit = {},
@@ -88,11 +89,12 @@ fun FunctionCard(
                     tint = colorScheme.inverseOnSurface
                 )
                 Text(text = title, style = typography.titleLarge)
-                helpIcon?.let {
+                extraIconContent?.let {
                     Spacer(modifier = Modifier.weight(1f))
-                    IconButton(onClick = onClickHelpIcon ?: {}) {
-                        Icon(imageVector = it, contentDescription = helpIconDescription)
-                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        content = it
+                    )
                 }
             }
             if (description != null) {
