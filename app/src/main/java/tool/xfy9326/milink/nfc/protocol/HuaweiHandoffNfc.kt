@@ -6,7 +6,7 @@ import android.nfc.NfcAdapter
 import androidx.core.content.IntentCompat
 import tool.xfy9326.milink.nfc.utils.toHexString
 
-object HuaweiNfc {
+object HuaweiHandoffNfc {
     private const val BT_MAC_START_IDX = 2
     private const val BT_MAC_END_IDX = 8
 

@@ -78,8 +78,7 @@
             android:exported="true"
             android:icon="@drawable/ic_screen_share_24"
             android:label="@string/mi_share_tile_service"
-            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
-            android:process=":mi_share_tile">
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
@@ -92,7 +91,6 @@
             android:foregroundServiceType="connectedDevice"
             android:label="@string/nfc_notification_service"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
-            android:process=":nfc_notification"
             android:stopWithTask="false">
             <intent-filter>
                 <action android:name="android.service.notification.NotificationListenerService" />

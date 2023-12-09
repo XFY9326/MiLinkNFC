@@ -11,8 +11,7 @@ import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import androidx.core.content.getSystemService
 import tool.xfy9326.milink.nfc.R
-import tool.xfy9326.milink.nfc.protocol.HuaweiNfc
-import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
+import tool.xfy9326.milink.nfc.protocol.HuaweiHandoffNfc
 import tool.xfy9326.milink.nfc.utils.isUsingNotificationService
 
 class NfcNotificationListenerService : NotificationListenerService() {
@@ -20,6 +19,7 @@ class NfcNotificationListenerService : NotificationListenerService() {
         private const val PACKAGE_NAME_NFC = "com.android.nfc"
         private const val FOREGROUND_ID = 1024
         private const val FOREGROUND_CHANNEL_ID = "foreground"
+        private const val NFC_NOTIFICATION_CHANNEL_ID = "tag_dispatch"
 
         fun toggleServiceIfStarted(context: Context) {
             if (context.isUsingNotificationService()) {
@@ -66,9 +66,9 @@ class NfcNotificationListenerService : NotificationListenerService() {
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
-        if (sbn.packageName == PACKAGE_NAME_NFC && sbn.notification.channelId == XiaomiNfc.NFC_NOTIFICATION_CHANNEL_ID) {
+        if (sbn.packageName == PACKAGE_NAME_NFC && sbn.notification.channelId == NFC_NOTIFICATION_CHANNEL_ID) {
             val text = sbn.notification.extras.getString(Notification.EXTRA_TEXT) ?: return
-            if (HuaweiNfc.NFC_URI_CONTENT in text && sbn.notification.actions.isNotEmpty()) {
+            if (HuaweiHandoffNfc.NFC_URI_CONTENT in text && sbn.notification.actions.isNotEmpty()) {
                 val cancelStr = getString(android.R.string.cancel)
                 sbn.notification.actions.first { it.title != cancelStr }?.actionIntent?.send()
             }

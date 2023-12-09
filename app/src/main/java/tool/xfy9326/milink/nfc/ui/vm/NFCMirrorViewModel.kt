@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.protobuf.BoolValue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -34,6 +35,7 @@ import tool.xfy9326.milink.nfc.data.getTilesXiaomiMirrorData
 import tool.xfy9326.milink.nfc.data.toXiaomiDeviceType
 import tool.xfy9326.milink.nfc.data.toXiaomiMirrorType
 import tool.xfy9326.milink.nfc.db.AppSettings
+import tool.xfy9326.milink.nfc.protocol.XiaomiMirrorNfc
 import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
 import tool.xfy9326.milink.nfc.service.MiShareTileService
 import tool.xfy9326.milink.nfc.ui.dialog.MiLinkVersionDialogData
@@ -129,7 +131,7 @@ class NFCMirrorViewModel : ViewModel() {
     }
 
     private fun checkLyraSupport() {
-        if (!XiaomiNfc.isLocalDeviceSupportLyra(AppContext)) {
+        if (!XiaomiMirrorNfc.isLocalDeviceSupportLyra(AppContext)) {
             _uiState.update {
                 it.copy(
                     defaultNFCTagData = it.defaultNFCTagData.copy(enableLyra = false),
@@ -155,7 +157,7 @@ class NFCMirrorViewModel : ViewModel() {
     fun requestWriteNfc(nfcTagData: XiaomiNFCTagData) {
         viewModelScope.launch {
             if (validateBtMac(nfcTagData.btMac)) {
-                val ndefMsg = XiaomiNfc.createNdefMsg(nfcTagData.deviceType.nfcType, nfcTagData.btMac, nfcTagData.enableLyra)
+                val ndefMsg = XiaomiMirrorNfc.createNdefMessage(nfcTagData.deviceType.nfcType, nfcTagData.btMac, nfcTagData.enableLyra)
                 val data = NdefWriteData(ndefMsg, nfcTagData.readOnly)
                 _uiState.update {
                     it.copy(ndefWriteDialogData = data)
@@ -191,8 +193,8 @@ class NFCMirrorViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.Default) {
             _uiState.update {
                 val data = MiLinkVersionDialogData(
-                    lyraSupported = XiaomiNfc.isLocalDeviceSupportLyra(AppContext),
-                    packageData = XiaomiNfc.getRelatedPackageDataMap(AppContext)
+                    lyraSupported = XiaomiMirrorNfc.isLocalDeviceSupportLyra(AppContext),
+                    packageData = XiaomiMirrorNfc.getRelatedPackageDataMap(AppContext)
                 )
                 it.copy(miLinkPackageDialogData = data)
             }
@@ -210,17 +212,17 @@ class NFCMirrorViewModel : ViewModel() {
             if (validateBtMac(mirrorData.btMac)) {
                 val nfcDeviceType = mirrorData.deviceType.nfcType
                 when (mirrorData.mirrorType) {
-                    XiaomiMirrorType.FAKE_NFC_TAG -> XiaomiNfc.newNdefActivityIntent(
-                        null,
-                        null,
+                    XiaomiMirrorType.FAKE_NFC_TAG -> XiaomiMirrorNfc.createNdefMessage(
                         nfcDeviceType,
                         mirrorData.btMac,
                         mirrorData.enableLyra
                     ).also {
-                        ContextCompat.startActivity(context, it, null)
+                        val intent = XiaomiNfc.newNdefActivityIntent(null, null, it)
+                        ContextCompat.startActivity(context, intent, null)
+                        println("OPEN $it")
                     }
 
-                    XiaomiMirrorType.MI_CONNECT_SERVICE -> XiaomiNfc.sendConnectServiceBroadcast(
+                    XiaomiMirrorType.MI_CONNECT_SERVICE -> XiaomiMirrorNfc.sendConnectServiceBroadcast(
                         context,
                         nfcDeviceType,
                         mirrorData.btMac,
@@ -268,6 +270,7 @@ class NFCMirrorViewModel : ViewModel() {
                         tilesNfcBtMac = mirrorData.btMac
                         tilesNfcDevice = mirrorData.deviceType.protoType
                         tilesMirrorIntent = mirrorData.mirrorType.protoType
+                        tilesEnableLyra = BoolValue.of(mirrorData.enableLyra)
                     }.build()
                 }
                 _snackbarMsg.emit(SnackbarMsg.SAVE_SUCCESS)
@@ -288,6 +291,7 @@ class NFCMirrorViewModel : ViewModel() {
                 it.toBuilder().apply {
                     huaweiRedirectNfcDevice = redirectData.deviceType.protoType
                     huaweiRedirectMirrorIntent = redirectData.mirrorType.protoType
+                    huaweiRedirectEnableLyra = BoolValue.of(redirectData.enableLyra)
                 }.build()
             }
             _snackbarMsg.emit(SnackbarMsg.SAVE_SUCCESS)

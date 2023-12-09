@@ -19,14 +19,14 @@ data class XiaomiMirrorData(
 ) : Parcelable
 
 enum class XiaomiDeviceType(
-    val nfcType: XiaomiNfc.NfcDeviceType,
+    val nfcType: XiaomiNfc.NewProtocol.DeviceType,
     val protoType: AppSettingsProto.NfcDevice,
     @StringRes val resId: Int
 ) {
-    TV(XiaomiNfc.NfcDeviceType.TV, AppSettingsProto.NfcDevice.TV, R.string.device_type_tv),
-    PC(XiaomiNfc.NfcDeviceType.PC, AppSettingsProto.NfcDevice.PC, R.string.device_type_pc),
-    CAR(XiaomiNfc.NfcDeviceType.CAR, AppSettingsProto.NfcDevice.CAR, R.string.device_type_car),
-    PAD(XiaomiNfc.NfcDeviceType.PAD, AppSettingsProto.NfcDevice.PAD, R.string.device_type_pad);
+    TV(XiaomiNfc.NewProtocol.DeviceType.TV, AppSettingsProto.NfcDevice.TV, R.string.device_type_tv),
+    PC(XiaomiNfc.NewProtocol.DeviceType.PC, AppSettingsProto.NfcDevice.PC, R.string.device_type_pc),
+    CAR(XiaomiNfc.NewProtocol.DeviceType.CAR, AppSettingsProto.NfcDevice.CAR, R.string.device_type_car),
+    PAD(XiaomiNfc.NewProtocol.DeviceType.PAD, AppSettingsProto.NfcDevice.PAD, R.string.device_type_pad);
 }
 
 enum class XiaomiMirrorType(

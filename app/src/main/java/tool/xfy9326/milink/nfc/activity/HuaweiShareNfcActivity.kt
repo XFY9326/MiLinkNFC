@@ -14,7 +14,8 @@ import tool.xfy9326.milink.nfc.data.XiaomiMirrorType
 import tool.xfy9326.milink.nfc.data.toXiaomiDeviceType
 import tool.xfy9326.milink.nfc.data.toXiaomiMirrorType
 import tool.xfy9326.milink.nfc.db.AppSettings
-import tool.xfy9326.milink.nfc.protocol.HuaweiNfc
+import tool.xfy9326.milink.nfc.protocol.HuaweiHandoffNfc
+import tool.xfy9326.milink.nfc.protocol.XiaomiMirrorNfc
 import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
 
 class HuaweiShareNfcActivity : Activity() {
@@ -22,7 +23,7 @@ class HuaweiShareNfcActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (NfcAdapter.ACTION_NDEF_DISCOVERED == intent.action) {
-            val btMac = HuaweiNfc.parseBtMac(intent)
+            val btMac = HuaweiHandoffNfc.parseBtMac(intent)
             if (btMac == null) {
                 Toast.makeText(applicationContext, R.string.bt_mac_not_found, Toast.LENGTH_SHORT).show()
             } else {
@@ -38,13 +39,14 @@ class HuaweiShareNfcActivity : Activity() {
                 }
                 when (globalSettings.huaweiRedirectMirrorIntent.toXiaomiMirrorType(AppSettings.GlobalDefaults.huaweiRedirectMirrorIntent)) {
                     XiaomiMirrorType.FAKE_NFC_TAG -> {
-                        XiaomiNfc.newNdefActivityIntent(tag, id, deviceType.nfcType, btMac, enableLyra).also {
-                            ContextCompat.startActivity(this, it, null)
+                        XiaomiMirrorNfc.createNdefMessage(deviceType.nfcType, btMac, enableLyra).also {
+                            val intent = XiaomiNfc.newNdefActivityIntent(tag, id, it)
+                            ContextCompat.startActivity(this, intent, null)
                         }
                     }
 
                     XiaomiMirrorType.MI_CONNECT_SERVICE -> {
-                        XiaomiNfc.sendConnectServiceBroadcast(this, deviceType.nfcType, btMac, enableLyra)
+                        XiaomiMirrorNfc.sendConnectServiceBroadcast(this, deviceType.nfcType, btMac, enableLyra)
                     }
                 }
             }
