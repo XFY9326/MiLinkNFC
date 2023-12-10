@@ -1,6 +1,7 @@
 package tool.xfy9326.milink.nfc.service
 
 import android.app.PendingIntent
+import android.content.Intent
 import android.service.quicksettings.TileService
 import androidx.core.service.quicksettings.PendingIntentActivityWrapper
 import androidx.core.service.quicksettings.TileServiceCompat
@@ -41,6 +42,7 @@ class MiShareTileService : TileService() {
                     }
             }
         }.let {
+            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             PendingIntentActivityWrapper(this@MiShareTileService, TILE_ACTIVITY_REQUEST_CODE, it, PendingIntent.FLAG_ONE_SHOT, false)
         }.let {
             TileServiceCompat.startActivityAndCollapse(this@MiShareTileService, it)
