@@ -219,7 +219,6 @@ class NFCMirrorViewModel : ViewModel() {
                     ).also {
                         val intent = XiaomiNfc.newNdefActivityIntent(null, null, it)
                         ContextCompat.startActivity(context, intent, null)
-                        println("OPEN $it")
                     }
 
                     XiaomiMirrorType.MI_CONNECT_SERVICE -> XiaomiMirrorNfc.sendConnectServiceBroadcast(
