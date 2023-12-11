@@ -2,14 +2,14 @@ syntax = "proto3";
 
 package proto;
 
-option java_package = "tool.xfy9326.milink.nfc.proto";
-option java_outer_classname = "MiConnectProto";
+option java_package = "lib.xfy9326.xiaomi.nfc.proto";
+option java_outer_classname = "MiConnectProtocol";
 option java_multiple_files = false;
 
 // Extracted from: com.xiaomi.mi_connect_service
 // Original file: AttrProto.proto
 
-message AttrAdvData {
+message Payload {
   int32 versionMajor = 1;
   int32 versionMinor = 2;
   bytes apps = 3;//已过时。请使用appIds替代。
@@ -29,7 +29,7 @@ message AttrAdvData {
   string btMac = 17; //Bluetooth Device MAC
 }
 
-message AttrOps {
-  AttrAdvData advData = 1;
+message Container {
+  Payload data = 1;
   int32 sequenceId = 14;
 }

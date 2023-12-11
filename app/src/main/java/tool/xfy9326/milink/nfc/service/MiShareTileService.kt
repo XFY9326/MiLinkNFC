@@ -12,7 +12,6 @@ import tool.xfy9326.milink.nfc.data.XiaomiMirrorType
 import tool.xfy9326.milink.nfc.data.toXiaomiDeviceType
 import tool.xfy9326.milink.nfc.data.toXiaomiMirrorType
 import tool.xfy9326.milink.nfc.db.AppSettings
-import tool.xfy9326.milink.nfc.protocol.XiaomiMirrorNfc
 import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
 
 class MiShareTileService : TileService() {
@@ -37,9 +36,7 @@ class MiShareTileService : TileService() {
                     MiConnectServiceActivity.newIntent(this@MiShareTileService, deviceType, btMac, enableLyra)
 
                 XiaomiMirrorType.FAKE_NFC_TAG ->
-                    XiaomiMirrorNfc.createNdefMessage(deviceType.nfcType, btMac, enableLyra).let {
-                        XiaomiNfc.newNdefActivityIntent(null, null, it)
-                    }
+                    XiaomiNfc.ScreenMirror.newNdefDiscoveredIntent(null, null, XiaomiNfc.ScreenMirror.Config(deviceType.nfcType, btMac, enableLyra))
             }
         }.let {
             it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

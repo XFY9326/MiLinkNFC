@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.widget.Toast
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.data.XiaomiDeviceType
-import tool.xfy9326.milink.nfc.protocol.XiaomiMirrorNfc
+import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
 
 class MiConnectServiceActivity : Activity() {
     companion object {
@@ -31,7 +31,7 @@ class MiConnectServiceActivity : Activity() {
         val xiaomiDeviceType = intent.getStringExtra(EXTRA_DEVICE_TYPE)?.let { XiaomiDeviceType.valueOf(it) } ?: DEFAULT_NFC_DEVICE
         val enableLyra = intent.getBooleanExtra(EXTRA_ENABLE_LYRA, false)
         if (btMac != null) {
-            XiaomiMirrorNfc.sendConnectServiceBroadcast(this, xiaomiDeviceType.nfcType, btMac, enableLyra)
+            XiaomiNfc.ScreenMirror.sendBroadcast(this, XiaomiNfc.ScreenMirror.Config(xiaomiDeviceType.nfcType, btMac, enableLyra))
         } else {
             Toast.makeText(applicationContext, R.string.bt_mac_not_set, Toast.LENGTH_SHORT).show()
         }

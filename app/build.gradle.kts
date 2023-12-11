@@ -1,5 +1,3 @@
-import com.google.protobuf.gradle.id
-
 plugins {
     id("com.android.application")
     id("kotlin-parcelize")
@@ -74,7 +72,7 @@ android {
                 "META-INF/{NOTICE,NOTICE.txt,notice.txt}",
                 "META-INF/INDEX.LIST",
                 "okhttp3/internal/publicsuffix/NOTICE",
-                "google/protobuf/*.proto",
+                "**/*.proto",
                 "kotlin-tooling-metadata.json"
             )
         }
@@ -87,9 +85,9 @@ protobuf {
     }
 
     generateProtoTasks {
-        all().forEach { task ->
-            task.builtins {
-                id("java") {
+        all().configureEach {
+            builtins {
+                maybeCreate("java").apply {
                     option("lite")
                 }
             }
@@ -98,6 +96,8 @@ protobuf {
 }
 
 dependencies {
+    implementation(project(":XiaomiNFCProtocol"))
+
     // Kotlin
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 

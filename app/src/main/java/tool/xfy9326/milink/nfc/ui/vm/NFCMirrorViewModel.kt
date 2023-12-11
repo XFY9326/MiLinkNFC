@@ -6,7 +6,6 @@ import android.content.Context
 import android.graphics.drawable.Icon
 import android.os.Build
 import androidx.annotation.StringRes
-import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -35,12 +34,12 @@ import tool.xfy9326.milink.nfc.data.getTilesXiaomiMirrorData
 import tool.xfy9326.milink.nfc.data.toXiaomiDeviceType
 import tool.xfy9326.milink.nfc.data.toXiaomiMirrorType
 import tool.xfy9326.milink.nfc.db.AppSettings
-import tool.xfy9326.milink.nfc.protocol.XiaomiMirrorNfc
 import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
 import tool.xfy9326.milink.nfc.service.MiShareTileService
 import tool.xfy9326.milink.nfc.ui.dialog.MiLinkVersionDialogData
 import tool.xfy9326.milink.nfc.utils.EMPTY
 import tool.xfy9326.milink.nfc.utils.EmptyNdefMessage
+import tool.xfy9326.milink.nfc.utils.MiContinuityUtils
 import tool.xfy9326.milink.nfc.utils.isValidMacAddress
 import tool.xfy9326.milink.nfc.utils.isXiaomiHyperOS
 
@@ -131,7 +130,7 @@ class NFCMirrorViewModel : ViewModel() {
     }
 
     private fun checkLyraSupport() {
-        if (!XiaomiMirrorNfc.isLocalDeviceSupportLyra(AppContext)) {
+        if (!MiContinuityUtils.isLocalDeviceSupportLyra(AppContext)) {
             _uiState.update {
                 it.copy(
                     defaultNFCTagData = it.defaultNFCTagData.copy(enableLyra = false),
@@ -157,7 +156,9 @@ class NFCMirrorViewModel : ViewModel() {
     fun requestWriteNfc(nfcTagData: XiaomiNFCTagData) {
         viewModelScope.launch {
             if (validateBtMac(nfcTagData.btMac)) {
-                val ndefMsg = XiaomiMirrorNfc.createNdefMessage(nfcTagData.deviceType.nfcType, nfcTagData.btMac, nfcTagData.enableLyra)
+                val ndefMsg = XiaomiNfc.ScreenMirror.newNdefMessage(
+                    XiaomiNfc.ScreenMirror.Config(nfcTagData.deviceType.nfcType, nfcTagData.btMac, nfcTagData.enableLyra)
+                )
                 val data = NdefWriteData(ndefMsg, nfcTagData.readOnly)
                 _uiState.update {
                     it.copy(ndefWriteDialogData = data)
@@ -193,8 +194,8 @@ class NFCMirrorViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.Default) {
             _uiState.update {
                 val data = MiLinkVersionDialogData(
-                    lyraSupported = XiaomiMirrorNfc.isLocalDeviceSupportLyra(AppContext),
-                    packageData = XiaomiMirrorNfc.getRelatedPackageDataMap(AppContext)
+                    lyraSupported = MiContinuityUtils.isLocalDeviceSupportLyra(AppContext),
+                    packageData = MiContinuityUtils.getNfcRelatedPackageDataMap(AppContext)
                 )
                 it.copy(miLinkPackageDialogData = data)
             }
@@ -211,22 +212,10 @@ class NFCMirrorViewModel : ViewModel() {
         viewModelScope.launch {
             if (validateBtMac(mirrorData.btMac)) {
                 val nfcDeviceType = mirrorData.deviceType.nfcType
+                val config = XiaomiNfc.ScreenMirror.Config(nfcDeviceType, mirrorData.btMac, mirrorData.enableLyra)
                 when (mirrorData.mirrorType) {
-                    XiaomiMirrorType.FAKE_NFC_TAG -> XiaomiMirrorNfc.createNdefMessage(
-                        nfcDeviceType,
-                        mirrorData.btMac,
-                        mirrorData.enableLyra
-                    ).also {
-                        val intent = XiaomiNfc.newNdefActivityIntent(null, null, it)
-                        ContextCompat.startActivity(context, intent, null)
-                    }
-
-                    XiaomiMirrorType.MI_CONNECT_SERVICE -> XiaomiMirrorNfc.sendConnectServiceBroadcast(
-                        context,
-                        nfcDeviceType,
-                        mirrorData.btMac,
-                        mirrorData.enableLyra
-                    )
+                    XiaomiMirrorType.FAKE_NFC_TAG -> XiaomiNfc.ScreenMirror.newNdefDiscoveredIntent(null, null, config)
+                    XiaomiMirrorType.MI_CONNECT_SERVICE -> XiaomiNfc.ScreenMirror.sendBroadcast(context, config)
                 }
             }
         }

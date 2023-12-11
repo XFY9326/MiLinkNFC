@@ -12,7 +12,7 @@ import tool.xfy9326.milink.nfc.AppContext
 import tool.xfy9326.milink.nfc.proto.AppSettingsProto
 import tool.xfy9326.milink.nfc.proto.AppSettingsProto.MirrorIntent
 import tool.xfy9326.milink.nfc.proto.AppSettingsProto.NfcDevice
-import tool.xfy9326.milink.nfc.protocol.XiaomiMirrorNfc
+import tool.xfy9326.milink.nfc.utils.MiContinuityUtils
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -49,7 +49,7 @@ object AppSettings {
     }
 
     suspend fun initValues(context: Context): Unit = withContext(Dispatchers.IO) {
-        val isDeviceSupportLyra = XiaomiMirrorNfc.isLocalDeviceSupportLyra(context)
+        val isDeviceSupportLyra = MiContinuityUtils.isLocalDeviceSupportLyra(context)
 
         global.updateData {
             it.toBuilder().apply {

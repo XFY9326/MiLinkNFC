@@ -5,10 +5,10 @@ import androidx.annotation.StringRes
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.parcelize.Parcelize
+import lib.xfy9326.xiaomi.nfc.HandoffAppData
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.db.AppSettings
 import tool.xfy9326.milink.nfc.proto.AppSettingsProto
-import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
 
 @Parcelize
 data class XiaomiMirrorData(
@@ -19,14 +19,14 @@ data class XiaomiMirrorData(
 ) : Parcelable
 
 enum class XiaomiDeviceType(
-    val nfcType: XiaomiNfc.NewProtocol.DeviceType,
+    val nfcType: HandoffAppData.DeviceType,
     val protoType: AppSettingsProto.NfcDevice,
     @StringRes val resId: Int
 ) {
-    TV(XiaomiNfc.NewProtocol.DeviceType.TV, AppSettingsProto.NfcDevice.TV, R.string.device_type_tv),
-    PC(XiaomiNfc.NewProtocol.DeviceType.PC, AppSettingsProto.NfcDevice.PC, R.string.device_type_pc),
-    CAR(XiaomiNfc.NewProtocol.DeviceType.CAR, AppSettingsProto.NfcDevice.CAR, R.string.device_type_car),
-    PAD(XiaomiNfc.NewProtocol.DeviceType.PAD, AppSettingsProto.NfcDevice.PAD, R.string.device_type_pad);
+    TV(HandoffAppData.DeviceType.TV, AppSettingsProto.NfcDevice.TV, R.string.device_type_tv),
+    PC(HandoffAppData.DeviceType.PC, AppSettingsProto.NfcDevice.PC, R.string.device_type_pc),
+    CAR(HandoffAppData.DeviceType.CAR, AppSettingsProto.NfcDevice.CAR, R.string.device_type_car),
+    PAD(HandoffAppData.DeviceType.PAD, AppSettingsProto.NfcDevice.PAD, R.string.device_type_pad);
 }
 
 enum class XiaomiMirrorType(

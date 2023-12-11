@@ -15,7 +15,6 @@ import tool.xfy9326.milink.nfc.data.toXiaomiDeviceType
 import tool.xfy9326.milink.nfc.data.toXiaomiMirrorType
 import tool.xfy9326.milink.nfc.db.AppSettings
 import tool.xfy9326.milink.nfc.protocol.HuaweiHandoffNfc
-import tool.xfy9326.milink.nfc.protocol.XiaomiMirrorNfc
 import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
 
 class HuaweiShareNfcActivity : Activity() {
@@ -37,16 +36,16 @@ class HuaweiShareNfcActivity : Activity() {
                 } else {
                     AppSettings.GlobalDefaults.huaweiRedirectEnableLyra
                 }
+                val config = XiaomiNfc.ScreenMirror.Config(deviceType.nfcType, btMac, enableLyra)
                 when (globalSettings.huaweiRedirectMirrorIntent.toXiaomiMirrorType(AppSettings.GlobalDefaults.huaweiRedirectMirrorIntent)) {
                     XiaomiMirrorType.FAKE_NFC_TAG -> {
-                        XiaomiMirrorNfc.createNdefMessage(deviceType.nfcType, btMac, enableLyra).also {
-                            val intent = XiaomiNfc.newNdefActivityIntent(tag, id, it)
+                        XiaomiNfc.ScreenMirror.newNdefDiscoveredIntent(tag, id, config).also {
                             ContextCompat.startActivity(this, intent, null)
                         }
                     }
 
                     XiaomiMirrorType.MI_CONNECT_SERVICE -> {
-                        XiaomiMirrorNfc.sendConnectServiceBroadcast(this, deviceType.nfcType, btMac, enableLyra)
+                        XiaomiNfc.ScreenMirror.sendBroadcast(this, config)
                     }
                 }
             }
