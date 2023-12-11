@@ -6,6 +6,7 @@ import android.content.Context
 import android.graphics.drawable.Icon
 import android.os.Build
 import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -214,7 +215,10 @@ class NFCMirrorViewModel : ViewModel() {
                 val nfcDeviceType = mirrorData.deviceType.nfcType
                 val config = XiaomiNfc.ScreenMirror.Config(nfcDeviceType, mirrorData.btMac, mirrorData.enableLyra)
                 when (mirrorData.mirrorType) {
-                    XiaomiMirrorType.FAKE_NFC_TAG -> XiaomiNfc.ScreenMirror.newNdefDiscoveredIntent(null, null, config)
+                    XiaomiMirrorType.FAKE_NFC_TAG -> XiaomiNfc.ScreenMirror.newNdefDiscoveredIntent(null, null, config).also {
+                        ContextCompat.startActivity(context, it, null)
+                    }
+
                     XiaomiMirrorType.MI_CONNECT_SERVICE -> XiaomiNfc.ScreenMirror.sendBroadcast(context, config)
                 }
             }

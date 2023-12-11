@@ -227,7 +227,11 @@ object XiaomiNfc {
         fun sendBroadcast(context: Context, config: Config) {
             val jsonObject = JSONObject().apply {
                 put(KEY_DEVICE_TYPE, config.deviceType.value)
-                put(KEY_PROTOCOL_PAYLOAD, HandoffAppData.encodePayloadsMap(config.buildPayloadsMap()))
+                put(KEY_PROTOCOL_PAYLOAD,
+                    HandoffAppData.encodePayloadsMap(config.buildPayloadsMap()).let {
+                        Base64.encodeToString(it, Base64.DEFAULT)
+                    }
+                )
             }
 
             Intent(ACTION_PREFIX + ACTION_TAG_DISCOVERED).apply {
