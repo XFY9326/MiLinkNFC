@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
-import tool.xfy9326.milink.nfc.data.NdefData
+import tool.xfy9326.milink.nfc.data.NdefWriteData
 import tool.xfy9326.milink.nfc.datastore.AppDataStore
 import tool.xfy9326.milink.nfc.datastore.base.key.readValue
 import tool.xfy9326.milink.nfc.datastore.base.key.writeValue
@@ -23,13 +23,13 @@ class MainViewModel : ViewModel() {
 
     data class UiState(
         val showNotSupportedOSDialog: Boolean = false,
-        val ndefWriteDialogData: NdefData? = null,
+        val ndefWriteDialogData: NdefWriteData? = null,
     )
 
     private val nfcUsing = Semaphore(PERMITS_NFC_USING)
 
-    private val _nfcWriteData = MutableStateFlow<NdefData?>(null)
-    val nfcWriteData: StateFlow<NdefData?> = _nfcWriteData.asStateFlow()
+    private val _nfcWriteData = MutableStateFlow<NdefWriteData?>(null)
+    val nfcWriteData: StateFlow<NdefWriteData?> = _nfcWriteData.asStateFlow()
 
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
@@ -59,13 +59,13 @@ class MainViewModel : ViewModel() {
 
     fun requestClearNdefWriteDialog() {
         _uiState.update {
-            it.copy(ndefWriteDialogData = NdefData(EmptyNdefMessage, false))
+            it.copy(ndefWriteDialogData = NdefWriteData(EmptyNdefMessage, false))
         }
     }
 
-    fun requestNdefWriteDialog(ndefData: NdefData) {
+    fun requestNdefWriteDialog(ndefWriteData: NdefWriteData) {
         _uiState.update {
-            it.copy(ndefWriteDialogData = ndefData)
+            it.copy(ndefWriteDialogData = ndefWriteData)
         }
     }
 
@@ -75,9 +75,9 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun openNFCWriter(ndefData: NdefData): Boolean {
+    fun openNFCWriter(ndefWriteData: NdefWriteData): Boolean {
         return if (nfcUsing.tryAcquire()) {
-            _nfcWriteData.update { ndefData }
+            _nfcWriteData.update { ndefWriteData }
             true
         } else {
             false

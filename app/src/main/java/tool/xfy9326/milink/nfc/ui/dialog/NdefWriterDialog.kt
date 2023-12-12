@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import tool.xfy9326.milink.nfc.R
-import tool.xfy9326.milink.nfc.data.NdefData
+import tool.xfy9326.milink.nfc.data.NdefWriteData
 import tool.xfy9326.milink.nfc.ui.common.DialogContentSurface
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.theme.LocalAppThemeTypography
@@ -36,7 +36,7 @@ import tool.xfy9326.milink.nfc.utils.EmptyNdefMessage
 private fun Preview() {
     AppTheme {
         NdefWriterDialog(
-            ndefData = NdefData(
+            ndefWriteData = NdefWriteData(
                 msg = EmptyNdefMessage,
                 readOnly = false
             ),
@@ -50,8 +50,8 @@ private fun Preview() {
 
 @Composable
 fun NdefWriterDialog(
-    ndefData: NdefData,
-    onOpenReader: (NdefData) -> Boolean,
+    ndefWriteData: NdefWriteData,
+    onOpenReader: (NdefWriteData) -> Boolean,
     onCloseReader: () -> Unit,
     onNfcDeviceUsing: () -> Unit,
     onDismissRequest: () -> Unit
@@ -62,7 +62,7 @@ fun NdefWriterDialog(
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                if (!onOpenReader(ndefData)) {
+                if (!onOpenReader(ndefWriteData)) {
                     onNfcDeviceUsing()
                     onDismissRequest()
                 }
@@ -90,12 +90,12 @@ fun NdefWriterDialog(
                             .size(48.dp),
                         imageVector = Icons.Default.Nfc,
                         contentDescription = stringResource(id = R.string.write_screen_mirror_nfc),
-                        tint = if (ndefData.readOnly) Color.Red else LocalContentColor.current
+                        tint = if (ndefWriteData.readOnly) Color.Red else LocalContentColor.current
                     )
                     Spacer(modifier = Modifier.height(30.dp))
                     Text(
                         text = stringResource(
-                            id = if (ndefData.readOnly) {
+                            id = if (ndefWriteData.readOnly) {
                                 R.string.put_and_write_nfc_tag_read_only
                             } else {
                                 R.string.put_and_write_nfc_tag
@@ -105,7 +105,7 @@ fun NdefWriterDialog(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = stringResource(id = R.string.nfc_write_bytes, ndefData.msg.byteArrayLength),
+                        text = stringResource(id = R.string.nfc_write_bytes, ndefWriteData.msg.byteArrayLength),
                         textAlign = TextAlign.Center,
                         style = typography.labelMedium
                     )

@@ -52,7 +52,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.collectLatest
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.data.HuaweiRedirect
-import tool.xfy9326.milink.nfc.data.NdefData
+import tool.xfy9326.milink.nfc.data.NdefWriteData
 import tool.xfy9326.milink.nfc.data.ScreenMirror
 import tool.xfy9326.milink.nfc.service.NfcNotificationListenerService
 import tool.xfy9326.milink.nfc.ui.common.FunctionCard
@@ -85,7 +85,7 @@ private fun Preview() {
 @Composable
 fun ScreenMirrorScreen(
     viewModel: ScreenMirrorViewModel = viewModel(),
-    onRequestWriteNfc: (NdefData) -> Unit,
+    onRequestWriteNfc: (NdefWriteData) -> Unit,
     onNavBack: () -> Unit
 ) {
     val context = LocalContext.current
@@ -116,7 +116,7 @@ fun ScreenMirrorScreen(
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
                 .displayCutoutPadding()
-                .padding(horizontal = 8.dp, vertical = 4.dp),
+                .padding(horizontal = 8.dp, vertical = 6.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             TestScreenMirrorFunctionCard(

@@ -27,13 +27,14 @@ object XiaomiNfc {
 
     private const val PERMISSION_RECEIVE_ENDPOINT = "com.xiaomi.mi_connect_service.permission.RECEIVE_ENDPOINT"
 
-    @Suppress("SpellCheckingInspection")
     private const val NFC_EXTERNAL_TYPE = "com.xiaomi.mi_connect_service:externaltype"
 
-    fun getXiaomiNfcPayloadBytes(ndefMessage: NdefMessage): ByteArray? =
-        ndefMessage.records.asSequence().filterNotNull().filter {
-            it.toMimeType() == NFC_EXTERNAL_TYPE
+    fun getXiaomiNfcPayloadBytes(ndefMessage: NdefMessage): ByteArray? {
+        val typeBytes = NFC_EXTERNAL_TYPE.toByteArray(Charsets.US_ASCII)
+        return ndefMessage.records.asSequence().filterNotNull().filter {
+            it.tnf == NdefRecord.TNF_EXTERNAL_TYPE && it.type.contentEquals(typeBytes)
         }.firstOrNull()?.payload
+    }
 
     @Suppress("MemberVisibilityCanBePrivate")
     abstract class NfcAction<T, A : AppsData>(

@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import tool.xfy9326.milink.nfc.R
-import tool.xfy9326.milink.nfc.data.NdefData
+import tool.xfy9326.milink.nfc.data.NdefWriteData
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.vm.MiCirculateViewModel
 
@@ -47,7 +47,7 @@ private fun Preview() {
 @Composable
 fun MiCirculateScreen(
     viewModel: MiCirculateViewModel = viewModel(),
-    onRequestWriteNfc: (NdefData) -> Unit,
+    onRequestWriteNfc: (NdefWriteData) -> Unit,
     onNavBack: () -> Unit
 ) {
     val scrollState = rememberScrollState()
@@ -76,7 +76,7 @@ fun MiCirculateScreen(
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
                 .displayCutoutPadding()
-                .padding(horizontal = 8.dp, vertical = 4.dp),
+                .padding(horizontal = 8.dp, vertical = 6.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 

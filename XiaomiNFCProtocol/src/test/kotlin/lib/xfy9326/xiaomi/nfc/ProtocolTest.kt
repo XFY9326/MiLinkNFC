@@ -16,29 +16,7 @@ class ProtocolTest {
         private const val TEST_HEX_PAYLOAD_HANDOFF =
             "0a4b0801100d2201032a094d492d4e4643544147380f4a31271700000003000e5441475f444953434f564552454465064d4952524f52011130303a30303a30303a30303a30303a30306a02fa7f"
 
-        private inline fun <reified T : AppsData> XiaomiNfcProtocol<T>.testProtocol(bytes: ByteArray): XiaomiNfcPayload<T> {
-            val payload = bytes.decodeAsMiConnectPayload()
-
-            assertTrue(payload.isValidNfcPayload())
-
-            val protocol = payload.getNfcProtocol()
-            assertEquals(this, protocol)
-
-            val xiaomiNfcPayload = payload.toXiaomiNfcPayload(this)
-            assertIs<T>(xiaomiNfcPayload.appsData)
-
-            return xiaomiNfcPayload
-        }
-    }
-
-
-    @Test
-    fun testV1Protocol() {
-        val bytes = TEST_HEX_PAYLOAD_V1.hexToByteArray()
-        val payload = XiaomiNfcProtocol.V1.testProtocol(bytes)
-        assertContentEquals(bytes, payload.encode())
-
-        val mockData = NfcTagAppData(
+        private val TEST_PAYLOAD_V1 = NfcTagAppData(
             majorVersion = 1,
             minorVersion = 0,
             writeTime = 1684933764,
@@ -63,16 +41,7 @@ class ProtocolTest {
                 )
             )
         )
-        assertContentEquals(payload.appsData.encode(), mockData.encode())
-    }
-
-    @Test
-    fun testV2Protocol() {
-        val bytes = TEST_HEX_PAYLOAD_V2.hexToByteArray()
-        val payload = XiaomiNfcProtocol.V2.testProtocol(bytes)
-        assertContentEquals(bytes, payload.encode())
-
-        val mockData = NfcTagAppData(
+        private val TEST_PAYLOAD_V2 = NfcTagAppData(
             majorVersion = 1,
             minorVersion = 0,
             writeTime = 1661161323,
@@ -96,16 +65,7 @@ class ProtocolTest {
                 )
             )
         )
-        assertContentEquals(payload.appsData.encode(), mockData.encode())
-    }
-
-    @Test
-    fun testHandoffProtocol() {
-        val bytes = TEST_HEX_PAYLOAD_HANDOFF.hexToByteArray()
-        val payload = XiaomiNfcProtocol.HandOff.testProtocol(bytes)
-        assertContentEquals(bytes, payload.encode())
-
-        val mockData = HandoffAppData(
+        private val TEST_PAYLOAD_HANDOFF = HandoffAppData(
             majorVersion = 0x27,
             minorVersion = 0x17,
             deviceType = HandoffAppData.DeviceType.PC,
@@ -116,6 +76,44 @@ class ProtocolTest {
                 HandoffAppData.PayloadKey.BT_MAC to "00:00:00:00:00:00".toByteArray(Charsets.UTF_8)
             )
         )
-        assertContentEquals(payload.appsData.encode(), mockData.encode())
+
+        private inline fun <reified T : AppsData> XiaomiNfcProtocol<T>.testProtocol(bytes: ByteArray): XiaomiNfcPayload<T> {
+            val payload = bytes.decodeAsMiConnectPayload()
+
+            assertTrue(payload.isValidNfcPayload())
+
+            val protocol = payload.getNfcProtocol()
+            assertEquals(this, protocol)
+
+            val xiaomiNfcPayload = payload.toXiaomiNfcPayload(this)
+            assertIs<T>(xiaomiNfcPayload.appsData)
+
+            return xiaomiNfcPayload
+        }
+    }
+
+
+    @Test
+    fun testV1Protocol() {
+        val bytes = TEST_HEX_PAYLOAD_V1.hexToByteArray()
+        val payload = XiaomiNfcProtocol.V1.testProtocol(bytes)
+        assertContentEquals(bytes, payload.encode())
+        assertContentEquals(payload.appsData.encode(), TEST_PAYLOAD_V1.encode())
+    }
+
+    @Test
+    fun testV2Protocol() {
+        val bytes = TEST_HEX_PAYLOAD_V2.hexToByteArray()
+        val payload = XiaomiNfcProtocol.V2.testProtocol(bytes)
+        assertContentEquals(bytes, payload.encode())
+        assertContentEquals(payload.appsData.encode(), TEST_PAYLOAD_V2.encode())
+    }
+
+    @Test
+    fun testHandoffProtocol() {
+        val bytes = TEST_HEX_PAYLOAD_HANDOFF.hexToByteArray()
+        val payload = XiaomiNfcProtocol.HandOff.testProtocol(bytes)
+        assertContentEquals(bytes, payload.encode())
+        assertContentEquals(payload.appsData.encode(), TEST_PAYLOAD_HANDOFF.encode())
     }
 }

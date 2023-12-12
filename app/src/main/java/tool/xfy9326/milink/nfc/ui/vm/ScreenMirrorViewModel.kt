@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 import tool.xfy9326.milink.nfc.AppContext
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.data.HuaweiRedirect
-import tool.xfy9326.milink.nfc.data.NdefData
+import tool.xfy9326.milink.nfc.data.NdefWriteData
 import tool.xfy9326.milink.nfc.data.NfcActionIntentType
 import tool.xfy9326.milink.nfc.data.ScreenMirror
 import tool.xfy9326.milink.nfc.datastore.AppDataStore
@@ -110,10 +110,10 @@ class ScreenMirrorViewModel : ViewModel() {
         }
     }
 
-    fun requestWriteNfc(nfcTagData: ScreenMirror.NFCTag, ndefWriteHandler: (NdefData) -> Unit) {
+    fun requestWriteNfc(nfcTagData: ScreenMirror.NFCTag, ndefWriteHandler: (NdefWriteData) -> Unit) {
         viewModelScope.launch {
             if (validateBluetoothMac(nfcTagData.bluetoothMac)) {
-                val data = NdefData(XiaomiNfc.ScreenMirror.newNdefMessage(nfcTagData.toConfig()), nfcTagData.readOnly)
+                val data = NdefWriteData(XiaomiNfc.ScreenMirror.newNdefMessage(nfcTagData.toConfig()), nfcTagData.readOnly)
                 ndefWriteHandler(data)
             }
         }

@@ -33,3 +33,6 @@ fun <T : TagTechnology> T.tryConnect(): Result<T> = runCatching {
     require(isConnected)
     this
 }
+
+fun NdefMessage?.isNullOrEmpty(): Boolean =
+    this == null || records.isEmpty() || records.all { it.tnf == NdefRecord.TNF_EMPTY }

@@ -16,7 +16,7 @@ fun MiConnectProtocol.Payload.isValidNfcPayload(): Boolean =
             MI_CONNECT_PROTOCOL_PAYLOAD_NAME == name &&
             appsDataCount > 0
 
-fun MiConnectProtocol.Payload.getNfcProtocol(): XiaomiNfcProtocol<*> =
+fun MiConnectProtocol.Payload.getNfcProtocol(): XiaomiNfcProtocol<out AppsData> =
     XiaomiNfcProtocol.parse(flags.byteAt(0))
 
 fun <T : AppsData> MiConnectProtocol.Payload.toXiaomiNfcPayload(protocol: XiaomiNfcProtocol<T>): XiaomiNfcPayload<T> {

@@ -1,5 +1,6 @@
 package tool.xfy9326.milink.nfc.utils
 
+import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -14,6 +15,10 @@ import androidx.core.net.toUri
 
 val Context.packageUri: Uri
     get() = "package:${packageName}".toUri()
+
+inline fun <reified A : Activity> Context.startActivity(intentBlock: Intent.() -> Unit = {}) {
+    startActivity(Intent(this, A::class.java).apply(intentBlock))
+}
 
 fun Context.showToast(text: String, longDuration: Boolean = false): Unit =
     Toast.makeText(this, text, if (longDuration) Toast.LENGTH_LONG else Toast.LENGTH_SHORT).show()

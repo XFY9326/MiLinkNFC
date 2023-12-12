@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material.icons.filled.Devices
 import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.TapAndPlay
@@ -60,15 +61,19 @@ const val HomeRoute = "home"
 @Composable
 private fun Preview() {
     AppTheme {
-        HomeScreen {}
+        HomeScreen(
+            onNavToXiaomiNfcReader = {},
+            onExit = {}
+        )
     }
 }
 
-private const val NAV_ANIMATION_DURATION = 500
+private const val NAV_ANIMATION_DURATION = 400
 
 @Composable
 fun HomeScreen(
     viewModel: MainViewModel = viewModel(),
+    onNavToXiaomiNfcReader: () -> Unit,
     onExit: () -> Unit
 ) {
     val context = LocalContext.current
@@ -118,6 +123,7 @@ fun HomeScreen(
                 onNavToScreenMirror = {
                     navController.navigate(ScreenMirrorRoute)
                 },
+                onNavToXiaomiNfcReader = onNavToXiaomiNfcReader,
                 onRequestClearNfc = viewModel::requestClearNdefWriteDialog
             )
         }
@@ -164,7 +170,7 @@ fun HomeScreen(
 
     uiState.value.ndefWriteDialogData?.let {
         NdefWriterDialog(
-            ndefData = it,
+            ndefWriteData = it,
             onOpenReader = viewModel::openNFCWriter,
             onCloseReader = viewModel::closeNfcWriter,
             onNfcDeviceUsing = { context.showToast(context.getString(R.string.nfc_using_conflict)) },
@@ -178,6 +184,7 @@ private fun Content(
     onNavToMiPlay: () -> Unit,
     onNavToMiCirculate: () -> Unit,
     onNavToScreenMirror: () -> Unit,
+    onNavToXiaomiNfcReader: () -> Unit,
     onRequestClearNfc: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
@@ -219,6 +226,12 @@ private fun Content(
             Divider(modifier = Modifier.fillMaxWidth())
             EntryCard(
                 icon = Icons.Default.Nfc,
+                title = stringResource(id = R.string.nfc_read_xiaomi_ndef),
+                summary = stringResource(id = R.string.nfc_read_xiaomi_ndef_summary),
+                onClick = onNavToXiaomiNfcReader
+            )
+            EntryCard(
+                icon = Icons.Default.ClearAll,
                 title = stringResource(id = R.string.nfc_clear_ndef),
                 summary = stringResource(id = R.string.nfc_clear_ndef_summary),
                 onClick = onRequestClearNfc

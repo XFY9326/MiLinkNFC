@@ -4,11 +4,11 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import tool.xfy9326.milink.nfc.data.NdefData
+import tool.xfy9326.milink.nfc.data.NdefWriteData
 
 class MiPlayViewModel : ViewModel() {
     data class UiState(
-        val ndefWriteDialogData: NdefData? = null,
+        val ndefWriteDialogData: NdefWriteData? = null,
     )
 
     private val _uiState = MutableStateFlow(UiState())

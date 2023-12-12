@@ -19,13 +19,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import tool.xfy9326.milink.nfc.AppContext
 import tool.xfy9326.milink.nfc.R
-import tool.xfy9326.milink.nfc.data.NdefData
+import tool.xfy9326.milink.nfc.data.NdefWriteData
 import tool.xfy9326.milink.nfc.ui.screen.HomeScreen
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.vm.MainViewModel
 import tool.xfy9326.milink.nfc.utils.enableNdefReaderMode
 import tool.xfy9326.milink.nfc.utils.ignoreTagUntilRemoved
 import tool.xfy9326.milink.nfc.utils.showToast
+import tool.xfy9326.milink.nfc.utils.startActivity
 import tool.xfy9326.milink.nfc.utils.tryConnect
 import tool.xfy9326.milink.nfc.utils.useCatching
 
@@ -38,7 +39,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AppTheme {
-                HomeScreen(onExit = { finishAndRemoveTask() })
+                HomeScreen(
+                    onNavToXiaomiNfcReader = { startActivity<XiaomiNfcReaderActivity>() },
+                    onExit = { finishAndRemoveTask() }
+                )
             }
         }
         setupNfcReaderListener()
@@ -65,7 +69,7 @@ class MainActivity : ComponentActivity() {
 
     private fun makeToast(msg: String): Unit = runOnUiThread { showToast(msg) }
 
-    private fun handleNfcTag(nfcAdapter: NfcAdapter, tag: Tag, writeData: NdefData) {
+    private fun handleNfcTag(nfcAdapter: NfcAdapter, tag: Tag, writeData: NdefWriteData) {
         lifecycleScope.launch {
             val ndef = Ndef.get(tag)
             if (ndef != null) {
@@ -96,7 +100,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private suspend fun writeNdefTag(nfcAdapter: NfcAdapter, ndef: Ndef, writeData: NdefData): Unit = withContext(Dispatchers.IO) {
+    private suspend fun writeNdefTag(nfcAdapter: NfcAdapter, ndef: Ndef, writeData: NdefWriteData): Unit = withContext(Dispatchers.IO) {
         ndef.tryConnect().onSuccess {
             it.useCatching {
                 if (!it.isWritable) {

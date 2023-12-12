@@ -5,7 +5,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class NdefData(
+data class NdefWriteData(
     val msg: NdefMessage,
     val readOnly: Boolean
 ) : Parcelable
