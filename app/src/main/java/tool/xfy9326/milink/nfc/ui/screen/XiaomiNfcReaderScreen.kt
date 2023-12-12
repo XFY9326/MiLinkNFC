@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.collectLatest
+import lib.xfy9326.xiaomi.nfc.XiaomiNdefPayloadType
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.ui.common.InfoContent
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
@@ -174,7 +175,13 @@ private fun NfcTagInfoCard(modifier: Modifier = Modifier, data: XiaomiNfcReaderV
                 stringResource(id = R.string.nfc_field_type) to data.type,
                 stringResource(id = R.string.nfc_field_size) to stringResource(id = R.string.current_and_total_bytes, data.currentSize, data.maxSize),
                 stringResource(id = R.string.nfc_field_writeable) to stringResource(id = data.writeable.stringResId()),
-                stringResource(id = R.string.nfc_field_can_make_read_only) to stringResource(id = data.canMakeReadOnly.stringResId())
+                stringResource(id = R.string.nfc_field_can_make_read_only) to stringResource(id = data.canMakeReadOnly.stringResId()),
+                stringResource(id = R.string.nfc_field_ndef_payload_type) to stringResource(
+                    id = when (data.ndefPayloadType) {
+                        XiaomiNdefPayloadType.SMART_HOME -> R.string.ndef_payload_type_smart_home
+                        XiaomiNdefPayloadType.MI_CONNECT_SERVICE -> R.string.ndef_payload_type_mi_connect_service
+                    }
+                )
             )
         )
     }
@@ -240,48 +247,43 @@ private fun NfcTagAppDataCard(modifier: Modifier = Modifier, data: XiaomiNfcRead
                 stringResource(id = R.string.nfc_field_flags) to data.flags,
             )
         )
-        for (record in data.records) {
-            OutlinedCard(modifier = Modifier.padding(10.dp)) {
-                when (record) {
-                    is XiaomiNfcReaderViewModel.NfcTagDeviceRecordUI -> {
-                        InfoContent(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            title = stringResource(id = R.string.info_app_data_nfc_tag_device_record),
-                            data = mutableMapOf(
-                                stringResource(id = R.string.nfc_field_device_type) to record.deviceType,
-                                stringResource(id = R.string.nfc_field_flags) to record.flags,
-                                stringResource(id = R.string.nfc_field_device_number) to record.deviceNumber,
-                            ).also {
-                                if (record.attributesMap.isNotEmpty()) {
-                                    it[stringResource(id = R.string.nfc_field_attributes)] = record.attributesMap.map { entry ->
-                                        "${entry.key}: ${entry.value}"
-                                    }.joinToString("\n")
-                                }
-                            }
-                        )
-                    }
-
-                    is XiaomiNfcReaderViewModel.NfcTagActionRecordUI -> {
-                        InfoContent(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            title = stringResource(id = R.string.info_app_data_nfc_tag_action_record),
-                            data = mutableMapOf(
-                                stringResource(id = R.string.nfc_field_action) to record.action,
-                                stringResource(id = R.string.nfc_field_condition) to record.condition,
-                                stringResource(id = R.string.nfc_field_device_number) to record.deviceNumber,
-                                stringResource(id = R.string.nfc_field_flags) to record.flags
-                            ).also {
-                                if (record.conditionParameters.isNotEmpty()) {
-                                    it[stringResource(id = R.string.nfc_field_condition_parameters)] = record.conditionParameters
-                                }
-                            }
-                        )
+        data.actionRecord?.let { record ->
+            InfoContent(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                title = stringResource(id = R.string.info_app_data_nfc_tag_action_record),
+                data = mutableMapOf(
+                    stringResource(id = R.string.nfc_field_action) to record.action,
+                    stringResource(id = R.string.nfc_field_condition) to record.condition,
+                    stringResource(id = R.string.nfc_field_device_number) to record.deviceNumber,
+                    stringResource(id = R.string.nfc_field_flags) to record.flags
+                ).also {
+                    if (record.conditionParameters.isNotEmpty()) {
+                        it[stringResource(id = R.string.nfc_field_condition_parameters)] = record.conditionParameters
                     }
                 }
+            )
+        }
+        data.deviceRecord?.let { record ->
+            OutlinedCard(modifier = Modifier.padding(10.dp)) {
+                InfoContent(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    title = stringResource(id = R.string.info_app_data_nfc_tag_device_record),
+                    data = mutableMapOf(
+                        stringResource(id = R.string.nfc_field_device_type) to record.deviceType,
+                        stringResource(id = R.string.nfc_field_flags) to record.flags,
+                        stringResource(id = R.string.nfc_field_device_number) to record.deviceNumber,
+                    ).also {
+                        if (record.attributesMap.isNotEmpty()) {
+                            it[stringResource(id = R.string.nfc_field_attributes)] = record.attributesMap.map { entry ->
+                                "${entry.key}: ${entry.value}"
+                            }.joinToString("\n")
+                        }
+                    }
+                )
             }
         }
     }

@@ -16,6 +16,7 @@ import lib.xfy9326.xiaomi.nfc.HandoffAppData
 import lib.xfy9326.xiaomi.nfc.NfcTagActionRecord
 import lib.xfy9326.xiaomi.nfc.NfcTagAppData
 import lib.xfy9326.xiaomi.nfc.NfcTagDeviceRecord
+import lib.xfy9326.xiaomi.nfc.XiaomiNdefPayloadType
 import lib.xfy9326.xiaomi.nfc.XiaomiNfcPayload
 import lib.xfy9326.xiaomi.nfc.decodeAsMiConnectPayload
 import lib.xfy9326.xiaomi.nfc.getNfcProtocol
@@ -38,6 +39,7 @@ class XiaomiNfcReaderViewModel : ViewModel() {
     }
 
     class NfcTagInfo(
+        val ndefPayloadType: XiaomiNdefPayloadType,
         val techList: List<String>,
         val type: String,
         val currentSize: Int,
@@ -45,7 +47,8 @@ class XiaomiNfcReaderViewModel : ViewModel() {
         val writeable: Boolean,
         val canMakeReadOnly: Boolean
     ) {
-        constructor(ndefReadData: NdefReadData) : this(
+        constructor(type: XiaomiNdefPayloadType, ndefReadData: NdefReadData) : this(
+            ndefPayloadType = type,
             techList = ndefReadData.techList,
             type = ndefReadData.type,
             currentSize = ndefReadData.msg.byteArrayLength,
@@ -74,19 +77,16 @@ class XiaomiNfcReaderViewModel : ViewModel() {
         val minorVersion: String,
         val writeTime: String,
         val flags: String,
-        val records: List<NfcTagRecordUI>
+        val actionRecord: NfcTagActionRecordUI?,
+        val deviceRecord: NfcTagDeviceRecordUI?,
     ) {
-        constructor(nfcTagAppData: NfcTagAppData) : this(
+        constructor(nfcTagAppData: NfcTagAppData, ndefPayloadType: XiaomiNdefPayloadType) : this(
             majorVersion = nfcTagAppData.majorVersion.toHexString(true),
             minorVersion = nfcTagAppData.minorVersion.toHexString(true),
             writeTime = SimpleDateFormat.getDateTimeInstance().format(nfcTagAppData.writeTime * 1000L),
             flags = nfcTagAppData.flags.toHexString(true),
-            records = nfcTagAppData.records.map {
-                when (it) {
-                    is NfcTagActionRecord -> NfcTagActionRecordUI(it)
-                    is NfcTagDeviceRecord -> NfcTagDeviceRecordUI(it)
-                }
-            }
+            actionRecord = nfcTagAppData.getActionRecord()?.let { NfcTagActionRecordUI(it) },
+            deviceRecord = nfcTagAppData.getDeviceRecord()?.let { NfcTagDeviceRecordUI(it, nfcTagAppData.getActionRecord(), ndefPayloadType) }
         )
     }
 
@@ -98,26 +98,37 @@ class XiaomiNfcReaderViewModel : ViewModel() {
         val deviceNumber: String,
         val attributesMap: Map<String, String>,
     ) : NfcTagRecordUI {
-        constructor(deviceRecord: NfcTagDeviceRecord) : this(
+        constructor(deviceRecord: NfcTagDeviceRecord, actionRecord: NfcTagActionRecord?, ndefPayloadType: XiaomiNdefPayloadType) : this(
             deviceType = deviceRecord.deviceType.name,
             flags = deviceRecord.flags.toHexString(true),
             deviceNumber = deviceRecord.deviceNumber.toHexString(true),
-            attributesMap = deviceRecord.allAttributesMap.mapNotNull {
-                if (it.value.isNotEmpty()) {
-                    it.key.name to when (it.key) {
-                        NfcTagDeviceRecord.DeviceAttribute.WIFI_MAC_ADDRESS,
-                        NfcTagDeviceRecord.DeviceAttribute.BLUETOOTH_MAC_ADDRESS,
-                        NfcTagDeviceRecord.DeviceAttribute.NIC_MAC_ADDRESS,
-                        NfcTagDeviceRecord.DeviceAttribute.IP_ADDRESS -> it.value.toHexText()
+            attributesMap = if (actionRecord == null) {
+                deviceRecord.attributesMap.map { it.key.toString() to it.value.toHexText() }
+            } else {
+                deviceRecord.getAllAttributesMap(actionRecord, ndefPayloadType).mapNotNull {
+                    if (it.value.isNotEmpty()) {
+                        val key = it.key.attributeName
+                        val value = if (it.key == NfcTagDeviceRecord.DeviceAttribute.APP_DATA) {
+                            when (NfcTagDeviceRecord.getAppDataValueType(it.value, actionRecord, ndefPayloadType)) {
+                                NfcTagDeviceRecord.AppDataValueType.IOT_ACTION -> it.value.runCatching {
+                                    toString(Charsets.UTF_8)
+                                }.getOrNull() ?: it.value.toHexText()
 
-                        else -> {
-                            it.value.runCatching { toString(Charsets.UTF_8) }.getOrNull()?.takeIf { s ->
-                                s.all { c -> c.isDefined() && !c.isWhitespace() }
-                            } ?: it.value.toHexText()
+                                else -> it.value.toHexText()
+                            }
+                        } else {
+                            val text = it.value.runCatching { toString(Charsets.UTF_8) }.getOrNull()
+                            val hexText = it.value.toHexText()
+                            when (it.key.isText) {
+                                true -> text ?: hexText
+                                false -> hexText
+                                else -> "$text\n$hexText"
+                            }
                         }
+                        key to value
+                    } else {
+                        null
                     }
-                } else {
-                    null
                 }
             }.toMap()
         )
@@ -180,13 +191,19 @@ class XiaomiNfcReaderViewModel : ViewModel() {
 
     fun updateNfcReadData(ndefReadData: NdefReadData) {
         viewModelScope.launch(Dispatchers.IO) {
-            val bytes = XiaomiNfc.getXiaomiNfcPayloadBytes(ndefReadData.msg)
+            val type = XiaomiNfc.getXiaomiNfcPayloadType(ndefReadData.msg)
+            if (type == null) {
+                _snackbarMsg.emit(SnackbarMsg.NDEF_RECORD_NOT_FOUND)
+                _uiState.update { it.copy() }
+                return@launch
+            }
+            val bytes = XiaomiNfc.getXiaomiNfcPayloadBytes(ndefReadData.msg, type)
             if (bytes == null) {
                 _snackbarMsg.emit(SnackbarMsg.NDEF_RECORD_NOT_FOUND)
                 _uiState.update { it.copy() }
                 return@launch
             }
-            if (!decodeXiaomiNfcPayload(NfcTagInfo(ndefReadData), bytes)) {
+            if (!decodeXiaomiNfcPayload(NfcTagInfo(type, ndefReadData), bytes)) {
                 _uiState.update { it.copy() }
             }
         }
@@ -221,7 +238,7 @@ class XiaomiNfcReaderViewModel : ViewModel() {
                 }
 
                 is NfcTagAppData -> _uiState.update {
-                    it.copy(tagInfo = tagInfo, payloadUI = payloadUI, nfcTagAppDataUI = NfcTagAppDataUI(appsData))
+                    it.copy(tagInfo = tagInfo, payloadUI = payloadUI, nfcTagAppDataUI = NfcTagAppDataUI(appsData, tagInfo.ndefPayloadType))
                 }
             }
             return true

@@ -14,6 +14,7 @@ import lib.xfy9326.xiaomi.nfc.HandoffAppData
 import lib.xfy9326.xiaomi.nfc.NfcTagActionRecord
 import lib.xfy9326.xiaomi.nfc.NfcTagAppData
 import lib.xfy9326.xiaomi.nfc.NfcTagDeviceRecord
+import lib.xfy9326.xiaomi.nfc.XiaomiNdefPayloadType
 import lib.xfy9326.xiaomi.nfc.XiaomiNfcPayload
 import lib.xfy9326.xiaomi.nfc.XiaomiNfcProtocol
 import lib.xfy9326.xiaomi.nfc.decodeAsMiConnectPayload
@@ -26,19 +27,28 @@ object XiaomiNfc {
     private const val FLAG_BIND_TREAT_LIKE_VISIBLE_FOREGROUND_SERVICE = 268435456
 
     private const val PERMISSION_RECEIVE_ENDPOINT = "com.xiaomi.mi_connect_service.permission.RECEIVE_ENDPOINT"
-    private const val NFC_EXTERNAL_TYPE = "com.xiaomi.mi_connect_service:externaltype"
-    private const val NFC_SMART_HOME_TYPE = "com.xiaomi.smarthome:externaltype"
     private const val URI_MI_HOME = "https://g.home.mi.com"
 
-    fun getXiaomiNfcPayloadBytes(ndefMessage: NdefMessage): ByteArray? {
-        val externalTypeBytes = NFC_EXTERNAL_TYPE.toByteArray(Charsets.US_ASCII)
-        val smartHomeTypeBytes = NFC_SMART_HOME_TYPE.toByteArray(Charsets.US_ASCII)
-        return ndefMessage.records.asSequence().filterNotNull().filter {
-            it.tnf == NdefRecord.TNF_EXTERNAL_TYPE && (it.type.contentEquals(externalTypeBytes) || it.type.contentEquals(smartHomeTypeBytes))
-        }.firstOrNull()?.payload
-    }
+    private const val PKG_MI_CONNECT_SERVICE = "com.xiaomi.mi_connect_service"
+    private const val PKG_SMART_HOME = "com.xiaomi.smarthome"
 
-    private fun newMiHomeUriNdefRecord(): NdefRecord = NdefRecord.createUri(URI_MI_HOME.toUri())
+    fun getXiaomiNfcPayloadType(ndefMessage: NdefMessage): XiaomiNdefPayloadType? =
+        ndefMessage.records.asSequence().filterNotNull().filter {
+            it.tnf == NdefRecord.TNF_EXTERNAL_TYPE
+        }.firstOrNull()?.type?.runCatching(XiaomiNdefPayloadType::parse)?.getOrNull()
+
+    fun getXiaomiNfcPayloadBytes(ndefMessage: NdefMessage, type: XiaomiNdefPayloadType): ByteArray? =
+        ndefMessage.records.asSequence().filterNotNull().filter {
+            it.tnf == NdefRecord.TNF_EXTERNAL_TYPE && it.type.toString(Charsets.US_ASCII) == type.value
+        }.firstOrNull()?.payload
+
+    private fun newMiTapNdefMessage(ndefRecord: NdefRecord): NdefMessage =
+        NdefMessage(
+            ndefRecord,
+            NdefRecord.createApplicationRecord(PKG_SMART_HOME),
+            NdefRecord.createApplicationRecord(PKG_MI_CONNECT_SERVICE),
+            NdefRecord.createUri(URI_MI_HOME.toUri())
+        )
 
     @Suppress("MemberVisibilityCanBePrivate")
     abstract class NfcAction<T, A : AppsData>(
@@ -46,19 +56,19 @@ object XiaomiNfc {
         private val minorVersion: Int,
         private val idHash: Byte? = null,
         private val protocol: XiaomiNfcProtocol<A>,
-        private val nfcType: String
+        private val ndefRecordType: XiaomiNdefPayloadType
     ) {
         protected abstract fun encodeAppsData(config: T): A
 
-        open fun newNdefMessage(config: T): NdefMessage =
+        open fun newNdefMessage(config: T, shrink: Boolean = false): NdefMessage =
             NdefMessage(newNdefRecord(config))
 
         protected fun newNdefRecord(config: T): NdefRecord =
-            NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE, nfcType.toByteArray(Charsets.US_ASCII), null, encode(config).encode())
+            NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE, ndefRecordType.value.toByteArray(Charsets.US_ASCII), null, encode(config).encode())
 
         fun newNdefDiscoveredIntent(tag: Tag?, id: ByteArray?, config: T): Intent {
             return Intent(NfcAdapter.ACTION_NDEF_DISCOVERED).apply {
-                data = "vnd.android.nfc://ext/$nfcType".toUri()
+                data = "vnd.android.nfc://ext/$ndefRecordType".toUri()
                 putExtra(NfcAdapter.EXTRA_TAG, tag)
                 putExtra(NfcAdapter.EXTRA_ID, id)
                 putExtra(NfcAdapter.EXTRA_NDEF_MESSAGES, arrayOf(newNdefMessage(config)))
@@ -79,15 +89,25 @@ object XiaomiNfc {
         }
     }
 
-    object EmptyMiTap : NfcAction<Unit, NfcTagAppData>(1, 2, 0, XiaomiNfcProtocol.V1, NFC_SMART_HOME_TYPE) {
+    object EmptyMiTap : NfcAction<Unit, NfcTagAppData>(
+        majorVersion = 1,
+        minorVersion = 2,
+        idHash = 0,
+        protocol = XiaomiNfcProtocol.V1,
+        ndefRecordType = XiaomiNdefPayloadType.SMART_HOME
+    ) {
         private const val MAJOR_VERSION = 1.toByte()
         private const val MINOR_VERSION = 0.toByte()
         private const val FLAGS = 0.toByte()
         private const val DEVICE_NUMBER = 0.toByte()
         private const val WRITE_TIME = 0
 
-        override fun newNdefMessage(config: Unit): NdefMessage =
-            NdefMessage(newNdefRecord(config), newMiHomeUriNdefRecord())
+        override fun newNdefMessage(config: Unit, shrink: Boolean): NdefMessage =
+            if (shrink) {
+                super.newNdefMessage(config, true)
+            } else {
+                newMiTapNdefMessage(newNdefRecord(config))
+            }
 
         override fun encodeAppsData(config: Unit): NfcTagAppData =
             NfcTagAppData(
@@ -113,7 +133,13 @@ object XiaomiNfc {
             )
     }
 
-    object SoundBoxPlay : NfcAction<SoundBoxPlay.Config, NfcTagAppData>(1, 2, 0, XiaomiNfcProtocol.V1, NFC_EXTERNAL_TYPE) {
+    object SoundBoxPlay : NfcAction<SoundBoxPlay.Config, NfcTagAppData>(
+        majorVersion = 1,
+        minorVersion = 2,
+        idHash = 0,
+        protocol = XiaomiNfcProtocol.V1,
+        ndefRecordType = XiaomiNdefPayloadType.MI_CONNECT_SERVICE
+    ) {
         private const val MAJOR_VERSION = 1.toByte()
         private const val MINOR_VERSION = 0.toByte()
         private const val FLAGS = 0.toByte()
@@ -126,8 +152,12 @@ object XiaomiNfc {
             val model: String
         )
 
-        override fun newNdefMessage(config: Config): NdefMessage =
-            NdefMessage(newNdefRecord(config), newMiHomeUriNdefRecord())
+        override fun newNdefMessage(config: Config, shrink: Boolean): NdefMessage =
+            if (shrink) {
+                super.newNdefMessage(config, true)
+            } else {
+                newMiTapNdefMessage(newNdefRecord(config))
+            }
 
         override fun encodeAppsData(config: Config): NfcTagAppData =
             NfcTagAppData(
@@ -136,7 +166,7 @@ object XiaomiNfc {
                 writeTime = config.writeTime,
                 flags = FLAGS,
                 records = listOf(
-                    NfcTagDeviceRecord(
+                    NfcTagDeviceRecord.create(
                         deviceType = NfcTagDeviceRecord.DeviceType.MI_SOUND_BOX,
                         flags = FLAGS,
                         deviceNumber = DEVICE_NUMBER,
@@ -157,7 +187,13 @@ object XiaomiNfc {
             )
     }
 
-    object SoundBoxCirculate : NfcAction<SoundBoxCirculate.Config, NfcTagAppData>(1, 11, 0, XiaomiNfcProtocol.V2, NFC_EXTERNAL_TYPE) {
+    object SoundBoxCirculate : NfcAction<SoundBoxCirculate.Config, NfcTagAppData>(
+        majorVersion = 1,
+        minorVersion = 11,
+        idHash = 0,
+        protocol = XiaomiNfcProtocol.V2,
+        ndefRecordType = XiaomiNdefPayloadType.MI_CONNECT_SERVICE
+    ) {
         private const val MAJOR_VERSION = 1.toByte()
         private const val MINOR_VERSION = 0.toByte()
         private const val FLAGS = 0.toByte()
@@ -182,7 +218,7 @@ object XiaomiNfc {
                 writeTime = config.writeTime,
                 flags = FLAGS,
                 records = listOf(
-                    NfcTagDeviceRecord(
+                    NfcTagDeviceRecord.create(
                         deviceType = NfcTagDeviceRecord.DeviceType.MI_SOUND_BOX,
                         flags = FLAGS,
                         deviceNumber = DEVICE_NUMBER,
@@ -208,10 +244,10 @@ object XiaomiNfc {
                 addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
                 addFlags(FLAG_BIND_TREAT_LIKE_VISIBLE_FOREGROUND_SERVICE)
                 putExtra(EXTRA_ACTION, NfcTagActionRecord.Action.CUSTOM.value.toInt())
-                appData.getDeviceRecords().firstOrNull()?.attributesMap?.let { map ->
-                    val idHash = map[NfcTagDeviceRecord.DeviceAttribute.ID_HASH]?.let { Base64.encodeToString(it, Base64.DEFAULT) } ?: EMPTY
-                    val wifiMac = map[NfcTagDeviceRecord.DeviceAttribute.WIFI_MAC_ADDRESS]?.toHexString(true) ?: EMPTY
-                    val btMac = map[NfcTagDeviceRecord.DeviceAttribute.BLUETOOTH_MAC_ADDRESS]?.toHexString(true) ?: EMPTY
+                appData.getDeviceRecord()?.attributesMap?.let { map ->
+                    val idHash = map[NfcTagDeviceRecord.DeviceAttribute.ID_HASH.value]?.let { Base64.encodeToString(it, Base64.DEFAULT) } ?: EMPTY
+                    val wifiMac = map[NfcTagDeviceRecord.DeviceAttribute.WIFI_MAC_ADDRESS.value]?.toHexString(true) ?: EMPTY
+                    val btMac = map[NfcTagDeviceRecord.DeviceAttribute.BLUETOOTH_MAC_ADDRESS.value]?.toHexString(true) ?: EMPTY
                     putExtra(EXTRA_ID_HASH, idHash)
                     putExtra(EXTRA_WIFI_MAC, wifiMac)
                     putExtra(EXTRA_BLUETOOTH_MAC, btMac)
@@ -222,7 +258,14 @@ object XiaomiNfc {
         }
     }
 
-    object ScreenMirror : NfcAction<ScreenMirror.Config, HandoffAppData>(1, 13, null, XiaomiNfcProtocol.HandOff, NFC_EXTERNAL_TYPE) {
+    object ScreenMirror :
+        NfcAction<ScreenMirror.Config, HandoffAppData>(
+            majorVersion = 1,
+            minorVersion = 13,
+            idHash = null,
+            protocol = XiaomiNfcProtocol.HandOff,
+            ndefRecordType = XiaomiNdefPayloadType.MI_CONNECT_SERVICE
+        ) {
         private const val MAJOR_VERSION = 0x27.toByte()
         private const val MINOR_VERSION = 0x17.toByte()
 

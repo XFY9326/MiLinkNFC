@@ -24,7 +24,7 @@ sealed class NfcTagRecord(val type: Byte) : BinaryData {
                 deviceType = NfcTagDeviceRecord.DeviceType.parse(buffer.getShort()),
                 flags = buffer.get(),
                 deviceNumber = buffer.get(),
-                attributesMap = buffer.getShortKeyBytesMap().mapKeys { NfcTagDeviceRecord.DeviceAttribute.parse(it.key) }
+                attributesMap = buffer.getShortKeyBytesMap()
             )
         }
 

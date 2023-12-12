@@ -38,7 +38,7 @@
     <string name="nfc_write_error_no_read_only">不可设为只读</string>
     <string name="nfc_write_error_not_writeable">不可写入</string>
     <string name="test_screen_mirror">测试屏幕镜像</string>
-    <string name="test_screen_mirror_desc">模拟NFC一碰妙享，向指定蓝牙Mac地址的设备发送屏幕镜像（需安装小米电脑管家）。\n\n触发方式：\n“虚拟NFC标签”：可能使投屏服务出错，但不受系统版本限制。\n“互联互通服务”：直接控制投屏服务，但可能因为系统版本不符无法触发。\n\nLyra连接：\n可以提高查找连接设备的速度并避免设备重复显示，但是并非所有设备的版本都支持。\n无特殊需求建议启用，但是使用前最好先测试一下。</string>
+    <string name="test_screen_mirror_desc">模拟NFC一碰妙享，向指定蓝牙Mac地址的设备发送屏幕镜像（需安装小米电脑管家）。\n\n触发方式：\n“虚拟NFC标签”：可能使投屏服务出错，但不受系统版本限制。\n“互联通信服务”：直接控制投屏服务，但可能因为系统版本不符无法触发。\n\nLyra连接：\n可以提高查找连接设备的速度并避免设备重复显示，但是并非所有设备的版本都支持。\n无特殊需求建议启用，但是使用前最好先测试一下。</string>
     <string name="tiles_screen_mirror">通知栏磁贴快捷操作</string>
     <string name="tiles_screen_mirror_desc">使用预设的触发方式，通过点击通知栏中的“一碰妙享”磁贴触发屏幕镜像。\n\n如果处于系统“文件”或“相册”应用中并选择了文件或图片，则可以触发文件发送功能。</string>
     <string name="tiles_add_success">磁贴添加成功</string>
@@ -64,7 +64,7 @@
     <string name="device_type_pad">平板</string>
     <string name="nfc_action_intent">触发方式</string>
     <string name="nfc_action_intent_fake_nfc_tag">虚拟NFC标签</string>
-    <string name="nfc_action_intent_mi_connect_service">互联互通服务</string>
+    <string name="nfc_action_intent_mi_connect_service">互联通信服务</string>
     <string name="enter_mac_address">Mac地址</string>
     <string name="empty_mac_address">Mac地址为空！</string>
     <string name="invalid_mac_address">Mac地址格式错误！</string>
@@ -98,8 +98,11 @@
     <string name="info_app_data">小米应用数据</string>
     <string name="info_app_data_nfc_tag_action_record">NFC行为</string>
     <string name="info_app_data_nfc_tag_device_record">NFC设备</string>
+    <string name="ndef_payload_type_mi_connect_service">小米互联通信服务</string>
+    <string name="ndef_payload_type_smart_home">米家</string>
+    <string name="nfc_field_ndef_payload_type">NDEF类型</string>
     <string name="nfc_field_tech">技术</string>
-    <string name="nfc_field_type">类型</string>
+    <string name="nfc_field_type">NFC类型</string>
     <string name="nfc_field_size">容量</string>
     <string name="nfc_field_writeable">可写</string>
     <string name="nfc_field_can_make_read_only">可设置只读</string>

@@ -27,11 +27,11 @@ data class NfcTagAppData(
         }
     }
 
-    fun getDeviceRecords(): Sequence<NfcTagDeviceRecord> =
-        records.asSequence().filterIsInstance<NfcTagDeviceRecord>()
+    fun getDeviceRecord(): NfcTagDeviceRecord? =
+        records.asSequence().filterIsInstance<NfcTagDeviceRecord>().firstOrNull()
 
-    fun getActionRecords(): Sequence<NfcTagActionRecord> =
-        records.asSequence().filterIsInstance<NfcTagActionRecord>()
+    fun getActionRecord(): NfcTagActionRecord? =
+        records.asSequence().filterIsInstance<NfcTagActionRecord>().firstOrNull()
 
     override fun encode(): ByteArray {
         val recordByteArrays = records.map { it.encode() }
