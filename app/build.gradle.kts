@@ -2,7 +2,6 @@ plugins {
     id("com.android.application")
     id("kotlin-parcelize")
     id("org.jetbrains.kotlin.android")
-    id("com.google.protobuf")
 }
 
 android {
@@ -79,37 +78,18 @@ android {
     }
 }
 
-protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:3.25.1"
-    }
-
-    generateProtoTasks {
-        all().configureEach {
-            builtins {
-                maybeCreate("java").apply {
-                    option("lite")
-                }
-            }
-        }
-    }
-}
-
 dependencies {
     implementation(project(":XiaomiNFCProtocol"))
 
     // Kotlin
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
-    // Protocol Buffer
-    implementation("com.google.protobuf:protobuf-javalite:3.25.1")
-
     // AndroidX Core
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.core:core-splashscreen:1.0.1")
 
     // AndroidX
-    implementation("androidx.datastore:datastore:1.0.0")
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
     implementation("androidx.activity:activity-compose:1.8.1")
 
     // Compose BOM

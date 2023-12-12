@@ -32,7 +32,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -55,10 +54,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.collectLatest
 import tool.xfy9326.milink.nfc.R
-import tool.xfy9326.milink.nfc.data.HuaweiRedirectData
-import tool.xfy9326.milink.nfc.data.XiaomiDeviceType
-import tool.xfy9326.milink.nfc.data.XiaomiMirrorData
-import tool.xfy9326.milink.nfc.data.XiaomiNFCTagData
+import tool.xfy9326.milink.nfc.data.HuaweiRedirect
+import tool.xfy9326.milink.nfc.data.ScreenMirror
 import tool.xfy9326.milink.nfc.service.NfcNotificationListenerService
 import tool.xfy9326.milink.nfc.ui.common.FunctionCard
 import tool.xfy9326.milink.nfc.ui.common.IconTextButton
@@ -114,25 +111,24 @@ fun NFCMirrorScreen(
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             TestScreenMirrorFunctionCard(
-                mirrorData = uiState.value.defaultScreenMirrorData,
+                screenMirror = uiState.value.testScreenMirror,
                 onOpenMiLinkVersionDialog = viewModel::openMiLinkVersionDialog,
                 onSendScreenMirror = { viewModel.sendScreenMirror(context, it) }
             )
             WriteNfcFunctionCard(
-                nfcTagData = uiState.value.defaultNFCTagData,
-                onRequestWriteNfc = viewModel::requestWriteNfc,
-                onRequestClearNfc = viewModel::requestClearNfc
+                nfcTagData = uiState.value.screenMirrorNFCTag,
+                onRequestWriteNfc = viewModel::requestWriteNfc
             )
             TilesFunctionCard(
-                mirrorData = uiState.value.tilesMirrorData,
-                onChanged = viewModel::updateTilesMirrorData,
+                screenMirror = uiState.value.tilesScreenMirror,
+                onChanged = viewModel::updateTilesScreenMirror,
                 onRequestAddTiles = { viewModel.requestAddTiles(context) },
-                onSave = viewModel::saveTilesMirrorData
+                onSave = viewModel::saveTilesScreenMirror
             )
             HuaweiRedirectFunctionCard(
-                redirectData = uiState.value.huaweiRedirectData,
-                onChanged = viewModel::updateHuaweiRedirectData,
-                onSave = viewModel::saveHuaweiRedirectData
+                redirectData = uiState.value.huaweiRedirect,
+                onChanged = viewModel::updateHuaweiRedirect,
+                onSave = viewModel::saveHuaweiRedirect
             )
         }
     }
@@ -217,13 +213,13 @@ private fun TopBar() {
 
 @Composable
 private fun TestScreenMirrorFunctionCard(
-    mirrorData: XiaomiMirrorData,
+    screenMirror: ScreenMirror,
     onOpenMiLinkVersionDialog: () -> Unit,
-    onSendScreenMirror: (XiaomiMirrorData) -> Unit
+    onSendScreenMirror: (ScreenMirror) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
 
-    var editMirrorData by rememberSaveable { mutableStateOf(mirrorData) }
+    var editScreenMirror by rememberSaveable { mutableStateOf(screenMirror) }
 
     FunctionCard(
         modifier = Modifier
@@ -247,8 +243,8 @@ private fun TestScreenMirrorFunctionCard(
         ) {
             MirrorDataController(
                 modifier = Modifier.fillMaxWidth(),
-                mirrorData = editMirrorData,
-                onChanged = { editMirrorData = it },
+                screenMirror = editScreenMirror,
+                onChanged = { editScreenMirror = it },
             )
             IconTextButton(
                 modifier = Modifier.align(Alignment.End),
@@ -256,7 +252,7 @@ private fun TestScreenMirrorFunctionCard(
                 icon = Icons.Default.Cast,
                 onClick = {
                     focusManager.clearFocus()
-                    onSendScreenMirror(editMirrorData.copy())
+                    onSendScreenMirror(editScreenMirror.copy())
                 }
             )
         }
@@ -265,9 +261,8 @@ private fun TestScreenMirrorFunctionCard(
 
 @Composable
 private fun WriteNfcFunctionCard(
-    nfcTagData: XiaomiNFCTagData,
-    onRequestWriteNfc: (XiaomiNFCTagData) -> Unit,
-    onRequestClearNfc: () -> Unit
+    nfcTagData: ScreenMirror.NFCTag,
+    onRequestWriteNfc: (ScreenMirror.NFCTag) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -291,18 +286,18 @@ private fun WriteNfcFunctionCard(
                     .padding(bottom = 10.dp),
                 label = stringResource(id = R.string.nfc_xiaomi_device_type),
                 selectKey = editNfcTagData.deviceType.name,
-                keyTextMap = XiaomiDeviceType.entries.associate { it.name to stringResource(id = it.resId) },
+                keyTextMap = ScreenMirror.DeviceType.entries.associate { it.name to stringResource(id = it.resId) },
                 onKeySelected = {
-                    editNfcTagData = editNfcTagData.copy(deviceType = XiaomiDeviceType.valueOf(it))
+                    editNfcTagData = editNfcTagData.copy(deviceType = ScreenMirror.DeviceType.valueOf(it))
                 }
             )
             MacAddressTextField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 6.dp),
-                value = editNfcTagData.btMac,
+                value = editNfcTagData.bluetoothMac,
                 upperCase = true,
-                onValueChange = { editNfcTagData = editNfcTagData.copy(btMac = it) }
+                onValueChange = { editNfcTagData = editNfcTagData.copy(bluetoothMac = it) }
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -332,26 +327,16 @@ private fun WriteNfcFunctionCard(
                 )
                 Text(text = stringResource(id = R.string.set_nfc_read_only))
             }
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 6.dp)
-                    .align(Alignment.End),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(18.dp, Alignment.End),
-            ) {
-                TextButton(onClick = { onRequestClearNfc() }) {
-                    Text(text = stringResource(id = R.string.clear))
+            IconTextButton(
+                modifier = Modifier.align(Alignment.End),
+                text = stringResource(id = R.string.write_tag),
+                icon = Icons.Default.Code,
+                onClick = {
+                    focusManager.clearFocus()
+                    onRequestWriteNfc(editNfcTagData.copy())
+                    editNfcTagData = editNfcTagData.copy(readOnly = false)
                 }
-                IconTextButton(
-                    text = stringResource(id = R.string.write_tag),
-                    icon = Icons.Default.Code,
-                    onClick = {
-                        focusManager.clearFocus()
-                        onRequestWriteNfc(editNfcTagData.copy())
-                        editNfcTagData = editNfcTagData.copy(readOnly = false)
-                    }
-                )
-            }
+            )
         }
     }
     if (readOnlyAlert) {
@@ -373,8 +358,8 @@ private fun WriteNfcFunctionCard(
 
 @Composable
 private fun TilesFunctionCard(
-    mirrorData: XiaomiMirrorData,
-    onChanged: (XiaomiMirrorData) -> Unit,
+    screenMirror: ScreenMirror,
+    onChanged: (ScreenMirror) -> Unit,
     onRequestAddTiles: () -> Unit,
     onSave: () -> Unit
 ) {
@@ -397,7 +382,7 @@ private fun TilesFunctionCard(
         ) {
             MirrorDataController(
                 modifier = Modifier.fillMaxWidth(),
-                mirrorData = mirrorData,
+                screenMirror = screenMirror,
                 onChanged = onChanged
             )
             Row(
@@ -430,8 +415,8 @@ private fun TilesFunctionCard(
 
 @Composable
 private fun HuaweiRedirectFunctionCard(
-    redirectData: HuaweiRedirectData,
-    onChanged: (HuaweiRedirectData) -> Unit,
+    redirectData: HuaweiRedirect,
+    onChanged: (HuaweiRedirect) -> Unit,
     onSave: () -> Unit
 ) {
     val context = LocalContext.current
@@ -466,9 +451,9 @@ private fun HuaweiRedirectFunctionCard(
                     .fillMaxWidth()
                     .padding(vertical = 6.dp),
                 deviceType = redirectData.deviceType,
-                mirrorType = redirectData.mirrorType,
+                actionIntentType = redirectData.actionIntentType,
                 onDeviceTypeChanged = { onChanged(redirectData.copy(deviceType = it)) },
-                onMirrorTypeChanged = { onChanged(redirectData.copy(mirrorType = it)) }
+                onMirrorTypeChanged = { onChanged(redirectData.copy(actionIntentType = it)) }
             )
             Row(
                 modifier = Modifier

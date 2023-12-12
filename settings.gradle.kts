@@ -1,8 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-include(":XiaomiNFCProtocol")
-
-
 pluginManagement {
     repositories {
         google()
@@ -10,6 +7,7 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -20,4 +18,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "MiLinkNFC"
 include(":app")
- 
+include(":XiaomiNFCProtocol")

@@ -14,7 +14,7 @@ object HuaweiHandoffNfc {
     private const val MIME_NDEF_MSG = "application/vnd.huawei.handoff.ndefmsg"
     const val NFC_URI_CONTENT = "consumer.huawei.com/en/support/huaweisharewelcome/"
 
-    fun parseBtMac(intent: Intent): String? =
+    fun parseBluetoothMac(intent: Intent): String? =
         IntentCompat.getParcelableArrayExtra(intent, NfcAdapter.EXTRA_NDEF_MESSAGES, NdefMessage::class.java)
             ?.filterIsInstance<NdefMessage>()?.asSequence()?.flatMap {
                 it.records.asSequence()

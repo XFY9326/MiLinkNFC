@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Semaphore
-import tool.xfy9326.milink.nfc.data.NdefWriteData
+import tool.xfy9326.milink.nfc.data.NdefData
 
 class MainViewModel : ViewModel() {
     companion object {
@@ -15,10 +15,10 @@ class MainViewModel : ViewModel() {
 
     private val nfcUsing = Semaphore(PERMITS_NFC_USING)
 
-    private val _nfcWriteData = MutableStateFlow<NdefWriteData?>(null)
-    val nfcWriteData: StateFlow<NdefWriteData?> = _nfcWriteData.asStateFlow()
+    private val _nfcWriteData = MutableStateFlow<NdefData?>(null)
+    val nfcWriteData: StateFlow<NdefData?> = _nfcWriteData.asStateFlow()
 
-    fun openNFCWriter(ndefData: NdefWriteData): Boolean {
+    fun openNFCWriter(ndefData: NdefData): Boolean {
         return if (nfcUsing.tryAcquire()) {
             _nfcWriteData.update { ndefData }
             true

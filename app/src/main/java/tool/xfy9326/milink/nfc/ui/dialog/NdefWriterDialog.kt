@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import tool.xfy9326.milink.nfc.R
-import tool.xfy9326.milink.nfc.data.NdefWriteData
+import tool.xfy9326.milink.nfc.data.NdefData
 import tool.xfy9326.milink.nfc.ui.common.DialogContentSurface
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.theme.LocalAppThemeTypography
@@ -36,8 +36,8 @@ import tool.xfy9326.milink.nfc.utils.EmptyNdefMessage
 private fun Preview() {
     AppTheme {
         NdefWriterDialog(
-            ndefData = NdefWriteData(
-                ndefMsg = EmptyNdefMessage,
+            ndefData = NdefData(
+                msg = EmptyNdefMessage,
                 readOnly = false
             ),
             onOpenReader = { true },
@@ -50,8 +50,8 @@ private fun Preview() {
 
 @Composable
 fun NdefWriterDialog(
-    ndefData: NdefWriteData,
-    onOpenReader: (NdefWriteData) -> Boolean,
+    ndefData: NdefData,
+    onOpenReader: (NdefData) -> Boolean,
     onCloseReader: () -> Unit,
     onNfcDeviceUsing: () -> Unit,
     onDismissRequest: () -> Unit
@@ -105,7 +105,7 @@ fun NdefWriterDialog(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = stringResource(id = R.string.nfc_write_bytes, ndefData.ndefMsg.byteArrayLength),
+                        text = stringResource(id = R.string.nfc_write_bytes, ndefData.msg.byteArrayLength),
                         textAlign = TextAlign.Center,
                         style = typography.labelMedium
                     )

@@ -18,30 +18,29 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import tool.xfy9326.milink.nfc.R
-import tool.xfy9326.milink.nfc.data.XiaomiDeviceType
-import tool.xfy9326.milink.nfc.data.XiaomiMirrorData
-import tool.xfy9326.milink.nfc.data.XiaomiMirrorType
+import tool.xfy9326.milink.nfc.data.NfcActionIntentType
+import tool.xfy9326.milink.nfc.data.ScreenMirror
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.utils.EMPTY
 
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
-    var mirrorData by rememberSaveable {
+    var screenMirror by rememberSaveable {
         mutableStateOf(
-            XiaomiMirrorData(
-                XiaomiDeviceType.PC,
-                XiaomiMirrorType.FAKE_NFC_TAG,
-                EMPTY,
-                false
+            ScreenMirror(
+                deviceType = ScreenMirror.DeviceType.PC,
+                actionIntentType = NfcActionIntentType.FAKE_NFC_TAG,
+                bluetoothMac = EMPTY,
+                enableLyra = true
             )
         )
     }
 
     AppTheme {
         MirrorDataController(
-            mirrorData = mirrorData,
-            onChanged = { mirrorData = it },
+            screenMirror = screenMirror,
+            onChanged = { screenMirror = it },
         )
     }
 }
@@ -49,31 +48,31 @@ private fun Preview() {
 @Composable
 fun MirrorDataController(
     modifier: Modifier = Modifier,
-    mirrorData: XiaomiMirrorData,
-    onChanged: (XiaomiMirrorData) -> Unit
+    screenMirror: ScreenMirror,
+    onChanged: (ScreenMirror) -> Unit
 ) {
     Column(modifier = modifier) {
         MiConnectActionSettings(
             modifier = Modifier.fillMaxWidth(),
-            deviceType = mirrorData.deviceType,
-            mirrorType = mirrorData.mirrorType,
-            onDeviceTypeChanged = { onChanged(mirrorData.copy(deviceType = it)) },
-            onMirrorTypeChanged = { onChanged(mirrorData.copy(mirrorType = it)) }
+            deviceType = screenMirror.deviceType,
+            actionIntentType = screenMirror.actionIntentType,
+            onDeviceTypeChanged = { onChanged(screenMirror.copy(deviceType = it)) },
+            onMirrorTypeChanged = { onChanged(screenMirror.copy(actionIntentType = it)) }
         )
         Spacer(modifier = Modifier.height(10.dp))
         MacAddressTextField(
             modifier = Modifier.fillMaxWidth(),
-            value = mirrorData.btMac,
+            value = screenMirror.bluetoothMac,
             upperCase = true,
-            onValueChange = { onChanged(mirrorData.copy(btMac = it)) }
+            onValueChange = { onChanged(screenMirror.copy(bluetoothMac = it)) }
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Checkbox(
-                checked = mirrorData.enableLyra,
-                onCheckedChange = { onChanged(mirrorData.copy(enableLyra = it)) }
+                checked = screenMirror.enableLyra,
+                onCheckedChange = { onChanged(screenMirror.copy(enableLyra = it)) }
             )
             Text(text = stringResource(id = R.string.enable_lyra_ability))
         }

@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import tool.xfy9326.milink.nfc.AppContext
 import tool.xfy9326.milink.nfc.R
-import tool.xfy9326.milink.nfc.data.NdefWriteData
+import tool.xfy9326.milink.nfc.data.NdefData
 import tool.xfy9326.milink.nfc.ui.screen.NFCMirrorScreen
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.vm.MainViewModel
@@ -65,7 +65,7 @@ class MainActivity : ComponentActivity() {
 
     private fun makeToast(msg: String): Unit = runOnUiThread { showToast(msg) }
 
-    private fun handleNfcTag(nfcAdapter: NfcAdapter, tag: Tag, writeData: NdefWriteData) {
+    private fun handleNfcTag(nfcAdapter: NfcAdapter, tag: Tag, writeData: NdefData) {
         lifecycleScope.launch {
             val ndef = Ndef.get(tag)
             if (ndef != null) {
@@ -96,7 +96,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private suspend fun writeNdefTag(nfcAdapter: NfcAdapter, ndef: Ndef, writeData: NdefWriteData): Unit = withContext(Dispatchers.IO) {
+    private suspend fun writeNdefTag(nfcAdapter: NfcAdapter, ndef: Ndef, writeData: NdefData): Unit = withContext(Dispatchers.IO) {
         ndef.tryConnect().onSuccess {
             it.useCatching {
                 if (!it.isWritable) {
@@ -107,12 +107,12 @@ class MainActivity : ComponentActivity() {
                     makeToast(getString(R.string.nfc_write_error_no_read_only))
                     return@onSuccess
                 }
-                if (writeData.ndefMsg.byteArrayLength > it.maxSize) {
+                if (writeData.msg.byteArrayLength > it.maxSize) {
                     makeToast(getString(R.string.nfc_write_error_max_size))
                     return@onSuccess
                 }
                 try {
-                    it.writeNdefMessage(writeData.ndefMsg)
+                    it.writeNdefMessage(writeData.msg)
                 } catch (e: Exception) {
                     makeToast(getString(R.string.nfc_write_error))
                     return@onSuccess

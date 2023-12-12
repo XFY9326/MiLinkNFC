@@ -66,7 +66,7 @@
         </activity>
 
         <activity
-            android:name=".activity.MiConnectServiceActivity"
+            android:name=".activity.ScreenMirrorActionActivity"
             android:excludeFromRecents="true"
             android:exported="false"
             android:launchMode="singleInstance"
@@ -74,7 +74,7 @@
             android:theme="@android:style/Theme.NoDisplay" />
 
         <service
-            android:name=".service.MiShareTileService"
+            android:name=".service.ScreenMirrorTileService"
             android:exported="true"
             android:icon="@drawable/ic_screen_share_24"
             android:label="@string/mi_share_tile_service"

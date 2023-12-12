@@ -35,6 +35,7 @@ object XiaomiNfc {
             it.toMimeType() == NFC_EXTERNAL_TYPE
         }.firstOrNull()?.payload
 
+    @Suppress("MemberVisibilityCanBePrivate")
     abstract class NfcAction<T, A : AppsData>(
         private val majorVersion: Int,
         private val minorVersion: Int,

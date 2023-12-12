@@ -34,6 +34,6 @@ protobuf {
 }
 
 dependencies {
-    implementation("com.google.protobuf:protobuf-javalite:3.25.1")
+    api("com.google.protobuf:protobuf-javalite:3.25.1")
     testImplementation(kotlin("test"))
 }

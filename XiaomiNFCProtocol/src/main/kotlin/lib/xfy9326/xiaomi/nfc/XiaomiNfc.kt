@@ -1,5 +1,3 @@
-@file:Suppress("unused")
-
 package lib.xfy9326.xiaomi.nfc
 
 import lib.xfy9326.xiaomi.nfc.proto.MiConnectProtocol
