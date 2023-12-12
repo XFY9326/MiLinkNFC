@@ -46,7 +46,7 @@ fun MiConnectActionSettings(
     ) {
         SelectorTextField(
             modifier = Modifier.weight(0.4f),
-            label = stringResource(id = R.string.nfc_xiaomi_device_type),
+            label = stringResource(id = R.string.handoff_device_type),
             selectKey = deviceType.name,
             keyTextMap = ScreenMirror.DeviceType.entries.associate { it.name to stringResource(id = it.resId) },
             onKeySelected = {
@@ -55,7 +55,7 @@ fun MiConnectActionSettings(
         )
         SelectorTextField(
             modifier = Modifier.weight(0.6f),
-            label = stringResource(id = R.string.nfc_mirror_intent_type),
+            label = stringResource(id = R.string.nfc_action_intent),
             selectKey = actionIntentType.name,
             keyTextMap = NfcActionIntentType.entries.associate { it.name to stringResource(id = it.resId) },
             onKeySelected = {

@@ -61,7 +61,7 @@ import tool.xfy9326.milink.nfc.ui.common.FunctionCard
 import tool.xfy9326.milink.nfc.ui.common.IconTextButton
 import tool.xfy9326.milink.nfc.ui.common.MacAddressTextField
 import tool.xfy9326.milink.nfc.ui.common.MiConnectActionSettings
-import tool.xfy9326.milink.nfc.ui.common.MirrorDataController
+import tool.xfy9326.milink.nfc.ui.common.ScreenMirrorController
 import tool.xfy9326.milink.nfc.ui.common.SelectorTextField
 import tool.xfy9326.milink.nfc.ui.dialog.AboutDialog
 import tool.xfy9326.milink.nfc.ui.dialog.MessageAlertDialog
@@ -70,7 +70,7 @@ import tool.xfy9326.milink.nfc.ui.dialog.NdefWriterDialog
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.theme.LocalAppThemeColorScheme
 import tool.xfy9326.milink.nfc.ui.vm.MainViewModel
-import tool.xfy9326.milink.nfc.ui.vm.NFCMirrorViewModel
+import tool.xfy9326.milink.nfc.ui.vm.ScreenMirrorViewModel
 import tool.xfy9326.milink.nfc.utils.openAppSettings
 import tool.xfy9326.milink.nfc.utils.openNotificationServiceSettings
 
@@ -78,14 +78,14 @@ import tool.xfy9326.milink.nfc.utils.openNotificationServiceSettings
 @Composable
 private fun Preview() {
     AppTheme {
-        NFCMirrorScreen {}
+        ScreenMirrorScreen {}
     }
 }
 
 @Composable
-fun NFCMirrorScreen(
+fun ScreenMirrorScreen(
     mainViewModel: MainViewModel = viewModel(),
-    viewModel: NFCMirrorViewModel = viewModel(),
+    viewModel: ScreenMirrorViewModel = viewModel(),
     onExit: () -> Unit
 ) {
     val context = LocalContext.current
@@ -119,7 +119,7 @@ fun NFCMirrorScreen(
                 nfcTagData = uiState.value.screenMirrorNFCTag,
                 onRequestWriteNfc = viewModel::requestWriteNfc
             )
-            TilesFunctionCard(
+            TilesScreenMirrorFunctionCard(
                 screenMirror = uiState.value.tilesScreenMirror,
                 onChanged = viewModel::updateTilesScreenMirror,
                 onRequestAddTiles = { viewModel.requestAddTiles(context) },
@@ -170,7 +170,7 @@ fun NFCMirrorScreen(
 @Composable
 private fun EventHandler(
     snackBarHostState: SnackbarHostState,
-    viewModel: NFCMirrorViewModel,
+    viewModel: ScreenMirrorViewModel,
 ) {
     val context = LocalContext.current
 
@@ -226,14 +226,14 @@ private fun TestScreenMirrorFunctionCard(
             .fillMaxWidth()
             .padding(8.dp),
         icon = Icons.Default.BluetoothSearching,
-        iconDescription = stringResource(id = R.string.bt_screen_mirror),
+        iconDescription = stringResource(id = R.string.test_screen_mirror),
         extraIconContent = {
             IconButton(onClick = onOpenMiLinkVersionDialog) {
                 Icon(imageVector = Icons.Default.HelpOutline, contentDescription = stringResource(id = R.string.local_app_versions))
             }
         },
-        title = stringResource(id = R.string.bt_screen_mirror),
-        description = stringResource(id = R.string.bt_screen_mirror_desc)
+        title = stringResource(id = R.string.test_screen_mirror),
+        description = stringResource(id = R.string.test_screen_mirror_desc)
     ) {
         Column(
             modifier = Modifier
@@ -241,7 +241,7 @@ private fun TestScreenMirrorFunctionCard(
                 .padding(horizontal = 6.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            MirrorDataController(
+            ScreenMirrorController(
                 modifier = Modifier.fillMaxWidth(),
                 screenMirror = editScreenMirror,
                 onChanged = { editScreenMirror = it },
@@ -274,9 +274,9 @@ private fun WriteNfcFunctionCard(
             .fillMaxWidth()
             .padding(8.dp),
         icon = Icons.Default.Nfc,
-        iconDescription = stringResource(id = R.string.write_mirror_nfc),
-        title = stringResource(id = R.string.write_mirror_nfc),
-        description = stringResource(id = R.string.write_mirror_nfc_desc)
+        iconDescription = stringResource(id = R.string.write_screen_mirror_nfc),
+        title = stringResource(id = R.string.write_screen_mirror_nfc),
+        description = stringResource(id = R.string.write_screen_mirror_nfc_desc)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             SelectorTextField(
@@ -284,7 +284,7 @@ private fun WriteNfcFunctionCard(
                     .fillMaxWidth()
                     .padding(horizontal = 6.dp)
                     .padding(bottom = 10.dp),
-                label = stringResource(id = R.string.nfc_xiaomi_device_type),
+                label = stringResource(id = R.string.handoff_device_type),
                 selectKey = editNfcTagData.deviceType.name,
                 keyTextMap = ScreenMirror.DeviceType.entries.associate { it.name to stringResource(id = it.resId) },
                 onKeySelected = {
@@ -357,7 +357,7 @@ private fun WriteNfcFunctionCard(
 }
 
 @Composable
-private fun TilesFunctionCard(
+private fun TilesScreenMirrorFunctionCard(
     screenMirror: ScreenMirror,
     onChanged: (ScreenMirror) -> Unit,
     onRequestAddTiles: () -> Unit,
@@ -380,7 +380,7 @@ private fun TilesFunctionCard(
                 .padding(horizontal = 6.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            MirrorDataController(
+            ScreenMirrorController(
                 modifier = Modifier.fillMaxWidth(),
                 screenMirror = screenMirror,
                 onChanged = onChanged

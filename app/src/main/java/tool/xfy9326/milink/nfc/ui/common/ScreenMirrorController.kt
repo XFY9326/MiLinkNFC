@@ -38,7 +38,7 @@ private fun Preview() {
     }
 
     AppTheme {
-        MirrorDataController(
+        ScreenMirrorController(
             screenMirror = screenMirror,
             onChanged = { screenMirror = it },
         )
@@ -46,7 +46,7 @@ private fun Preview() {
 }
 
 @Composable
-fun MirrorDataController(
+fun ScreenMirrorController(
     modifier: Modifier = Modifier,
     screenMirror: ScreenMirror,
     onChanged: (ScreenMirror) -> Unit

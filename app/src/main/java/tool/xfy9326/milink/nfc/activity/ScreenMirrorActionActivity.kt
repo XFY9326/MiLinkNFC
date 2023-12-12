@@ -26,7 +26,7 @@ class ScreenMirrorActionActivity : Activity() {
         if (screenMirror != null && screenMirror.bluetoothMac.isNotBlank()) {
             XiaomiNfc.ScreenMirror.sendBroadcast(this, screenMirror.toConfig())
         } else {
-            Toast.makeText(applicationContext, R.string.bt_mac_not_set, Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext, R.string.bluetooth_mac_not_set, Toast.LENGTH_SHORT).show()
         }
         finish()
     }

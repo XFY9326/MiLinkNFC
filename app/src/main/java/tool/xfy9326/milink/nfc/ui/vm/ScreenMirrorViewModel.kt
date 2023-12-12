@@ -37,7 +37,7 @@ import tool.xfy9326.milink.nfc.utils.MiContinuityUtils
 import tool.xfy9326.milink.nfc.utils.isValidMacAddress
 import tool.xfy9326.milink.nfc.utils.isXiaomiHyperOS
 
-class NFCMirrorViewModel : ViewModel() {
+class ScreenMirrorViewModel : ViewModel() {
     enum class SnackbarMsg(@StringRes val resId: Int) {
         INVALID_MAC_ADDRESS(R.string.invalid_mac_address),
         EMPTY_MAC_ADDRESS(R.string.empty_mac_address),
@@ -194,7 +194,7 @@ class NFCMirrorViewModel : ViewModel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             context.getSystemService<StatusBarManager>()?.requestAddTileService(
                 ComponentName(context, ScreenMirrorTileService::class.java),
-                context.getString(R.string.mi_share_tile_service),
+                context.getString(R.string.tiles_screen_mirror_service),
                 Icon.createWithResource(context, R.drawable.ic_screen_share_24),
                 { it.run() },
                 {
