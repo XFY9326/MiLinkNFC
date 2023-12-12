@@ -4,8 +4,16 @@
     <string name="author">作者：%1$s</string>
     <string name="open_source">项目开源：</string>
     <string name="open_source_license">开源协议：MIT</string>
+    <string name="xiaomi_screen_mirror_nfc">一碰妙享</string>
+    <string name="xiaomi_screen_mirror_nfc_summary">通过NFC快速连接小米电脑管家</string>
+    <string name="mi_play_nfc">碰一碰</string>
+    <string name="mi_play_nfc_summary">基于小米NFC碰碰贴提供关联设备的控制</string>
+    <string name="mi_circulate_nfc">内容流转</string>
+    <string name="mi_circulate_nfc_summary">使用NFC将播放的音频等内容流转到另一台设备</string>
+    <string name="nfc_clear_ndef">清空NFC标签</string>
+    <string name="nfc_clear_ndef_summary">使标签失去功能，但不会完全抹除旧数据</string>
     <string name="write_screen_mirror_nfc">一碰妙享NFC标签</string>
-    <string name="write_screen_mirror_nfc_desc">向NFC标签中覆盖写入小米一碰妙享的数据，仅支持NDEF格式的NFC标签。\n\n如果写入失败，可能是因为写入NFC标签时连接断开，请多尝试几次。\n\n如果投屏时多次出现连接失败，可以使用“测试屏幕镜像”功能并尝试重启小米电脑管家。\n\n“清空”功能不会完全抹除旧数据，依然有数据残留。</string>
+    <string name="write_screen_mirror_nfc_desc">向NFC标签中覆盖写入小米一碰妙享的数据，仅支持NDEF格式的NFC标签。\n\n如果写入失败，可能是因为写入NFC标签时连接断开，请多尝试几次。\n\n如果投屏时多次出现连接失败，可以使用“测试屏幕镜像”功能并尝试重启小米电脑管家。</string>
     <string name="put_and_write_nfc_tag">靠近NFC标签以写入数据</string>
     <string name="put_and_write_nfc_tag_read_only">靠近NFC标签以写入只读数据</string>
     <string name="nfc_write_bytes">写入数据：%1$d字节</string>
@@ -39,7 +47,6 @@
     <string name="set_nfc_read_only_desc">将NFC标签设置为只读是不可逆的，一旦只读模式锁定成功就无法再次修改NFC标签中的任何数据，请确认要操作是否符合需求并充分测试要写入的数据无误！</string>
     <string name="save">保存</string>
     <string name="save_success">保存成功！</string>
-    <string name="clear">清空</string>
     <string name="write_tag">写入</string>
     <string name="screen_mirror">投屏</string>
     <string name="handoff_device_type">设备类型</string>
@@ -69,6 +76,8 @@
     <string name="check_update">检查更新</string>
     <string name="not_support_nfc">当前设备不支持NFC！</string>
     <string name="exit">退出</string>
+    <string name="nav_back">返回</string>
+    <string name="clear">清空</string>
 
     <string name="version" translatable="false">%1$s (%2$d)</string>
     <string name="author_name" translatable="false">XFY9326</string>

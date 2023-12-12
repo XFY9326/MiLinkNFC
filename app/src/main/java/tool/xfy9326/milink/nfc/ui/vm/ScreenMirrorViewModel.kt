@@ -27,29 +27,24 @@ import tool.xfy9326.milink.nfc.data.NdefData
 import tool.xfy9326.milink.nfc.data.NfcActionIntentType
 import tool.xfy9326.milink.nfc.data.ScreenMirror
 import tool.xfy9326.milink.nfc.datastore.AppDataStore
-import tool.xfy9326.milink.nfc.datastore.base.key.readValue
-import tool.xfy9326.milink.nfc.datastore.base.key.writeValue
 import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
 import tool.xfy9326.milink.nfc.service.ScreenMirrorTileService
 import tool.xfy9326.milink.nfc.ui.dialog.MiLinkVersionDialogData
 import tool.xfy9326.milink.nfc.utils.EMPTY
 import tool.xfy9326.milink.nfc.utils.MiContinuityUtils
 import tool.xfy9326.milink.nfc.utils.isValidMacAddress
-import tool.xfy9326.milink.nfc.utils.isXiaomiHyperOS
 
 class ScreenMirrorViewModel : ViewModel() {
     enum class SnackbarMsg(@StringRes val resId: Int) {
         INVALID_MAC_ADDRESS(R.string.invalid_mac_address),
         EMPTY_MAC_ADDRESS(R.string.empty_mac_address),
         SAVE_SUCCESS(R.string.save_success),
-        NFC_USING_CONFLICT(R.string.nfc_using_conflict),
         TILES_ADD_SUCCESS(R.string.tiles_add_success),
         TILES_ALREADY_ADD(R.string.tiles_already_added),
         TILES_ADD_FAILED(R.string.tiles_add_failed);
     }
 
     data class UiState(
-        val showNotSupportedOSDialog: Boolean = false,
         val screenMirrorNFCTag: ScreenMirror.NFCTag = ScreenMirror.NFCTag(
             deviceType = ScreenMirror.DeviceType.PC,
             bluetoothMac = EMPTY,
@@ -64,7 +59,6 @@ class ScreenMirrorViewModel : ViewModel() {
         ),
         val tilesScreenMirror: ScreenMirror = AppDataStore.Defaults.tilesScreenMirror,
         val huaweiRedirect: HuaweiRedirect = AppDataStore.Defaults.huaweiRedirect,
-        val ndefWriteDialogData: NdefData? = null,
         val miLinkPackageDialogData: MiLinkVersionDialogData? = null,
     )
 
@@ -77,7 +71,6 @@ class ScreenMirrorViewModel : ViewModel() {
     init {
         checkLyraSupport()
         viewModelScope.launch(Dispatchers.IO) {
-            checkNotSupportedOS()
             initDataStoreListeners()
         }
     }
@@ -104,14 +97,6 @@ class ScreenMirrorViewModel : ViewModel() {
         }
     }
 
-    private suspend fun checkNotSupportedOS() {
-        if (!isXiaomiHyperOS() && !AppDataStore.readValue(AppDataStore.confirmedNotSupportedOSAlert)) {
-            _uiState.update {
-                it.copy(showNotSupportedOSDialog = true)
-            }
-        }
-    }
-
     private suspend fun initDataStoreListeners() = coroutineScope {
         launch {
             AppDataStore.getTilesScreenMirror().collect { data ->
@@ -125,35 +110,12 @@ class ScreenMirrorViewModel : ViewModel() {
         }
     }
 
-    fun confirmNotSupportedOS() {
-        viewModelScope.launch(Dispatchers.IO) {
-            AppDataStore.writeValue(AppDataStore.confirmedNotSupportedOSAlert, true)
-            _uiState.update {
-                it.copy(showNotSupportedOSDialog = false)
-            }
-        }
-    }
-
-    fun requestWriteNfc(nfcTagData: ScreenMirror.NFCTag) {
+    fun requestWriteNfc(nfcTagData: ScreenMirror.NFCTag, ndefWriteHandler: (NdefData) -> Unit) {
         viewModelScope.launch {
             if (validateBluetoothMac(nfcTagData.bluetoothMac)) {
                 val data = NdefData(XiaomiNfc.ScreenMirror.newNdefMessage(nfcTagData.toConfig()), nfcTagData.readOnly)
-                _uiState.update {
-                    it.copy(ndefWriteDialogData = data)
-                }
+                ndefWriteHandler(data)
             }
-        }
-    }
-
-    fun reportNfcDeviceUsing() {
-        viewModelScope.launch {
-            _snackbarMsg.emit(SnackbarMsg.NFC_USING_CONFLICT)
-        }
-    }
-
-    fun cancelWriteNfc() {
-        _uiState.update {
-            it.copy(ndefWriteDialogData = null)
         }
     }
 

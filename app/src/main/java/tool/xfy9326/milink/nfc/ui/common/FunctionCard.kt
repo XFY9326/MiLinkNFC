@@ -36,7 +36,6 @@ private fun Preview() {
     AppTheme {
         FunctionCard(
             icon = Icons.Default.Android,
-            iconDescription = null,
             title = "Function",
             extraIconContent = {
                 IconButton(onClick = {}) {
@@ -54,7 +53,6 @@ private fun Preview() {
 fun FunctionCard(
     modifier: Modifier = Modifier,
     icon: ImageVector,
-    iconDescription: String?,
     title: String,
     extraIconContent: (@Composable RowScope.() -> Unit)? = null,
     description: String? = null,
@@ -81,7 +79,7 @@ fun FunctionCard(
             ) {
                 Icon(
                     imageVector = icon,
-                    contentDescription = iconDescription,
+                    contentDescription = title,
                     modifier = Modifier
                         .size(38.dp)
                         .background(color = colorScheme.onSurfaceVariant, shape = CircleShape)

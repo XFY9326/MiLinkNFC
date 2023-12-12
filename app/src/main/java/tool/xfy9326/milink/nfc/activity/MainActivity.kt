@@ -20,7 +20,7 @@ import kotlinx.coroutines.withContext
 import tool.xfy9326.milink.nfc.AppContext
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.data.NdefData
-import tool.xfy9326.milink.nfc.ui.screen.ScreenMirrorScreen
+import tool.xfy9326.milink.nfc.ui.screen.HomeScreen
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.vm.MainViewModel
 import tool.xfy9326.milink.nfc.utils.enableNdefReaderMode
@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AppTheme {
-                ScreenMirrorScreen(onExit = { finishAndRemoveTask() })
+                HomeScreen(onExit = { finishAndRemoveTask() })
             }
         }
         setupNfcReaderListener()
