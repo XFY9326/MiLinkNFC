@@ -19,5 +19,12 @@ private val hexPrefixFormat = HexFormat {
 fun ByteArray.toHexString(separate: Boolean = false): String =
     toHexString(if (separate) hexSeparateFormat else HexFormat.UpperCase)
 
+fun ByteArray.toHexText(): String =
+    when (size) {
+        0 -> EMPTY
+        1 -> this[0].toHexString(true)
+        else -> toHexString(true)
+    }
+
 fun Byte.toHexString(prefix: Boolean = false): String =
     toHexString(if (prefix) hexPrefixFormat else HexFormat.UpperCase)

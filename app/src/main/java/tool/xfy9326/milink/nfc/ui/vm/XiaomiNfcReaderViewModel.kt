@@ -26,6 +26,7 @@ import tool.xfy9326.milink.nfc.data.NdefReadData
 import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
 import tool.xfy9326.milink.nfc.utils.EMPTY
 import tool.xfy9326.milink.nfc.utils.toHexString
+import tool.xfy9326.milink.nfc.utils.toHexText
 import java.text.SimpleDateFormat
 
 class XiaomiNfcReaderViewModel : ViewModel() {
@@ -101,7 +102,24 @@ class XiaomiNfcReaderViewModel : ViewModel() {
             deviceType = deviceRecord.deviceType.name,
             flags = deviceRecord.flags.toHexString(true),
             deviceNumber = deviceRecord.deviceNumber.toHexString(true),
-            attributesMap = deviceRecord.attributesMap.map { it.key.name to it.value.toHexString(separate = true) }.toMap()
+            attributesMap = deviceRecord.allAttributesMap.mapNotNull {
+                if (it.value.isNotEmpty()) {
+                    it.key.name to when (it.key) {
+                        NfcTagDeviceRecord.DeviceAttribute.WIFI_MAC_ADDRESS,
+                        NfcTagDeviceRecord.DeviceAttribute.BLUETOOTH_MAC_ADDRESS,
+                        NfcTagDeviceRecord.DeviceAttribute.NIC_MAC_ADDRESS,
+                        NfcTagDeviceRecord.DeviceAttribute.IP_ADDRESS -> it.value.toHexText()
+
+                        else -> {
+                            it.value.runCatching { toString(Charsets.UTF_8) }.getOrNull()?.takeIf { s ->
+                                s.all { c -> c.isDefined() && !c.isWhitespace() }
+                            } ?: it.value.toHexText()
+                        }
+                    }
+                } else {
+                    null
+                }
+            }.toMap()
         )
     }
 
@@ -133,15 +151,11 @@ class XiaomiNfcReaderViewModel : ViewModel() {
             majorVersion = handoffAppData.majorVersion.toHexString(true),
             minorVersion = handoffAppData.minorVersion.toHexString(true),
             deviceType = handoffAppData.deviceType.name,
-            attributesMap = handoffAppData.attributesMap.map { it.key.toHexString(true) to it.value.toHexString(true) }.toMap(),
+            attributesMap = handoffAppData.attributesMap.map { it.key.toHexString(true) to it.value.toHexText() }.toMap(),
             action = handoffAppData.action,
             payloadsMap = handoffAppData.payloadsMap.map {
                 it.key.name to if (it.key == HandoffAppData.PayloadKey.EXT_ABILITY) {
-                    when (it.value.size) {
-                        0 -> EMPTY
-                        1 -> it.value[0].toHexString(true)
-                        else -> it.value.toHexString(true)
-                    }
+                    it.value.toHexText()
                 } else {
                     it.value.toString(Charsets.UTF_8)
                 }
@@ -199,16 +213,21 @@ class XiaomiNfcReaderViewModel : ViewModel() {
             return false
         }
 
-        val payloadUI = XiaomiNfcPayloadUI(payload)
-        when (val appsData = payload.appsData) {
-            is HandoffAppData -> _uiState.update {
-                it.copy(tagInfo = tagInfo, payloadUI = payloadUI, handoffAppDataUI = HandoffAppDataUI(appsData))
-            }
+        try {
+            val payloadUI = XiaomiNfcPayloadUI(payload)
+            when (val appsData = payload.appsData) {
+                is HandoffAppData -> _uiState.update {
+                    it.copy(tagInfo = tagInfo, payloadUI = payloadUI, handoffAppDataUI = HandoffAppDataUI(appsData))
+                }
 
-            is NfcTagAppData -> _uiState.update {
-                it.copy(tagInfo = tagInfo, payloadUI = payloadUI, nfcTagAppDataUI = NfcTagAppDataUI(appsData))
+                is NfcTagAppData -> _uiState.update {
+                    it.copy(tagInfo = tagInfo, payloadUI = payloadUI, nfcTagAppDataUI = NfcTagAppDataUI(appsData))
+                }
             }
+            return true
+        } catch (e: Exception) {
+            // Ignore
         }
-        return true
+        return false
     }
 }

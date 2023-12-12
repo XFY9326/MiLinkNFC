@@ -13,7 +13,12 @@ data class NfcTagDeviceRecord(
     companion object {
         private const val PREFIX_ATTR_APP_DATA = "mxD"
 
-        fun encodeAppDataValue(map: Map<DeviceAttribute, ByteArray>): ByteArray {
+        fun isAppDataValueMap(bytes: ByteArray): Boolean {
+            val prefix = PREFIX_ATTR_APP_DATA.toByteArray(Charsets.UTF_8)
+            return bytes.size >= prefix.size && bytes.take(prefix.size) == prefix.asList()
+        }
+
+        fun encodeAppDataValueMap(map: Map<DeviceAttribute, ByteArray>): ByteArray {
             val prefix = PREFIX_ATTR_APP_DATA.toByteArray(Charsets.UTF_8)
             val attributeShortMap = map.mapKeys { it.key.value }
             return ByteBuffer.allocate(prefix.size + attributeShortMap.shortMapTotalBytes())
@@ -22,7 +27,7 @@ data class NfcTagDeviceRecord(
                 .array()
         }
 
-        fun decodeAppDataValue(bytes: ByteArray): Map<DeviceAttribute, ByteArray> {
+        fun decodeAppDataValueMap(bytes: ByteArray): Map<DeviceAttribute, ByteArray> {
             val prefix = PREFIX_ATTR_APP_DATA.toByteArray(Charsets.UTF_8)
             val buffer = ByteBuffer.wrap(bytes)
             require(ByteArray(prefix.size) { buffer.get(it) }.contentEquals(prefix)) { "Not an valid DeviceAttribute.APP_DATA byte array" }
@@ -34,7 +39,12 @@ data class NfcTagDeviceRecord(
         get() = attributesMap.takeIf {
             DeviceAttribute.APP_DATA in it
         }?.let { map ->
-            map.filterNot { it.key == DeviceAttribute.APP_DATA } + decodeAppDataValue(map.getValue(DeviceAttribute.APP_DATA))
+            val appDataBytes = map.getValue(DeviceAttribute.APP_DATA)
+            map.filterNot { it.key == DeviceAttribute.APP_DATA } + if (isAppDataValueMap(appDataBytes)) {
+                decodeAppDataValueMap(appDataBytes)
+            } else {
+                mapOf(DeviceAttribute.APP_DATA to appDataBytes)
+            }
         } ?: attributesMap
 
     override fun encodeContent(): ByteArray {

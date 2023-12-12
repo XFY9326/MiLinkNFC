@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ClearAll
+import androidx.compose.material.icons.filled.DataObject
 import androidx.compose.material.icons.filled.Devices
 import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.TapAndPlay
@@ -124,7 +125,8 @@ fun HomeScreen(
                     navController.navigate(ScreenMirrorRoute)
                 },
                 onNavToXiaomiNfcReader = onNavToXiaomiNfcReader,
-                onRequestClearNfc = viewModel::requestClearNdefWriteDialog
+                onRequestClearNfc = viewModel::requestClearNdefWriteDialog,
+                onRequestFormatXiaomiTap = viewModel::requestFormatXiaomiTapNdefWriteDialog
             )
         }
         composable(MiPlayRoute) {
@@ -186,6 +188,7 @@ private fun Content(
     onNavToScreenMirror: () -> Unit,
     onNavToXiaomiNfcReader: () -> Unit,
     onRequestClearNfc: () -> Unit,
+    onRequestFormatXiaomiTap: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val snackBarHostState = remember { SnackbarHostState() }
@@ -225,10 +228,16 @@ private fun Content(
             )
             Divider(modifier = Modifier.fillMaxWidth())
             EntryCard(
-                icon = Icons.Default.Nfc,
+                icon = Icons.Default.DataObject,
                 title = stringResource(id = R.string.nfc_read_xiaomi_ndef),
                 summary = stringResource(id = R.string.nfc_read_xiaomi_ndef_summary),
                 onClick = onNavToXiaomiNfcReader
+            )
+            EntryCard(
+                icon = Icons.Default.Nfc,
+                title = stringResource(id = R.string.nfc_format_xiaomi_tap),
+                summary = stringResource(id = R.string.nfc_format_xiaomi_tap_summary),
+                onClick = onRequestFormatXiaomiTap
             )
             EntryCard(
                 icon = Icons.Default.ClearAll,
