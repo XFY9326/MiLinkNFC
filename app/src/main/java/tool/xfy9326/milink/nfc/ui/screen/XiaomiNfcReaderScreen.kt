@@ -99,6 +99,7 @@ fun XiaomiNfcReaderScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     NfcTagInfoCard(modifier = Modifier.padding(horizontal = 8.dp), data = it.tag)
+                    NdefCard(modifier = Modifier.padding(horizontal = 8.dp), ndefType = it.ndefType)
                     XiaomiNfcPayloadCard(modifier = Modifier.padding(horizontal = 8.dp), data = it.payload)
                     when (it.appData) {
                         is HandoffAppDataUI -> HandoffAppDataCard(
@@ -210,9 +211,23 @@ private fun NfcTagInfoCard(modifier: Modifier = Modifier, data: XiaomiNfcTagUI) 
                 stringResource(id = R.string.nfc_field_type) to data.type,
                 stringResource(id = R.string.nfc_field_size) to stringResource(id = R.string.current_and_total_bytes, data.currentSize, data.maxSize),
                 stringResource(id = R.string.nfc_field_writeable) to stringResource(id = data.writeable.stringResId()),
-                stringResource(id = R.string.nfc_field_can_make_read_only) to stringResource(id = data.canMakeReadOnly.stringResId()),
-                stringResource(id = R.string.nfc_field_ndef_payload_type) to stringResource(
-                    id = when (data.ndefPayloadType) {
+                stringResource(id = R.string.nfc_field_can_make_read_only) to stringResource(id = data.canMakeReadOnly.stringResId())
+            )
+        )
+    }
+}
+
+@Composable
+private fun NdefCard(modifier: Modifier = Modifier, ndefType: XiaomiNdefPayloadType) {
+    OutlinedCard(modifier = modifier) {
+        InfoContent(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            title = stringResource(id = R.string.info_ndef),
+            data = mapOf(
+                stringResource(id = R.string.nfc_field_type) to stringResource(
+                    id = when (ndefType) {
                         XiaomiNdefPayloadType.UNKNOWN -> R.string.unknown
                         XiaomiNdefPayloadType.SMART_HOME -> R.string.ndef_payload_type_smart_home
                         XiaomiNdefPayloadType.MI_CONNECT_SERVICE -> R.string.ndef_payload_type_mi_connect_service

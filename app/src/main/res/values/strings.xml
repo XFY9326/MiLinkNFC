@@ -97,6 +97,7 @@
     <string name="clear">清空</string>
     <string name="unknown">未知</string>
     <string name="current_and_total_bytes">%1$d/%2$d 字节</string>
+    <string name="info_ndef">NDEF信息</string>
     <string name="info_nfc_tag">NFC标签</string>
     <string name="info_xiaomi_payload">小米NFC协议</string>
     <string name="info_app_data">小米应用数据</string>
@@ -104,9 +105,8 @@
     <string name="info_app_data_nfc_tag_device_record">NFC设备</string>
     <string name="ndef_payload_type_mi_connect_service">小米互联通信服务</string>
     <string name="ndef_payload_type_smart_home">米家</string>
-    <string name="nfc_field_ndef_payload_type">NDEF类型</string>
     <string name="nfc_field_tech">技术</string>
-    <string name="nfc_field_type">NFC类型</string>
+    <string name="nfc_field_type">类型</string>
     <string name="nfc_field_size">容量</string>
     <string name="nfc_field_writeable">可写</string>
     <string name="nfc_field_can_make_read_only">可设置只读</string>
