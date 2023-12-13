@@ -178,6 +178,7 @@ private fun NfcTagInfoCard(modifier: Modifier = Modifier, data: XiaomiNfcReaderV
                 stringResource(id = R.string.nfc_field_can_make_read_only) to stringResource(id = data.canMakeReadOnly.stringResId()),
                 stringResource(id = R.string.nfc_field_ndef_payload_type) to stringResource(
                     id = when (data.ndefPayloadType) {
+                        XiaomiNdefPayloadType.UNKNOWN -> R.string.unknown
                         XiaomiNdefPayloadType.SMART_HOME -> R.string.ndef_payload_type_smart_home
                         XiaomiNdefPayloadType.MI_CONNECT_SERVICE -> R.string.ndef_payload_type_mi_connect_service
                     }
@@ -248,22 +249,24 @@ private fun NfcTagAppDataCard(modifier: Modifier = Modifier, data: XiaomiNfcRead
             )
         )
         data.actionRecord?.let { record ->
-            InfoContent(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                title = stringResource(id = R.string.info_app_data_nfc_tag_action_record),
-                data = mutableMapOf(
-                    stringResource(id = R.string.nfc_field_action) to record.action,
-                    stringResource(id = R.string.nfc_field_condition) to record.condition,
-                    stringResource(id = R.string.nfc_field_device_number) to record.deviceNumber,
-                    stringResource(id = R.string.nfc_field_flags) to record.flags
-                ).also {
-                    if (record.conditionParameters.isNotEmpty()) {
-                        it[stringResource(id = R.string.nfc_field_condition_parameters)] = record.conditionParameters
+            OutlinedCard(modifier = Modifier.padding(10.dp)) {
+                InfoContent(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    title = stringResource(id = R.string.info_app_data_nfc_tag_action_record),
+                    data = mutableMapOf(
+                        stringResource(id = R.string.nfc_field_action) to record.action,
+                        stringResource(id = R.string.nfc_field_condition) to record.condition,
+                        stringResource(id = R.string.nfc_field_device_number) to record.deviceNumber,
+                        stringResource(id = R.string.nfc_field_flags) to record.flags
+                    ).also {
+                        if (record.conditionParameters.isNotEmpty()) {
+                            it[stringResource(id = R.string.nfc_field_condition_parameters)] = record.conditionParameters
+                        }
                     }
-                }
-            )
+                )
+            }
         }
         data.deviceRecord?.let { record ->
             OutlinedCard(modifier = Modifier.padding(10.dp)) {

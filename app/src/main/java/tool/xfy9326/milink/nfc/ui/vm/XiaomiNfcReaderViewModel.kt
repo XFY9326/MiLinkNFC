@@ -108,14 +108,15 @@ class XiaomiNfcReaderViewModel : ViewModel() {
                 deviceRecord.getAllAttributesMap(actionRecord, ndefPayloadType).mapNotNull {
                     if (it.value.isNotEmpty()) {
                         val key = it.key.attributeName
-                        val value = if (it.key == NfcTagDeviceRecord.DeviceAttribute.APP_DATA) {
-                            when (NfcTagDeviceRecord.getAppDataValueType(it.value, actionRecord, ndefPayloadType)) {
-                                NfcTagDeviceRecord.AppDataValueType.IOT_ACTION -> it.value.runCatching {
-                                    toString(Charsets.UTF_8)
-                                }.getOrNull() ?: it.value.toHexText()
-
-                                else -> it.value.toHexText()
-                            }
+                        val value = if (
+                            it.key == NfcTagDeviceRecord.DeviceAttribute.APP_DATA &&
+                            NfcTagDeviceRecord.getAppDataValueType(
+                                bytes = it.value,
+                                actionRecord = actionRecord,
+                                ndefType = ndefPayloadType
+                            ) != NfcTagDeviceRecord.AppDataValueType.IOT_ACTION
+                        ) {
+                            it.value.toHexText()
                         } else {
                             val text = it.value.runCatching { toString(Charsets.UTF_8) }.getOrNull()
                             val hexText = it.value.toHexText()

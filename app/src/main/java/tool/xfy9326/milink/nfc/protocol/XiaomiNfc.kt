@@ -35,7 +35,11 @@ object XiaomiNfc {
     fun getXiaomiNfcPayloadType(ndefMessage: NdefMessage): XiaomiNdefPayloadType? =
         ndefMessage.records.asSequence().filterNotNull().filter {
             it.tnf == NdefRecord.TNF_EXTERNAL_TYPE
-        }.firstOrNull()?.type?.runCatching(XiaomiNdefPayloadType::parse)?.getOrNull()
+        }.mapNotNull {
+            runCatching {
+                XiaomiNdefPayloadType.parse(it.type.toString(Charsets.US_ASCII))
+            }.getOrNull()
+        }.firstOrNull()
 
     fun getXiaomiNfcPayloadBytes(ndefMessage: NdefMessage, type: XiaomiNdefPayloadType): ByteArray? =
         ndefMessage.records.asSequence().filterNotNull().filter {
@@ -64,7 +68,7 @@ object XiaomiNfc {
             NdefMessage(newNdefRecord(config))
 
         protected fun newNdefRecord(config: T): NdefRecord =
-            NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE, ndefRecordType.value.toByteArray(Charsets.US_ASCII), null, encode(config).encode())
+            NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE, ndefRecordType.bytes.takeIf { it.isNotEmpty() }, null, encode(config).encode())
 
         fun newNdefDiscoveredIntent(tag: Tag?, id: ByteArray?, config: T): Intent {
             return Intent(NfcAdapter.ACTION_NDEF_DISCOVERED).apply {

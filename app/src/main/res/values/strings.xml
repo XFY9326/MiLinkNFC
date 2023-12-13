@@ -92,6 +92,7 @@
     <string name="exit">退出</string>
     <string name="nav_back">返回</string>
     <string name="clear">清空</string>
+    <string name="unknown">未知</string>
     <string name="current_and_total_bytes">%1$d/%2$d 字节</string>
     <string name="info_nfc_tag">NFC标签</string>
     <string name="info_xiaomi_payload">小米NFC协议</string>

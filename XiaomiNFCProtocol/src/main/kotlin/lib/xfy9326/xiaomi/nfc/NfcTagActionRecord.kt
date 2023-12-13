@@ -27,6 +27,7 @@ data class NfcTagActionRecord(
     }
 
     enum class Action(val value: Short) {
+        UNKNOWN(0),
         IOT(1),
         MUSIC_RELAY(2),
         TEL_RELAY(3),
@@ -45,11 +46,12 @@ data class NfcTagActionRecord(
         companion object {
             private val valuesMap by lazy { entries.associateBy { it.value } }
 
-            fun parse(value: Short) = valuesMap.getValue(value)
+            fun parse(value: Short) = valuesMap[value] ?: UNKNOWN
         }
     }
 
     enum class Condition(val value: Byte) {
+        UNKNOWN(0),
         APP_FOREGROUND(1),
         SCREEN_LOCKED(2),
         AUTO(Byte.MAX_VALUE);
@@ -57,7 +59,7 @@ data class NfcTagActionRecord(
         companion object {
             private val valuesMap by lazy { entries.associateBy { it.value } }
 
-            fun parse(value: Byte) = valuesMap.getValue(value)
+            fun parse(value: Byte) = valuesMap[value] ?: UNKNOWN
         }
     }
 

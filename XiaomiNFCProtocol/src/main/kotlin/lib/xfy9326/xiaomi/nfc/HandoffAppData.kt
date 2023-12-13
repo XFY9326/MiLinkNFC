@@ -62,6 +62,7 @@ data class HandoffAppData(
     }
 
     enum class DeviceType(val value: Int) {
+        UNKNOWN(0),
         TV(2),
         PC(3),
         CAR(5),
@@ -70,11 +71,12 @@ data class HandoffAppData(
         companion object {
             private val valuesMap by lazy { entries.associateBy { it.value } }
 
-            fun parse(value: Int) = valuesMap.getValue(value)
+            fun parse(value: Int) = valuesMap[value] ?: UNKNOWN
         }
     }
 
     enum class PayloadKey(val value: Byte) {
+        UNKNOWN(0),
         ACTION_SUFFIX(101),
         BT_MAC(1),
         WIFI_MAC(2),
@@ -84,7 +86,7 @@ data class HandoffAppData(
         companion object {
             private val valuesMap by lazy { entries.associateBy { it.value } }
 
-            fun parse(value: Byte) = valuesMap.getValue(value)
+            fun parse(value: Byte) = valuesMap[value] ?: UNKNOWN
         }
     }
 }
