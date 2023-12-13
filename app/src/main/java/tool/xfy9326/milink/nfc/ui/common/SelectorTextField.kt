@@ -75,7 +75,6 @@ fun SelectorTextField(
                 DropdownMenuItem(
                     text = { Text(text = text) },
                     onClick = {
-                        // showText = keyTextMap[key] ?: error("Key $key not in keyTextMap")
                         expanded = false
                         onKeySelected(key)
                     },

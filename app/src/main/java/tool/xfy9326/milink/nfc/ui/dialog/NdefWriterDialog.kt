@@ -96,9 +96,9 @@ fun NdefWriterDialog(
                     Text(
                         text = stringResource(
                             id = if (ndefWriteData.readOnly) {
-                                R.string.put_and_write_nfc_tag_read_only
+                                R.string.tap_and_write_nfc_tag_read_only
                             } else {
-                                R.string.put_and_write_nfc_tag
+                                R.string.tap_and_write_nfc_tag
                             }
                         ),
                         textAlign = TextAlign.Center

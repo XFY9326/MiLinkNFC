@@ -24,11 +24,13 @@ import androidx.compose.material.icons.outlined.ScreenShare
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
@@ -191,11 +194,14 @@ private fun Content(
     onRequestFormatXiaomiTap: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val snackBarHostState = remember { SnackbarHostState() }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = { TopBar() },
+        modifier = Modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = { TopBar(scrollBehavior = scrollBehavior) },
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
     ) { innerPadding ->
         Column(
@@ -250,13 +256,15 @@ private fun Content(
 }
 
 @Composable
-private fun TopBar() {
+private fun TopBar(
+    scrollBehavior: TopAppBarScrollBehavior
+) {
     val uriHandler = LocalUriHandler.current
     val context = LocalContext.current
 
     var openAboutDialog by remember { mutableStateOf(false) }
 
-    TopAppBar(
+    LargeTopAppBar(
         title = { Text(text = stringResource(id = R.string.app_name)) },
         actions = {
             IconButton(onClick = {
@@ -269,7 +277,8 @@ private fun TopBar() {
             }) {
                 Icon(imageVector = Icons.Outlined.Info, contentDescription = stringResource(id = R.string.about))
             }
-        }
+        },
+        scrollBehavior = scrollBehavior
     )
 
     if (openAboutDialog) {

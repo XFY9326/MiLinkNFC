@@ -27,11 +27,12 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -42,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -92,19 +94,28 @@ fun ScreenMirrorScreen(
 
     val scrollState = rememberScrollState()
     val snackBarHostState = remember { SnackbarHostState() }
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            TopAppBar(
+            LargeTopAppBar(
                 title = { Text(text = stringResource(id = R.string.xiaomi_screen_mirror_nfc)) },
                 navigationIcon = {
                     IconButton(onClick = onNavBack) {
                         Icon(imageVector = Icons.Default.ArrowBack, contentDescription = stringResource(id = R.string.nav_back))
                     }
-                }
+                },
+                actions = {
+                    IconButton(onClick = viewModel::openMiLinkVersionDialog) {
+                        Icon(imageVector = Icons.Default.HelpOutline, contentDescription = stringResource(id = R.string.local_app_versions))
+                    }
+                },
+                scrollBehavior = scrollBehavior
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
@@ -122,7 +133,6 @@ fun ScreenMirrorScreen(
             TestScreenMirrorFunctionCard(
                 modifier = Modifier.padding(horizontal = 8.dp),
                 screenMirror = uiState.value.testScreenMirror,
-                onOpenMiLinkVersionDialog = viewModel::openMiLinkVersionDialog,
                 onSendScreenMirror = { viewModel.sendScreenMirror(context, it) }
             )
             WriteNfcFunctionCard(
@@ -175,7 +185,6 @@ private fun EventHandler(
 private fun TestScreenMirrorFunctionCard(
     modifier: Modifier = Modifier,
     screenMirror: ScreenMirror,
-    onOpenMiLinkVersionDialog: () -> Unit,
     onSendScreenMirror: (ScreenMirror) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
@@ -185,11 +194,6 @@ private fun TestScreenMirrorFunctionCard(
     FunctionCard(
         modifier = modifier.fillMaxWidth(),
         icon = Icons.Default.BluetoothSearching,
-        extraIconContent = {
-            IconButton(onClick = onOpenMiLinkVersionDialog) {
-                Icon(imageVector = Icons.Default.HelpOutline, contentDescription = stringResource(id = R.string.local_app_versions))
-            }
-        },
         title = stringResource(id = R.string.test_screen_mirror),
         description = stringResource(id = R.string.test_screen_mirror_desc)
     ) {

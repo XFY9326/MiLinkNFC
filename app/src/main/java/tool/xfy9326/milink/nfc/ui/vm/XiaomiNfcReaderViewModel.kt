@@ -20,6 +20,7 @@ import lib.xfy9326.xiaomi.nfc.isValidNfcPayload
 import lib.xfy9326.xiaomi.nfc.toXiaomiNfcPayload
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.data.NdefReadData
+import tool.xfy9326.milink.nfc.data.ui.AppDataUI
 import tool.xfy9326.milink.nfc.data.ui.HandoffAppDataUI
 import tool.xfy9326.milink.nfc.data.ui.NfcTagAppDataUI
 import tool.xfy9326.milink.nfc.data.ui.XiaomiNfcPayloadUI
@@ -36,13 +37,13 @@ class XiaomiNfcReaderViewModel : ViewModel() {
     }
 
     data class UiState(
-        val showDumpNdefButton: Boolean = false,
-        val tagInfo: XiaomiNfcTagUI? = null,
-        val payloadUI: XiaomiNfcPayloadUI? = null,
-        val handoffAppDataUI: HandoffAppDataUI? = null,
-        val nfcTagAppDataUI: NfcTagAppDataUI? = null,
+        val nfcInfo: NfcInfo? = null
     ) {
-        val hasData: Boolean = tagInfo != null && payloadUI != null && (handoffAppDataUI != null || nfcTagAppDataUI != null)
+        data class NfcInfo(
+            val tag: XiaomiNfcTagUI,
+            val payload: XiaomiNfcPayloadUI,
+            val appData: AppDataUI,
+        )
     }
 
     private val _uiState = MutableStateFlow(UiState())
@@ -93,16 +94,15 @@ class XiaomiNfcReaderViewModel : ViewModel() {
         }
 
         try {
-            val payloadUI = XiaomiNfcPayloadUI(payload)
-            when (val appsData = payload.appsData) {
-                is HandoffAppData -> _uiState.update {
-                    it.copy(tagInfo = tagInfo, payloadUI = payloadUI, handoffAppDataUI = HandoffAppDataUI(appsData))
+            val info = UiState.NfcInfo(
+                tag = tagInfo,
+                payload = XiaomiNfcPayloadUI(payload),
+                appData = when (val appData = payload.appsData) {
+                    is HandoffAppData -> HandoffAppDataUI(appData)
+                    is NfcTagAppData -> NfcTagAppDataUI(appData, tagInfo.ndefPayloadType)
                 }
-
-                is NfcTagAppData -> _uiState.update {
-                    it.copy(tagInfo = tagInfo, payloadUI = payloadUI, nfcTagAppDataUI = NfcTagAppDataUI(appsData, tagInfo.ndefPayloadType))
-                }
-            }
+            )
+            _uiState.update { it.copy(nfcInfo = info) }
             _instantMsg.emit(InstantMsg.NEW_TAG_FOUND)
             return true
         } catch (e: Exception) {

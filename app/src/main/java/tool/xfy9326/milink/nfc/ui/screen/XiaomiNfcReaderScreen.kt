@@ -1,6 +1,7 @@
 package tool.xfy9326.milink.nfc.ui.screen
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -60,6 +61,8 @@ private fun Preview() {
     }
 }
 
+private const val ANIMATION_LABEL_CONTENT = "Content"
+
 @Composable
 fun XiaomiNfcReaderScreen(
     viewModel: XiaomiNfcReaderViewModel = viewModel(),
@@ -72,44 +75,36 @@ fun XiaomiNfcReaderScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                title = { Text(text = stringResource(id = R.string.nfc_read_xiaomi_ndef)) },
-                navigationIcon = {
-                    IconButton(onClick = onNavBack) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = stringResource(id = R.string.nav_back))
-                    }
-                }
-            )
-        },
+        topBar = { TopBar(onNavBack = onNavBack) },
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
     ) { innerPadding ->
-        if (uiState.value.hasData) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(scrollState)
-                    .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding)
-                    .displayCutoutPadding()
-                    .padding(horizontal = 8.dp, vertical = 6.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                uiState.value.tagInfo?.let {
-                    NfcTagInfoCard(modifier = Modifier.padding(horizontal = 8.dp), data = it)
+        Crossfade(targetState = uiState.value.nfcInfo, label = ANIMATION_LABEL_CONTENT) { nfcInfo ->
+            nfcInfo?.let {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(scrollState)
+                        .padding(innerPadding)
+                        .consumeWindowInsets(innerPadding)
+                        .displayCutoutPadding()
+                        .padding(horizontal = 8.dp, vertical = 6.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    NfcTagInfoCard(modifier = Modifier.padding(horizontal = 8.dp), data = it.tag)
+                    XiaomiNfcPayloadCard(modifier = Modifier.padding(horizontal = 8.dp), data = it.payload)
+                    when (it.appData) {
+                        is HandoffAppDataUI -> HandoffAppDataCard(
+                            modifier = Modifier.padding(horizontal = 8.dp),
+                            data = it.appData
+                        )
+
+                        is NfcTagAppDataUI -> NfcTagAppDataCard(
+                            modifier = Modifier.padding(horizontal = 8.dp),
+                            data = it.appData
+                        )
+                    }
                 }
-                uiState.value.payloadUI?.let {
-                    XiaomiNfcPayloadCard(modifier = Modifier.padding(horizontal = 8.dp), data = it)
-                }
-                uiState.value.handoffAppDataUI?.let {
-                    HandoffAppDataCard(modifier = Modifier.padding(horizontal = 8.dp), data = it)
-                }
-                uiState.value.nfcTagAppDataUI?.let {
-                    NfcTagAppDataCard(modifier = Modifier.padding(horizontal = 8.dp), data = it)
-                }
-            }
-        } else {
-            Box(
+            } ?: Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
@@ -124,6 +119,18 @@ fun XiaomiNfcReaderScreen(
     EventHandler(
         snackBarHostState = snackBarHostState,
         viewModel = viewModel
+    )
+}
+
+@Composable
+private fun TopBar(onNavBack: () -> Unit) {
+    TopAppBar(
+        title = { Text(text = stringResource(id = R.string.nfc_read_xiaomi_ndef)) },
+        navigationIcon = {
+            IconButton(onClick = onNavBack) {
+                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = stringResource(id = R.string.nav_back))
+            }
+        }
     )
 }
 
@@ -156,11 +163,11 @@ private fun NfcWaitScan() {
         Icon(
             modifier = Modifier.size(62.dp),
             imageVector = Icons.Default.Nfc,
-            contentDescription = stringResource(id = R.string.put_and_read_nfc_tag),
+            contentDescription = stringResource(id = R.string.tap_and_read_nfc_tag),
         )
         Spacer(modifier = Modifier.height(30.dp))
         Text(
-            text = stringResource(id = R.string.put_and_read_nfc_tag),
+            text = stringResource(id = R.string.tap_and_read_nfc_tag),
             textAlign = TextAlign.Center,
             style = typography.bodyLarge
         )

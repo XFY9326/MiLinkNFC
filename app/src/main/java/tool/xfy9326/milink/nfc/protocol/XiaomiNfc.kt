@@ -259,14 +259,13 @@ object XiaomiNfc {
         }
     }
 
-    object ScreenMirror :
-        NfcAction<ScreenMirror.Config, HandoffAppData>(
-            majorVersion = 1,
-            minorVersion = 13,
-            idHash = null,
-            protocol = XiaomiNfcProtocol.HandOff,
-            ndefRecordType = XiaomiNdefPayloadType.MI_CONNECT_SERVICE
-        ) {
+    object ScreenMirror : NfcAction<ScreenMirror.Config, HandoffAppData>(
+        majorVersion = 1,
+        minorVersion = 13,
+        idHash = null,
+        protocol = XiaomiNfcProtocol.HandOff,
+        ndefRecordType = XiaomiNdefPayloadType.MI_CONNECT_SERVICE
+    ) {
         private const val MAJOR_VERSION = 0x27.toByte()
         private const val MINOR_VERSION = 0x17.toByte()
 

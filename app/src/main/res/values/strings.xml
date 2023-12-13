@@ -19,9 +19,9 @@
     <string name="nfc_writer">NFC写入</string>
     <string name="write_screen_mirror_nfc">一碰妙享NFC标签</string>
     <string name="write_screen_mirror_nfc_desc">向NFC标签中覆盖写入小米一碰妙享的数据，仅支持NDEF格式的NFC标签。\n\n如果写入失败，可能是因为写入NFC标签时连接断开，请多尝试几次。\n\n如果投屏时多次出现连接失败，可以使用“测试屏幕镜像”功能并尝试重启小米电脑管家。</string>
-    <string name="put_and_write_nfc_tag">靠近NFC标签以写入数据</string>
-    <string name="put_and_write_nfc_tag_read_only">靠近NFC标签以写入只读数据</string>
-    <string name="put_and_read_nfc_tag">靠近NFC标签以读取数据</string>
+    <string name="tap_and_write_nfc_tag">靠近NFC标签以写入数据</string>
+    <string name="tap_and_write_nfc_tag_read_only">靠近NFC标签以写入只读数据</string>
+    <string name="tap_and_read_nfc_tag">靠近NFC标签以读取数据</string>
     <string name="nfc_write_bytes">写入数据：%1$d字节</string>
     <string name="nfc_using_conflict">设备正在使用中</string>
     <string name="nfc_write_success">写入成功</string>
@@ -82,7 +82,7 @@
     <string name="not_supported_os">不支持的系统</string>
     <string name="not_supported_os_desc">当前设备并非小米Hyper OS系统，本应用不保证运行稳定性。</string>
     <string name="local_app_versions">本机应用版本</string>
-    <string name="local_app_versions_desc">一碰妙享镜像投屏功能需要设备上对应应用版本升级到最新版</string>
+    <string name="local_app_versions_desc">一碰妙享镜像投屏功能需要设备上对应应用版本升级到最新版。建议使用HyperOS和小米电脑管家。</string>
     <string name="missing_package">缺少应用：%1$s</string>
     <string name="check_update">检查更新</string>
     <string name="not_support_nfc">当前设备不支持NFC！</string>
@@ -122,6 +122,7 @@
     <string name="nfc_field_condition">条件</string>
     <string name="nfc_field_condition_parameters">条件参数</string>
     <string name="nfc_field_attributes">属性</string>
+    <string name="dump_ndef_bin">导出NDEF</string>
 
     <string name="version" translatable="false">%1$s (%2$d)</string>
     <string name="author_name" translatable="false">XFY9326</string>
