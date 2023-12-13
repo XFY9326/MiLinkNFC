@@ -22,7 +22,7 @@ class ProtocolTest {
             writeTime = 1684933764,
             flags = 0,
             records = listOf(
-                NfcTagDeviceRecord.create(
+                NfcTagDeviceRecord.newInstance(
                     deviceType = NfcTagDeviceRecord.DeviceType.MI_SOUND_BOX,
                     flags = 0,
                     deviceNumber = 0,
@@ -47,7 +47,7 @@ class ProtocolTest {
             writeTime = 1661161323,
             flags = 0,
             records = listOf(
-                NfcTagDeviceRecord.create(
+                NfcTagDeviceRecord.newInstance(
                     deviceType = NfcTagDeviceRecord.DeviceType.MI_SOUND_BOX,
                     flags = 0,
                     deviceNumber = 0,

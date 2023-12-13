@@ -2,7 +2,7 @@ package lib.xfy9326.xiaomi.nfc
 
 import java.nio.ByteBuffer
 
-@Suppress("unused")
+@Suppress("unused", "MemberVisibilityCanBePrivate")
 data class NfcTagDeviceRecord(
     val deviceType: DeviceType,
     val flags: Byte,
@@ -13,7 +13,7 @@ data class NfcTagDeviceRecord(
     companion object {
         private val PREFIX_APP_DATA_MAP by lazy { "mxD".toByteArray(Charsets.UTF_8) }
 
-        fun create(
+        fun newInstance(
             deviceType: DeviceType,
             flags: Byte,
             deviceNumber: Byte,
@@ -134,11 +134,15 @@ data class NfcTagDeviceRecord(
         SSID(15, true),
         PASSWORD(17, true),
         MODEL(18, true),
+
+        // IOT
         IOT_DEVICE_ID(6, true),
         IOT_USER_MODEL(7, true),
         IOT_NFC_EXTRA_DATA(8, true),
         IOT_DEVICE_MAC(2, true),
         IOT_APP_DATA(13, true),
+
+        // IOT_ENV
         IOT_ENV_USER_ID(1, true),
         IOT_ENV_OWNER_UID(2, true),
         IOT_ENV_REGION(3, true),

@@ -40,6 +40,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.collectLatest
 import lib.xfy9326.xiaomi.nfc.XiaomiNdefPayloadType
 import tool.xfy9326.milink.nfc.R
+import tool.xfy9326.milink.nfc.data.ui.HandoffAppDataUI
+import tool.xfy9326.milink.nfc.data.ui.NfcTagAppDataUI
+import tool.xfy9326.milink.nfc.data.ui.XiaomiNfcPayloadUI
+import tool.xfy9326.milink.nfc.data.ui.XiaomiNfcTagUI
 import tool.xfy9326.milink.nfc.ui.common.InfoContent
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.theme.LocalAppThemeTypography
@@ -163,7 +167,7 @@ private fun Boolean.stringResId(): Int =
     if (this) R.string.content_true else R.string.content_false
 
 @Composable
-private fun NfcTagInfoCard(modifier: Modifier = Modifier, data: XiaomiNfcReaderViewModel.NfcTagInfo) {
+private fun NfcTagInfoCard(modifier: Modifier = Modifier, data: XiaomiNfcTagUI) {
     OutlinedCard(modifier = modifier) {
         InfoContent(
             modifier = Modifier
@@ -189,7 +193,7 @@ private fun NfcTagInfoCard(modifier: Modifier = Modifier, data: XiaomiNfcReaderV
 }
 
 @Composable
-private fun XiaomiNfcPayloadCard(modifier: Modifier = Modifier, data: XiaomiNfcReaderViewModel.XiaomiNfcPayloadUI) {
+private fun XiaomiNfcPayloadCard(modifier: Modifier = Modifier, data: XiaomiNfcPayloadUI) {
     OutlinedCard(modifier = modifier) {
         InfoContent(
             modifier = Modifier
@@ -207,7 +211,7 @@ private fun XiaomiNfcPayloadCard(modifier: Modifier = Modifier, data: XiaomiNfcR
 }
 
 @Composable
-private fun HandoffAppDataCard(modifier: Modifier = Modifier, data: XiaomiNfcReaderViewModel.HandoffAppDataUI) {
+private fun HandoffAppDataCard(modifier: Modifier = Modifier, data: HandoffAppDataUI) {
     OutlinedCard(modifier = modifier) {
         InfoContent(
             modifier = Modifier
@@ -235,7 +239,7 @@ private fun HandoffAppDataCard(modifier: Modifier = Modifier, data: XiaomiNfcRea
 }
 
 @Composable
-private fun NfcTagAppDataCard(modifier: Modifier = Modifier, data: XiaomiNfcReaderViewModel.NfcTagAppDataUI) {
+private fun NfcTagAppDataCard(modifier: Modifier = Modifier, data: NfcTagAppDataUI) {
     OutlinedCard(modifier = modifier) {
         InfoContent(
             modifier = Modifier

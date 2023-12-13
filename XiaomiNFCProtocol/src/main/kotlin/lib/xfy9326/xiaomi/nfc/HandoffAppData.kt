@@ -75,13 +75,13 @@ data class HandoffAppData(
         }
     }
 
-    enum class PayloadKey(val value: Byte) {
+    enum class PayloadKey(val value: Byte, val isText: Boolean? = null) {
         UNKNOWN(0),
-        ACTION_SUFFIX(101),
-        BT_MAC(1),
-        WIFI_MAC(2),
-        WIRED_MAC(3),
-        EXT_ABILITY(121);
+        ACTION_SUFFIX(101, true),
+        BT_MAC(1, true),
+        WIFI_MAC(2, true),
+        WIRED_MAC(3, true),
+        EXT_ABILITY(121, false);
 
         companion object {
             private val valuesMap by lazy { entries.associateBy { it.value } }

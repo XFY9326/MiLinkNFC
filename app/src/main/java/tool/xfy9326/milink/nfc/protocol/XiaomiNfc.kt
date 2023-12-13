@@ -170,7 +170,7 @@ object XiaomiNfc {
                 writeTime = config.writeTime,
                 flags = FLAGS,
                 records = listOf(
-                    NfcTagDeviceRecord.create(
+                    NfcTagDeviceRecord.newInstance(
                         deviceType = NfcTagDeviceRecord.DeviceType.MI_SOUND_BOX,
                         flags = FLAGS,
                         deviceNumber = DEVICE_NUMBER,
@@ -222,7 +222,7 @@ object XiaomiNfc {
                 writeTime = config.writeTime,
                 flags = FLAGS,
                 records = listOf(
-                    NfcTagDeviceRecord.create(
+                    NfcTagDeviceRecord.newInstance(
                         deviceType = NfcTagDeviceRecord.DeviceType.MI_SOUND_BOX,
                         flags = FLAGS,
                         deviceNumber = DEVICE_NUMBER,
