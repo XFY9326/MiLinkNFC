@@ -68,7 +68,7 @@ class XiaomiNfcReaderActivity : ComponentActivity() {
             try {
                 val msg = it.ndefMessage
                 if (msg.isNullOrEmpty()) {
-                    makeToast(getString(R.string.nfc_empty_ndef))
+                    makeToast(getString(R.string.nfc_empty))
                 } else {
                     NdefReadData(
                         techList = it.tag.techList.map { str -> str.substringAfterLast(".") },

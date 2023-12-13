@@ -48,6 +48,7 @@ import tool.xfy9326.milink.nfc.ui.common.InfoContent
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.theme.LocalAppThemeTypography
 import tool.xfy9326.milink.nfc.ui.vm.XiaomiNfcReaderViewModel
+import tool.xfy9326.milink.nfc.utils.showToast
 
 @Preview(showBackground = true)
 @Composable
@@ -134,8 +135,12 @@ private fun EventHandler(
     val context = LocalContext.current
 
     LaunchedEffect(snackBarHostState) {
-        viewModel.snackbarMsg.collectLatest {
-            snackBarHostState.showSnackbar(message = context.getString(it.resId))
+        viewModel.instantMsg.collectLatest {
+            if (it.isToast) {
+                context.showToast(text = context.getString(it.resId))
+            } else {
+                snackBarHostState.showSnackbar(message = context.getString(it.resId))
+            }
         }
     }
 }

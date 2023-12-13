@@ -26,7 +26,7 @@
     <string name="nfc_write_success">写入成功</string>
     <string name="nfc_connect_failed">连接失败</string>
     <string name="nfc_read_failed">读取失败</string>
-    <string name="nfc_empty_ndef">空的NDEF标签</string>
+    <string name="nfc_empty">空标签</string>
     <string name="nfc_ndef_not_supported">不支持NDEF格式\n%1$s</string>
     <string name="nfc_not_ndef">非NDEF格式的标签</string>
     <string name="nfc_write_error">写入失败</string>
@@ -37,6 +37,7 @@
     <string name="nfc_write_error_max_size">写入空间不足</string>
     <string name="nfc_write_error_no_read_only">不可设为只读</string>
     <string name="nfc_write_error_not_writeable">不可写入</string>
+    <string name="nfc_new_tag_found">检测到NFC标签</string>
     <string name="test_screen_mirror">测试屏幕镜像</string>
     <string name="test_screen_mirror_desc">模拟NFC一碰妙享，向指定蓝牙Mac地址的设备发送屏幕镜像（需安装小米电脑管家）。\n\n触发方式：\n“虚拟NFC标签”：可能使投屏服务出错，但不受系统版本限制。\n“互联通信服务”：直接控制投屏服务，但可能因为系统版本不符无法触发。\n\nLyra连接：\n可以提高查找连接设备的速度并避免设备重复显示，但是并非所有设备的版本都支持。\n无特殊需求建议启用，但是使用前最好先测试一下。</string>
     <string name="tiles_screen_mirror">通知栏磁贴快捷操作</string>

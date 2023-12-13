@@ -35,7 +35,7 @@ import tool.xfy9326.milink.nfc.utils.MiContinuityUtils
 import tool.xfy9326.milink.nfc.utils.isValidMacAddress
 
 class ScreenMirrorViewModel : ViewModel() {
-    enum class SnackbarMsg(@StringRes val resId: Int) {
+    enum class InstantMsg(@StringRes val resId: Int) {
         INVALID_MAC_ADDRESS(R.string.invalid_mac_address),
         EMPTY_MAC_ADDRESS(R.string.empty_mac_address),
         SAVE_SUCCESS(R.string.save_success),
@@ -65,8 +65,8 @@ class ScreenMirrorViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
-    private val _snackbarMsg = MutableSharedFlow<SnackbarMsg>()
-    val snackbarMsg: SharedFlow<SnackbarMsg> = _snackbarMsg.asSharedFlow()
+    private val _instantMsg = MutableSharedFlow<InstantMsg>()
+    val instantMsg: SharedFlow<InstantMsg> = _instantMsg.asSharedFlow()
 
     init {
         checkLyraSupport()
@@ -77,9 +77,9 @@ class ScreenMirrorViewModel : ViewModel() {
 
     private suspend fun validateBluetoothMac(btMac: String): Boolean {
         if (btMac.isBlank()) {
-            _snackbarMsg.emit(SnackbarMsg.EMPTY_MAC_ADDRESS)
+            _instantMsg.emit(InstantMsg.EMPTY_MAC_ADDRESS)
         } else if (!btMac.isValidMacAddress()) {
-            _snackbarMsg.emit(SnackbarMsg.INVALID_MAC_ADDRESS)
+            _instantMsg.emit(InstantMsg.INVALID_MAC_ADDRESS)
         } else {
             return true
         }
@@ -162,11 +162,11 @@ class ScreenMirrorViewModel : ViewModel() {
                 {
                     viewModelScope.launch {
                         if (it == StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ADDED) {
-                            _snackbarMsg.emit(SnackbarMsg.TILES_ADD_SUCCESS)
+                            _instantMsg.emit(InstantMsg.TILES_ADD_SUCCESS)
                         } else if (it == StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ALREADY_ADDED) {
-                            _snackbarMsg.emit(SnackbarMsg.TILES_ALREADY_ADD)
+                            _instantMsg.emit(InstantMsg.TILES_ALREADY_ADD)
                         } else if (it != StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_NOT_ADDED) {
-                            _snackbarMsg.emit(SnackbarMsg.TILES_ADD_FAILED)
+                            _instantMsg.emit(InstantMsg.TILES_ADD_FAILED)
                         }
                     }
                 }
@@ -185,7 +185,7 @@ class ScreenMirrorViewModel : ViewModel() {
             val screenMirror = uiState.value.tilesScreenMirror
             if (validateBluetoothMac(screenMirror.bluetoothMac)) {
                 AppDataStore.setTilesScreenMirror(screenMirror)
-                _snackbarMsg.emit(SnackbarMsg.SAVE_SUCCESS)
+                _instantMsg.emit(InstantMsg.SAVE_SUCCESS)
             }
         }
     }
@@ -199,7 +199,7 @@ class ScreenMirrorViewModel : ViewModel() {
     fun saveHuaweiRedirect() {
         viewModelScope.launch(Dispatchers.IO) {
             AppDataStore.setHuaweiRedirect(uiState.value.huaweiRedirect)
-            _snackbarMsg.emit(SnackbarMsg.SAVE_SUCCESS)
+            _instantMsg.emit(InstantMsg.SAVE_SUCCESS)
         }
     }
 }

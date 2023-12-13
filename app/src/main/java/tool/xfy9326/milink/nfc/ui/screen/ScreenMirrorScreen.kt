@@ -165,7 +165,7 @@ private fun EventHandler(
     val context = LocalContext.current
 
     LaunchedEffect(snackBarHostState) {
-        viewModel.snackbarMsg.collectLatest {
+        viewModel.instantMsg.collectLatest {
             snackBarHostState.showSnackbar(message = context.getString(it.resId))
         }
     }
