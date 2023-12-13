@@ -15,14 +15,14 @@ class HandoffAppDataUI(
     constructor(handoffAppData: HandoffAppData) : this(
         majorVersion = handoffAppData.majorVersion.toHexString(true),
         minorVersion = handoffAppData.minorVersion.toHexString(true),
-        deviceType = handoffAppData.deviceType.name,
+        deviceType = handoffAppData.enumDeviceType.name,
         attributesMap = handoffAppData.attributesMap.map { it.key.toHexString(true) to it.value.toHexText() }.toMap(),
         action = handoffAppData.action,
-        payloadsMap = handoffAppData.payloadsMap.map {
+        payloadsMap = handoffAppData.enumPayloadsMap.map {
             it.key.name to if (it.key.isText == true) {
-                it.value.toHexText()
-            } else {
                 it.value.toString(Charsets.UTF_8)
+            } else {
+                it.value.toHexText()
             }
         }.toMap(),
     )

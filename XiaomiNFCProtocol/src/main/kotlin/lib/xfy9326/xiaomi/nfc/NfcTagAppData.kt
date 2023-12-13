@@ -27,11 +27,20 @@ data class NfcTagAppData(
         }
     }
 
-    fun getDeviceRecord(): NfcTagDeviceRecord? =
+    fun firstOrNullDeviceRecord(): NfcTagDeviceRecord? =
         records.asSequence().filterIsInstance<NfcTagDeviceRecord>().firstOrNull()
 
-    fun getActionRecord(): NfcTagActionRecord? =
+    fun firstOrNullActionRecord(): NfcTagActionRecord? =
         records.asSequence().filterIsInstance<NfcTagActionRecord>().firstOrNull()
+
+    fun firstAction(): NfcTagActionRecord.Action =
+        firstOrNullActionRecord()?.enumAction ?: NfcTagActionRecord.Action.UNKNOWN
+
+    fun firstOrNullActionValue(): Short? =
+        firstOrNullActionRecord()?.action
+
+    fun getFirstDeviceAttributesMap(ndefType: XiaomiNdefPayloadType): Map<NfcTagDeviceRecord.DeviceAttribute, ByteArray> =
+        firstOrNullDeviceRecord()?.getAllAttributesMap(firstAction(), ndefType) ?: emptyMap()
 
     override fun encode(): ByteArray {
         val recordByteArrays = records.map { it.encode() }

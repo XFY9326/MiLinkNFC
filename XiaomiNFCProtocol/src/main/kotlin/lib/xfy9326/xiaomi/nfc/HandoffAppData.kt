@@ -5,22 +5,38 @@ import java.nio.ByteBuffer
 data class HandoffAppData(
     val majorVersion: Byte,
     val minorVersion: Byte,
-    val deviceType: DeviceType,
+    val deviceType: Int,
     val attributesMap: Map<Byte, ByteArray>,
     val action: String,
-    val payloadsMap: Map<PayloadKey, ByteArray>
+    val payloadsMap: Map<Byte, ByteArray>
 ) : AppsData {
     @Suppress("unused")
     companion object {
+        fun newInstance(
+            majorVersion: Byte,
+            minorVersion: Byte,
+            deviceType: DeviceType,
+            attributesMap: Map<Byte, ByteArray>,
+            action: String,
+            payloadsMap: Map<PayloadKey, ByteArray>
+        ) = HandoffAppData(
+            majorVersion = majorVersion,
+            minorVersion = minorVersion,
+            deviceType = deviceType.value,
+            attributesMap = attributesMap,
+            action = action,
+            payloadsMap = payloadsMap.mapKeys { it.key.value }
+        )
+
         fun decode(bytes: ByteArray): HandoffAppData {
             val buffer = ByteBuffer.wrap(bytes)
             return HandoffAppData(
                 majorVersion = buffer.get(),
                 minorVersion = buffer.get(),
-                deviceType = DeviceType.parse(buffer.getInt()),
+                deviceType = buffer.getInt(),
                 attributesMap = buffer.getByteKeyBytesMap(buffer.get().toInt()),
                 action = ByteArray(buffer.get().toInt()).also { buffer.get(it) }.toString(Charsets.UTF_8),
-                payloadsMap = buffer.getByteKeyBytesMap().mapKeys { PayloadKey.parse(it.key) }
+                payloadsMap = buffer.getByteKeyBytesMap()
             )
         }
 
@@ -37,9 +53,12 @@ data class HandoffAppData(
         }
     }
 
+    val enumDeviceType by lazy { DeviceType.parse(deviceType) }
+    val enumPayloadsMap
+        get() = payloadsMap.mapKeys { PayloadKey.parse(it.key) }
+
     override fun encode(): ByteArray {
         val actionBytes = action.toByteArray(Charsets.UTF_8)
-        val payloadByteMap = payloadsMap.mapKeys { it.key.value }
         return ByteBuffer.allocate(
             Byte.SIZE_BYTES + // major version
                     Byte.SIZE_BYTES + // minor version
@@ -48,16 +67,16 @@ data class HandoffAppData(
                     attributesMap.bytesMapTotalBytes() + // attributeMap
                     Byte.SIZE_BYTES + // action size
                     actionBytes.size + // action
-                    payloadByteMap.bytesMapTotalBytes() // payloadData
+                    payloadsMap.bytesMapTotalBytes() // payloadData
         )
             .put(majorVersion)
             .put(minorVersion)
-            .putInt(deviceType.value)
+            .putInt(deviceType)
             .put(attributesMap.size.toByte())
             .putByteKeyBytesMap(attributesMap)
             .put(action.length.toByte())
             .put(action.toByteArray(Charsets.UTF_8))
-            .putByteKeyBytesMap(payloadByteMap)
+            .putByteKeyBytesMap(payloadsMap)
             .array()
     }
 

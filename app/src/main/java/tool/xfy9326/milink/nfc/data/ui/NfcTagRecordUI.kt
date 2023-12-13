@@ -13,14 +13,14 @@ class NfcTagActionRecordUI(
     val condition: String,
     val deviceNumber: String,
     val flags: String,
-    val conditionParameters: String
+    val conditionParameters: String?
 ) : NfcTagRecordUI {
     constructor(actionRecord: NfcTagActionRecord) : this(
-        action = actionRecord.action.name,
-        condition = actionRecord.condition.name,
+        action = actionRecord.enumAction.name,
+        condition = actionRecord.enumCondition.name,
         deviceNumber = actionRecord.deviceNumber.toHexString(true),
         flags = actionRecord.flags.toHexString(true),
-        conditionParameters = actionRecord.conditionParameters.toHexString(true),
+        conditionParameters = actionRecord.conditionParameters?.toHexString(true),
     )
 }
 
@@ -30,21 +30,21 @@ class NfcTagDeviceRecordUI(
     val deviceNumber: String,
     val attributesMap: Map<String, String>,
 ) : NfcTagRecordUI {
-    constructor(deviceRecord: NfcTagDeviceRecord, actionRecord: NfcTagActionRecord?, ndefPayloadType: XiaomiNdefPayloadType) : this(
-        deviceType = deviceRecord.deviceType.name,
+    constructor(deviceRecord: NfcTagDeviceRecord, action: NfcTagActionRecord.Action, ndefPayloadType: XiaomiNdefPayloadType) : this(
+        deviceType = deviceRecord.enumDeviceType.name,
         flags = deviceRecord.flags.toHexString(true),
         deviceNumber = deviceRecord.deviceNumber.toHexString(true),
-        attributesMap = if (actionRecord == null) {
+        attributesMap = if (action == NfcTagActionRecord.Action.UNKNOWN) {
             deviceRecord.attributesMap.map { it.key.toString() to it.value.toHexText() }
         } else {
-            deviceRecord.getAllAttributesMap(actionRecord, ndefPayloadType).mapNotNull {
+            deviceRecord.getAllAttributesMap(action, ndefPayloadType).mapNotNull {
                 if (it.value.isNotEmpty()) {
                     val key = it.key.attributeName
                     val value = if (
                         it.key == NfcTagDeviceRecord.DeviceAttribute.APP_DATA &&
                         NfcTagDeviceRecord.getAppDataValueType(
                             bytes = it.value,
-                            actionRecord = actionRecord,
+                            action = action,
                             ndefType = ndefPayloadType
                         ) != NfcTagDeviceRecord.AppDataValueType.IOT_ACTION
                     ) {

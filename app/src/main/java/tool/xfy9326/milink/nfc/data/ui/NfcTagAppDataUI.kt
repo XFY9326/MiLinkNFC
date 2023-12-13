@@ -18,7 +18,7 @@ class NfcTagAppDataUI(
         minorVersion = nfcTagAppData.minorVersion.toHexString(true),
         writeTime = SimpleDateFormat.getDateTimeInstance().format(nfcTagAppData.writeTime * 1000L),
         flags = nfcTagAppData.flags.toHexString(true),
-        actionRecord = nfcTagAppData.getActionRecord()?.let { NfcTagActionRecordUI(it) },
-        deviceRecord = nfcTagAppData.getDeviceRecord()?.let { NfcTagDeviceRecordUI(it, nfcTagAppData.getActionRecord(), ndefPayloadType) }
+        actionRecord = nfcTagAppData.firstOrNullActionRecord()?.let { NfcTagActionRecordUI(it) },
+        deviceRecord = nfcTagAppData.firstOrNullDeviceRecord()?.let { NfcTagDeviceRecordUI(it, nfcTagAppData.firstAction(), ndefPayloadType) }
     )
 }

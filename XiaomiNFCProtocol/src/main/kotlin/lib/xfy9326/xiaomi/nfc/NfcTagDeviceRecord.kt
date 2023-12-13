@@ -4,7 +4,7 @@ import java.nio.ByteBuffer
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 data class NfcTagDeviceRecord(
-    val deviceType: DeviceType,
+    val deviceType: Short,
     val flags: Byte,
     val deviceNumber: Byte,
     val attributesMap: Map<Short, ByteArray>,
@@ -19,16 +19,16 @@ data class NfcTagDeviceRecord(
             deviceNumber: Byte,
             attributesMap: Map<DeviceAttribute, ByteArray>,
         ) = NfcTagDeviceRecord(
-            deviceType = deviceType,
+            deviceType = deviceType.value,
             flags = flags,
             deviceNumber = deviceNumber,
             attributesMap = attributesMap.mapKeys { it.key.value }
         )
 
-        fun getAppDataValueType(bytes: ByteArray, actionRecord: NfcTagActionRecord, ndefType: XiaomiNdefPayloadType): AppDataValueType {
+        fun getAppDataValueType(bytes: ByteArray, action: NfcTagActionRecord.Action, ndefType: XiaomiNdefPayloadType): AppDataValueType {
             return if (
                 ndefType == XiaomiNdefPayloadType.SMART_HOME &&
-                (actionRecord.action == NfcTagActionRecord.Action.IOT || actionRecord.action == NfcTagActionRecord.Action.IOT_ENV)
+                (action == NfcTagActionRecord.Action.IOT || action == NfcTagActionRecord.Action.IOT_ENV)
             ) {
                 AppDataValueType.IOT_ACTION
             } else if (
@@ -57,12 +57,12 @@ data class NfcTagDeviceRecord(
             return buffer.getShortKeyBytesMap().mapKeys { DeviceAttribute.parse(it.key) }
         }
 
-        private fun Map<DeviceAttribute, ByteArray>.tryExtractAppDataValueMap(actionRecord: NfcTagActionRecord, ndefType: XiaomiNdefPayloadType) =
+        private fun Map<DeviceAttribute, ByteArray>.tryExtractAppDataValueMap(action: NfcTagActionRecord.Action, ndefType: XiaomiNdefPayloadType) =
             takeIf {
                 DeviceAttribute.APP_DATA in it
             }?.let { map ->
                 val appDataBytes = map.getValue(DeviceAttribute.APP_DATA)
-                val extMap = when (getAppDataValueType(appDataBytes, actionRecord, ndefType)) {
+                val extMap = when (getAppDataValueType(appDataBytes, action, ndefType)) {
                     AppDataValueType.ATTRIBUTES_MAP -> decodeAppDataValueMap(appDataBytes)
                     else -> mapOf(DeviceAttribute.APP_DATA to appDataBytes)
                 }
@@ -70,10 +70,12 @@ data class NfcTagDeviceRecord(
             } ?: this
     }
 
-    fun getAllAttributesMap(actionRecord: NfcTagActionRecord, ndefType: XiaomiNdefPayloadType): Map<DeviceAttribute, ByteArray> =
+    val enumDeviceType by lazy { DeviceType.parse(deviceType) }
+
+    fun getAllAttributesMap(action: NfcTagActionRecord.Action, ndefType: XiaomiNdefPayloadType): Map<DeviceAttribute, ByteArray> =
         when (ndefType) {
             XiaomiNdefPayloadType.SMART_HOME -> attributesMap.mapKeys {
-                when (actionRecord.action) {
+                when (action) {
                     NfcTagActionRecord.Action.IOT -> DeviceAttribute.parseIOT(it.key)
                     NfcTagActionRecord.Action.IOT_ENV -> DeviceAttribute.parseIOTEnv(it.key)
                     else -> DeviceAttribute.parse(it.key)
@@ -82,7 +84,7 @@ data class NfcTagDeviceRecord(
 
             XiaomiNdefPayloadType.MI_CONNECT_SERVICE -> attributesMap.mapKeys { DeviceAttribute.parse(it.key) }
             else -> emptyMap()
-        }.tryExtractAppDataValueMap(actionRecord, ndefType)
+        }.tryExtractAppDataValueMap(action, ndefType)
 
     override fun encodeContent(): ByteArray {
         return ByteBuffer.allocate(
@@ -91,7 +93,7 @@ data class NfcTagDeviceRecord(
                     Byte.SIZE_BYTES + // deviceNumber
                     attributesMap.shortMapTotalBytes() // attributeMap
         )
-            .putShort(deviceType.value)
+            .putShort(deviceType)
             .put(flags)
             .put(deviceNumber)
             .putShortKeyBytesMap(attributesMap)

@@ -32,7 +32,7 @@ class ProtocolTest {
                         NfcTagDeviceRecord.DeviceAttribute.MODEL to "xiaomi.wifispeaker.x08c".toByteArray(Charsets.UTF_8)
                     )
                 ),
-                NfcTagActionRecord(
+                NfcTagActionRecord.newInstance(
                     action = NfcTagActionRecord.Action.AUTO,
                     condition = NfcTagActionRecord.Condition.AUTO,
                     deviceNumber = 0,
@@ -56,7 +56,7 @@ class ProtocolTest {
                         NfcTagDeviceRecord.DeviceAttribute.BLUETOOTH_MAC_ADDRESS to byteArrayOf(0x11, 0x11, 0x11, 0x11, 0x11, 0x11),
                     )
                 ),
-                NfcTagActionRecord(
+                NfcTagActionRecord.newInstance(
                     action = NfcTagActionRecord.Action.CUSTOM,
                     condition = NfcTagActionRecord.Condition.AUTO,
                     deviceNumber = 0,
@@ -65,7 +65,7 @@ class ProtocolTest {
                 )
             )
         )
-        private val TEST_PAYLOAD_HANDOFF = HandoffAppData(
+        private val TEST_PAYLOAD_HANDOFF = HandoffAppData.newInstance(
             majorVersion = 0x27,
             minorVersion = 0x17,
             deviceType = HandoffAppData.DeviceType.PC,

@@ -36,6 +36,7 @@ class XiaomiNfcReaderViewModel : ViewModel() {
     }
 
     data class UiState(
+        val showDumpNdefButton: Boolean = false,
         val tagInfo: XiaomiNfcTagUI? = null,
         val payloadUI: XiaomiNfcPayloadUI? = null,
         val handoffAppDataUI: HandoffAppDataUI? = null,

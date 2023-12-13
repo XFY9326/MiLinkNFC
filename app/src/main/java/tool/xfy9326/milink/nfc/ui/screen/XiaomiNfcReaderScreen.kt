@@ -270,7 +270,7 @@ private fun NfcTagAppDataCard(modifier: Modifier = Modifier, data: NfcTagAppData
                         stringResource(id = R.string.nfc_field_device_number) to record.deviceNumber,
                         stringResource(id = R.string.nfc_field_flags) to record.flags
                     ).also {
-                        if (record.conditionParameters.isNotEmpty()) {
+                        if (!record.conditionParameters.isNullOrEmpty()) {
                             it[stringResource(id = R.string.nfc_field_condition_parameters)] = record.conditionParameters
                         }
                     }

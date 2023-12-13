@@ -60,7 +60,7 @@ object XiaomiNfc {
         private val minorVersion: Int,
         private val idHash: Byte? = null,
         private val protocol: XiaomiNfcProtocol<A>,
-        private val ndefRecordType: XiaomiNdefPayloadType
+        protected val ndefRecordType: XiaomiNdefPayloadType
     ) {
         protected abstract fun encodeAppsData(config: T): A
 
@@ -120,18 +120,17 @@ object XiaomiNfc {
                 writeTime = WRITE_TIME,
                 flags = FLAGS,
                 records = listOf(
-                    NfcTagDeviceRecord(
+                    NfcTagDeviceRecord.newInstance(
                         deviceType = NfcTagDeviceRecord.DeviceType.IOT,
                         flags = FLAGS,
                         deviceNumber = DEVICE_NUMBER,
                         attributesMap = emptyMap()
                     ),
-                    NfcTagActionRecord(
+                    NfcTagActionRecord.newInstance(
                         action = NfcTagActionRecord.Action.EMPTY,
                         condition = NfcTagActionRecord.Condition.AUTO,
                         deviceNumber = DEVICE_NUMBER,
-                        flags = FLAGS,
-                        conditionParameters = ByteArray(0)
+                        flags = FLAGS
                     )
                 )
             )
@@ -180,12 +179,11 @@ object XiaomiNfc {
                             NfcTagDeviceRecord.DeviceAttribute.MODEL to config.model.toByteArray(Charsets.UTF_8)
                         )
                     ),
-                    NfcTagActionRecord(
+                    NfcTagActionRecord.newInstance(
                         action = NfcTagActionRecord.Action.AUTO,
                         condition = NfcTagActionRecord.Condition.AUTO,
                         deviceNumber = DEVICE_NUMBER,
-                        flags = FLAGS,
-                        conditionParameters = ByteArray(0)
+                        flags = FLAGS
                     )
                 )
             )
@@ -231,12 +229,11 @@ object XiaomiNfc {
                             NfcTagDeviceRecord.DeviceAttribute.BLUETOOTH_MAC_ADDRESS to config.bluetoothMac
                         )
                     ),
-                    NfcTagActionRecord(
+                    NfcTagActionRecord.newInstance(
                         action = NfcTagActionRecord.Action.CUSTOM,
                         condition = NfcTagActionRecord.Condition.AUTO,
                         deviceNumber = DEVICE_NUMBER,
-                        flags = FLAGS,
-                        conditionParameters = ByteArray(0)
+                        flags = FLAGS
                     )
                 )
             )
@@ -248,10 +245,10 @@ object XiaomiNfc {
                 addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
                 addFlags(FLAG_BIND_TREAT_LIKE_VISIBLE_FOREGROUND_SERVICE)
                 putExtra(EXTRA_ACTION, NfcTagActionRecord.Action.CUSTOM.value.toInt())
-                appData.getDeviceRecord()?.attributesMap?.let { map ->
-                    val idHash = map[NfcTagDeviceRecord.DeviceAttribute.ID_HASH.value]?.let { Base64.encodeToString(it, Base64.DEFAULT) } ?: EMPTY
-                    val wifiMac = map[NfcTagDeviceRecord.DeviceAttribute.WIFI_MAC_ADDRESS.value]?.toHexString(true) ?: EMPTY
-                    val btMac = map[NfcTagDeviceRecord.DeviceAttribute.BLUETOOTH_MAC_ADDRESS.value]?.toHexString(true) ?: EMPTY
+                appData.getFirstDeviceAttributesMap(ndefRecordType).let { map ->
+                    val idHash = map[NfcTagDeviceRecord.DeviceAttribute.ID_HASH]?.let { Base64.encodeToString(it, Base64.DEFAULT) } ?: EMPTY
+                    val wifiMac = map[NfcTagDeviceRecord.DeviceAttribute.WIFI_MAC_ADDRESS]?.toHexString(true) ?: EMPTY
+                    val btMac = map[NfcTagDeviceRecord.DeviceAttribute.BLUETOOTH_MAC_ADDRESS]?.toHexString(true) ?: EMPTY
                     putExtra(EXTRA_ID_HASH, idHash)
                     putExtra(EXTRA_WIFI_MAC, wifiMac)
                     putExtra(EXTRA_BLUETOOTH_MAC, btMac)
@@ -290,7 +287,7 @@ object XiaomiNfc {
         )
 
         override fun encodeAppsData(config: Config): HandoffAppData =
-            HandoffAppData(
+            HandoffAppData.newInstance(
                 majorVersion = MAJOR_VERSION,
                 minorVersion = MINOR_VERSION,
                 deviceType = config.deviceType,

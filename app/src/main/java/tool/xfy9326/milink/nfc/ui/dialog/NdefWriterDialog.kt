@@ -89,7 +89,7 @@ fun NdefWriterDialog(
                         modifier = Modifier
                             .size(48.dp),
                         imageVector = Icons.Default.Nfc,
-                        contentDescription = stringResource(id = R.string.write_screen_mirror_nfc),
+                        contentDescription = stringResource(id = R.string.nfc_writer),
                         tint = if (ndefWriteData.readOnly) Color.Red else LocalContentColor.current
                     )
                     Spacer(modifier = Modifier.height(30.dp))

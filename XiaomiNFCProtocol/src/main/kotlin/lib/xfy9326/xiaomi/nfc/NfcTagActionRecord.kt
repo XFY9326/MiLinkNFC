@@ -3,12 +3,31 @@ package lib.xfy9326.xiaomi.nfc
 import java.nio.ByteBuffer
 
 data class NfcTagActionRecord(
-    val action: Action,
-    val condition: Condition,
+    val action: Short,
+    val condition: Byte,
     val deviceNumber: Byte,
     val flags: Byte,
-    val conditionParameters: ByteArray
+    val conditionParameters: ByteArray? = null
 ) : NfcTagRecord(TYPE_ACTION) {
+
+    companion object {
+        fun newInstance(
+            action: Action,
+            condition: Condition,
+            deviceNumber: Byte,
+            flags: Byte,
+            conditionParameters: ByteArray? = null
+        ) = NfcTagActionRecord(
+            action = action.value,
+            condition = condition.value,
+            deviceNumber = deviceNumber,
+            flags = flags,
+            conditionParameters = conditionParameters
+        )
+    }
+
+    val enumAction by lazy { Action.parse(action) }
+    val enumCondition by lazy { Condition.parse(condition) }
 
     override fun encodeContent(): ByteArray {
         return ByteBuffer.allocate(
@@ -16,14 +35,15 @@ data class NfcTagActionRecord(
                     Byte.SIZE_BYTES + // condition
                     Byte.SIZE_BYTES + // deviceNumber
                     Byte.SIZE_BYTES + // flags
-                    conditionParameters.size // conditionParameters
+                    (conditionParameters?.size ?: 0) // conditionParameters
         )
-            .putShort(action.value)
-            .put(condition.value)
+            .putShort(action)
+            .put(condition)
             .put(deviceNumber)
             .put(flags)
-            .put(conditionParameters)
-            .array()
+            .apply {
+                conditionParameters?.let { put(it) }
+            }.array()
     }
 
     enum class Action(val value: Short) {
@@ -73,15 +93,20 @@ data class NfcTagActionRecord(
         if (condition != other.condition) return false
         if (deviceNumber != other.deviceNumber) return false
         if (flags != other.flags) return false
-        return conditionParameters.contentEquals(other.conditionParameters)
+        if (conditionParameters != null) {
+            if (other.conditionParameters == null) return false
+            if (!conditionParameters.contentEquals(other.conditionParameters)) return false
+        } else if (other.conditionParameters != null) return false
+
+        return true
     }
 
     override fun hashCode(): Int {
-        var result = action.hashCode()
-        result = 31 * result + condition.hashCode()
+        var result = action.toInt()
+        result = 31 * result + condition
         result = 31 * result + deviceNumber
         result = 31 * result + flags
-        result = 31 * result + conditionParameters.contentHashCode()
+        result = 31 * result + (conditionParameters?.contentHashCode() ?: 0)
         return result
     }
 }

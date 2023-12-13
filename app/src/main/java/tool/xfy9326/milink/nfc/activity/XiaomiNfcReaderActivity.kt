@@ -2,6 +2,7 @@ package tool.xfy9326.milink.nfc.activity
 
 import android.nfc.NfcAdapter
 import android.nfc.tech.Ndef
+import android.nfc.tech.NdefFormatable
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -53,7 +54,12 @@ class XiaomiNfcReaderActivity : ComponentActivity() {
                     }
                     return@enableNdefReaderMode
                 }
-                makeToast(getString(R.string.nfc_not_ndef))
+                val ndefFormatable = NdefFormatable.get(it)
+                if (ndefFormatable != null) {
+                    makeToast(getString(R.string.nfc_ndef_formatable))
+                } else {
+                    makeToast(getString(R.string.nfc_not_ndef))
+                }
             }
         }
     }
