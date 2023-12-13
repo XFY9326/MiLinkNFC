@@ -1,7 +1,5 @@
 package tool.xfy9326.milink.nfc.ui.screen
 
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -47,11 +45,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.ui.common.EntryCard
+import tool.xfy9326.milink.nfc.ui.common.SlideAnimationNavHost
 import tool.xfy9326.milink.nfc.ui.dialog.AboutDialog
 import tool.xfy9326.milink.nfc.ui.dialog.MessageAlertDialog
 import tool.xfy9326.milink.nfc.ui.dialog.NdefWriterDialog
@@ -72,8 +70,6 @@ private fun Preview() {
     }
 }
 
-private const val NAV_ANIMATION_DURATION = 400
-
 @Composable
 fun HomeScreen(
     viewModel: MainViewModel = viewModel(),
@@ -85,36 +81,10 @@ fun HomeScreen(
     val navController = rememberNavController()
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
-    NavHost(
+    SlideAnimationNavHost(
         modifier = Modifier.fillMaxSize(),
         navController = navController,
-        startDestination = HomeRoute,
-        enterTransition = {
-            slideIntoContainer(
-                AnimatedContentTransitionScope.SlideDirection.Start,
-                animationSpec = tween(NAV_ANIMATION_DURATION)
-            )
-        },
-        exitTransition = {
-            slideOutOfContainer(
-                AnimatedContentTransitionScope.SlideDirection.Start,
-                animationSpec = tween(NAV_ANIMATION_DURATION),
-                targetOffset = { it / 4 }
-            )
-        },
-        popEnterTransition = {
-            slideIntoContainer(
-                AnimatedContentTransitionScope.SlideDirection.End,
-                animationSpec = tween(NAV_ANIMATION_DURATION),
-                initialOffset = { it / 4 }
-            )
-        },
-        popExitTransition = {
-            slideOutOfContainer(
-                AnimatedContentTransitionScope.SlideDirection.End,
-                animationSpec = tween(NAV_ANIMATION_DURATION)
-            )
-        }
+        startDestination = HomeRoute
     ) {
         composable(HomeRoute) {
             Content(

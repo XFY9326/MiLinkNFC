@@ -7,8 +7,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -17,6 +20,7 @@ import tool.xfy9326.milink.nfc.data.NdefReadData
 import tool.xfy9326.milink.nfc.ui.screen.XiaomiNfcReaderScreen
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.vm.XiaomiNfcReaderViewModel
+import tool.xfy9326.milink.nfc.utils.MIME_BINARY
 import tool.xfy9326.milink.nfc.utils.enableNdefReaderMode
 import tool.xfy9326.milink.nfc.utils.ignoreTagUntilRemoved
 import tool.xfy9326.milink.nfc.utils.isNullOrEmpty
@@ -25,6 +29,13 @@ import tool.xfy9326.milink.nfc.utils.tryConnect
 
 class XiaomiNfcReaderActivity : ComponentActivity() {
     private val viewModel by viewModels<XiaomiNfcReaderViewModel>()
+    private val exportNdefBin = registerForActivityResult(ActivityResultContracts.CreateDocument(MIME_BINARY)) {
+        if (it == null) {
+            showToast(getString(R.string.export_canceled))
+        } else {
+            viewModel.exportNdefBin(it)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -36,6 +47,17 @@ class XiaomiNfcReaderActivity : ComponentActivity() {
                         onBackPressedDispatcher.onBackPressed()
                     }
                 )
+            }
+        }
+        observeViewModel()
+    }
+
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.exportNdefBin.collect {
+                    exportNdefBin.launch(it)
+                }
             }
         }
     }
@@ -60,6 +82,7 @@ class XiaomiNfcReaderActivity : ComponentActivity() {
                 } else {
                     makeToast(getString(R.string.nfc_not_ndef))
                 }
+                viewModel.clearNfcReadData()
             }
         }
     }
@@ -77,6 +100,7 @@ class XiaomiNfcReaderActivity : ComponentActivity() {
                     makeToast(getString(R.string.nfc_empty))
                 } else {
                     NdefReadData(
+                        scanTime = System.currentTimeMillis(),
                         techList = it.tag.techList.map { str -> str.substringAfterLast(".") },
                         type = it.type,
                         msg = msg,
@@ -89,10 +113,12 @@ class XiaomiNfcReaderActivity : ComponentActivity() {
                 }
             } catch (e: Exception) {
                 makeToast(getString(R.string.nfc_read_failed))
+                viewModel.clearNfcReadData()
             }
             nfcAdapter.ignoreTagUntilRemoved(ndef.tag)
         }.onFailure {
             makeToast(getString(R.string.nfc_connect_failed))
+            viewModel.clearNfcReadData()
         }
     }
 }

@@ -6,6 +6,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class NdefReadData(
+    val scanTime: Long,
     val techList: List<String>,
     val type: String,
     val msg: NdefMessage,

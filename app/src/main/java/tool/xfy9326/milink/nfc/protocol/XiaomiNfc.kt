@@ -72,7 +72,9 @@ object XiaomiNfc {
 
         fun newNdefDiscoveredIntent(tag: Tag?, id: ByteArray?, config: T): Intent {
             return Intent(NfcAdapter.ACTION_NDEF_DISCOVERED).apply {
-                data = "vnd.android.nfc://ext/$ndefRecordType".toUri()
+                ndefRecordType.value.takeIf { it.isNotEmpty() }?.let {
+                    data = "vnd.android.nfc://ext/${it}".toUri()
+                }
                 putExtra(NfcAdapter.EXTRA_TAG, tag)
                 putExtra(NfcAdapter.EXTRA_ID, id)
                 putExtra(NfcAdapter.EXTRA_NDEF_MESSAGES, arrayOf(newNdefMessage(config)))

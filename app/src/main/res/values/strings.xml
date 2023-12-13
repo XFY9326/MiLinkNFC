@@ -122,7 +122,11 @@
     <string name="nfc_field_condition">条件</string>
     <string name="nfc_field_condition_parameters">条件参数</string>
     <string name="nfc_field_attributes">属性</string>
-    <string name="dump_ndef_bin">导出NDEF</string>
+    <string name="export">导出</string>
+    <string name="export_canceled">导出已取消</string>
+    <string name="export_succeed">导出成功</string>
+    <string name="export_failed">导出失败</string>
+    <string name="no_cached_ndef_data">暂无无缓存的NDEF数据</string>
 
     <string name="version" translatable="false">%1$s (%2$d)</string>
     <string name="author_name" translatable="false">XFY9326</string>

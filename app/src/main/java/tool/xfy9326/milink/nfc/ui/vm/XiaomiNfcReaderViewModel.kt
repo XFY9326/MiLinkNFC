@@ -1,5 +1,6 @@
 package tool.xfy9326.milink.nfc.ui.vm
 
+import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -26,17 +27,22 @@ import tool.xfy9326.milink.nfc.data.ui.NfcTagAppDataUI
 import tool.xfy9326.milink.nfc.data.ui.XiaomiNfcPayloadUI
 import tool.xfy9326.milink.nfc.data.ui.XiaomiNfcTagUI
 import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
+import tool.xfy9326.milink.nfc.utils.writeBinary
 
 class XiaomiNfcReaderViewModel : ViewModel() {
     enum class InstantMsg(@StringRes val resId: Int, val isToast: Boolean = false) {
         NEW_TAG_FOUND(R.string.nfc_new_tag_found, true),
+        EXPORT_SUCCEED(R.string.export_succeed, true),
+        EXPORT_FAILED(R.string.export_failed, true),
         NDEF_RECORD_NOT_FOUND(R.string.xiaomi_ndef_not_found),
         NOT_XIAOMI_NFC(R.string.xiaomi_ndef_not_nfc),
         PARSE_ERROR(R.string.xiaomi_ndef_parse_error),
         VERSION_ERROR(R.string.xiaomi_ndef_version_error),
+        NO_CACHED_NDEF_DATA(R.string.no_cached_ndef_data);
     }
 
     data class UiState(
+        val canExportNdefBin: Boolean = false,
         val nfcInfo: NfcInfo? = null
     ) {
         data class NfcInfo(
@@ -46,29 +52,69 @@ class XiaomiNfcReaderViewModel : ViewModel() {
         )
     }
 
+    private var ndefReadCache: NdefReadData? = null
+
+    private val _exportNdefBin = MutableSharedFlow<String>()
+    val exportNdefBin: SharedFlow<String> = _exportNdefBin.asSharedFlow()
+
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     private val _instantMsg = MutableSharedFlow<InstantMsg>()
     val instantMsg: SharedFlow<InstantMsg> = _instantMsg.asSharedFlow()
 
+    private suspend fun prepareNdefReadCache(): NdefReadData? {
+        val cache = ndefReadCache
+        if (cache == null) {
+            _instantMsg.emit(InstantMsg.NO_CACHED_NDEF_DATA)
+        }
+        return cache
+    }
+
+    fun requestExportNdefBin() {
+        viewModelScope.launch {
+            prepareNdefReadCache()?.let {
+                _exportNdefBin.emit("NDEF_${it.scanTime}.bin")
+            }
+        }
+    }
+
+    fun exportNdefBin(uri: Uri) {
+        viewModelScope.launch(Dispatchers.IO) {
+            prepareNdefReadCache()?.let {
+                val result = uri.writeBinary(it.msg.toByteArray())
+                _instantMsg.emit(if (result) InstantMsg.EXPORT_SUCCEED else InstantMsg.EXPORT_FAILED)
+            }
+        }
+    }
+
     fun updateNfcReadData(ndefReadData: NdefReadData) {
         viewModelScope.launch(Dispatchers.IO) {
+            this@XiaomiNfcReaderViewModel.ndefReadCache = ndefReadData
+            _uiState.update { it.copy(canExportNdefBin = true) }
+
             val type = XiaomiNfc.getXiaomiNfcPayloadType(ndefReadData.msg)
             if (type == null) {
                 _instantMsg.emit(InstantMsg.NDEF_RECORD_NOT_FOUND)
-                _uiState.update { it.copy() }
+                _uiState.update { it.copy(nfcInfo = null) }
                 return@launch
             }
             val bytes = XiaomiNfc.getXiaomiNfcPayloadBytes(ndefReadData.msg, type)
             if (bytes == null) {
                 _instantMsg.emit(InstantMsg.NDEF_RECORD_NOT_FOUND)
-                _uiState.update { it.copy() }
+                _uiState.update { it.copy(nfcInfo = null) }
                 return@launch
             }
             if (!decodeXiaomiNfcPayload(XiaomiNfcTagUI(type, ndefReadData), bytes)) {
-                _uiState.update { it.copy() }
+                _uiState.update { it.copy(nfcInfo = null) }
             }
+        }
+    }
+
+    fun clearNfcReadData() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(nfcInfo = null, canExportNdefBin = false) }
+            this@XiaomiNfcReaderViewModel.ndefReadCache = null
         }
     }
 

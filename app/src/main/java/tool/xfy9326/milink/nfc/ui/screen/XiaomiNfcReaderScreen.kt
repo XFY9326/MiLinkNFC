@@ -1,6 +1,7 @@
 package tool.xfy9326.milink.nfc.ui.screen
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Nfc
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedCard
@@ -75,7 +77,13 @@ fun XiaomiNfcReaderScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = { TopBar(onNavBack = onNavBack) },
+        topBar = {
+            TopBar(
+                canExportNdefBin = uiState.value.canExportNdefBin,
+                onNavBack = onNavBack,
+                onRequestExportNdefBin = viewModel::requestExportNdefBin
+            )
+        },
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
     ) { innerPadding ->
         Crossfade(targetState = uiState.value.nfcInfo, label = ANIMATION_LABEL_CONTENT) { nfcInfo ->
@@ -123,12 +131,23 @@ fun XiaomiNfcReaderScreen(
 }
 
 @Composable
-private fun TopBar(onNavBack: () -> Unit) {
+private fun TopBar(
+    canExportNdefBin: Boolean,
+    onNavBack: () -> Unit,
+    onRequestExportNdefBin: () -> Unit
+) {
     TopAppBar(
         title = { Text(text = stringResource(id = R.string.nfc_read_xiaomi_ndef)) },
         navigationIcon = {
             IconButton(onClick = onNavBack) {
                 Icon(imageVector = Icons.Default.ArrowBack, contentDescription = stringResource(id = R.string.nav_back))
+            }
+        },
+        actions = {
+            AnimatedVisibility(visible = canExportNdefBin) {
+                IconButton(onClick = onRequestExportNdefBin) {
+                    Icon(imageVector = Icons.Default.Save, contentDescription = stringResource(id = R.string.export))
+                }
             }
         }
     )

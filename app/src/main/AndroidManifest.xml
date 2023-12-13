@@ -16,13 +16,6 @@
     <queries>
         <package android:name="com.xiaomi.mi_connect_service" />
         <package android:name="com.milink.service" />
-
-        <intent>
-            <action android:name="android.nfc.action.NDEF_DISCOVERED" />
-        </intent>
-        <intent>
-            <action android:name="com.xiaomi.nfc.action.TAG_DISCOVERED" />
-        </intent>
     </queries>
 
     <application
