@@ -18,6 +18,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.FileOpen
 import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Icon
@@ -45,8 +46,8 @@ import lib.xfy9326.xiaomi.nfc.XiaomiNdefPayloadType
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.data.ui.HandoffAppDataUI
 import tool.xfy9326.milink.nfc.data.ui.NfcTagAppDataUI
+import tool.xfy9326.milink.nfc.data.ui.NfcTagInfoUI
 import tool.xfy9326.milink.nfc.data.ui.XiaomiNfcPayloadUI
-import tool.xfy9326.milink.nfc.data.ui.XiaomiNfcTagUI
 import tool.xfy9326.milink.nfc.ui.common.InfoContent
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.theme.LocalAppThemeTypography
@@ -58,7 +59,8 @@ import tool.xfy9326.milink.nfc.utils.showToast
 private fun Preview() {
     AppTheme {
         XiaomiNfcReaderScreen(
-            onNavBack = {}
+            onNavBack = {},
+            onRequestImportNdefBin = {}
         )
     }
 }
@@ -68,7 +70,8 @@ private const val ANIMATION_LABEL_CONTENT = "Content"
 @Composable
 fun XiaomiNfcReaderScreen(
     viewModel: XiaomiNfcReaderViewModel = viewModel(),
-    onNavBack: () -> Unit
+    onNavBack: () -> Unit,
+    onRequestImportNdefBin: () -> Unit
 ) {
     val scrollState = rememberScrollState()
     val snackBarHostState = remember { SnackbarHostState() }
@@ -81,7 +84,8 @@ fun XiaomiNfcReaderScreen(
             TopBar(
                 canExportNdefBin = uiState.value.canExportNdefBin,
                 onNavBack = onNavBack,
-                onRequestExportNdefBin = viewModel::requestExportNdefBin
+                onRequestExportNdefBin = viewModel::requestExportNdefBin,
+                onRequestImportNdefBin = onRequestImportNdefBin
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
@@ -98,7 +102,9 @@ fun XiaomiNfcReaderScreen(
                         .padding(horizontal = 8.dp, vertical = 6.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    NfcTagInfoCard(modifier = Modifier.padding(horizontal = 8.dp), data = it.tag)
+                    it.tag?.let { tag ->
+                        NfcTagInfoCard(modifier = Modifier.padding(horizontal = 8.dp), data = tag)
+                    }
                     NdefCard(modifier = Modifier.padding(horizontal = 8.dp), ndefType = it.ndefType)
                     XiaomiNfcPayloadCard(modifier = Modifier.padding(horizontal = 8.dp), data = it.payload)
                     when (it.appData) {
@@ -135,7 +141,8 @@ fun XiaomiNfcReaderScreen(
 private fun TopBar(
     canExportNdefBin: Boolean,
     onNavBack: () -> Unit,
-    onRequestExportNdefBin: () -> Unit
+    onRequestExportNdefBin: () -> Unit,
+    onRequestImportNdefBin: () -> Unit
 ) {
     TopAppBar(
         title = { Text(text = stringResource(id = R.string.nfc_read_xiaomi_ndef)) },
@@ -145,6 +152,9 @@ private fun TopBar(
             }
         },
         actions = {
+            IconButton(onClick = onRequestImportNdefBin) {
+                Icon(imageVector = Icons.Default.FileOpen, contentDescription = stringResource(id = R.string.import_text))
+            }
             AnimatedVisibility(visible = canExportNdefBin) {
                 IconButton(onClick = onRequestExportNdefBin) {
                     Icon(imageVector = Icons.Default.Save, contentDescription = stringResource(id = R.string.export))
@@ -199,7 +209,7 @@ private fun Boolean.stringResId(): Int =
     if (this) R.string.content_true else R.string.content_false
 
 @Composable
-private fun NfcTagInfoCard(modifier: Modifier = Modifier, data: XiaomiNfcTagUI) {
+private fun NfcTagInfoCard(modifier: Modifier = Modifier, data: NfcTagInfoUI) {
     OutlinedCard(modifier = modifier) {
         InfoContent(
             modifier = Modifier

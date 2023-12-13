@@ -36,6 +36,13 @@ class XiaomiNfcReaderActivity : ComponentActivity() {
             viewModel.exportNdefBin(it)
         }
     }
+    private val importNdefBin = registerForActivityResult(ActivityResultContracts.GetContent()) {
+        if (it == null) {
+            showToast(getString(R.string.import_canceled))
+        } else {
+            viewModel.updateNfcReadData(it)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -45,6 +52,9 @@ class XiaomiNfcReaderActivity : ComponentActivity() {
                 XiaomiNfcReaderScreen(
                     onNavBack = {
                         onBackPressedDispatcher.onBackPressed()
+                    },
+                    onRequestImportNdefBin = {
+                        importNdefBin.launch(MIME_BINARY)
                     }
                 )
             }

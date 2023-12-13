@@ -8,3 +8,9 @@ fun Uri.writeBinary(bytes: ByteArray): Boolean = runCatching {
         it.write(bytes)
     }
 }.isSuccess
+
+fun Uri.readBinary(): ByteArray? = runCatching {
+    AppContext.contentResolver.openInputStream(this)!!.use {
+        it.readBytes()
+    }
+}.getOrNull()
