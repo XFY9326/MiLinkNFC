@@ -1,5 +1,7 @@
 package tool.xfy9326.milink.nfc.ui.dialog
 
+import android.nfc.NdefMessage
+import android.nfc.NdefRecord
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -29,7 +31,6 @@ import tool.xfy9326.milink.nfc.data.NdefWriteData
 import tool.xfy9326.milink.nfc.ui.common.DialogContentSurface
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.theme.LocalAppThemeTypography
-import tool.xfy9326.milink.nfc.utils.EmptyNdefMessage
 
 @Preview(showBackground = true)
 @Composable
@@ -37,7 +38,7 @@ private fun Preview() {
     AppTheme {
         NdefWriterDialog(
             ndefWriteData = NdefWriteData(
-                msg = EmptyNdefMessage,
+                msg = NdefMessage(NdefRecord(NdefRecord.TNF_EMPTY, null, null, null)),
                 readOnly = false
             ),
             onOpenReader = { true },
@@ -97,18 +98,22 @@ fun NdefWriterDialog(
                         text = stringResource(
                             id = if (ndefWriteData.readOnly) {
                                 R.string.tap_and_write_nfc_tag_read_only
+                            } else if (ndefWriteData.msg == null) {
+                                R.string.tap_and_clear_nfc_tag
                             } else {
                                 R.string.tap_and_write_nfc_tag
                             }
                         ),
                         textAlign = TextAlign.Center
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = stringResource(id = R.string.nfc_write_bytes, ndefWriteData.msg.byteArrayLength),
-                        textAlign = TextAlign.Center,
-                        style = typography.labelMedium
-                    )
+                    ndefWriteData.msg?.let {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = stringResource(id = R.string.nfc_write_bytes, it.byteArrayLength),
+                            textAlign = TextAlign.Center,
+                            style = typography.labelMedium
+                        )
+                    }
                 }
             }
         }

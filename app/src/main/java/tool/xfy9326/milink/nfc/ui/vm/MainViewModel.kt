@@ -20,7 +20,6 @@ import tool.xfy9326.milink.nfc.datastore.AppDataStore
 import tool.xfy9326.milink.nfc.datastore.base.key.readValue
 import tool.xfy9326.milink.nfc.datastore.base.key.writeValue
 import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
-import tool.xfy9326.milink.nfc.utils.EmptyNdefMessage
 import tool.xfy9326.milink.nfc.utils.NdefIO
 import tool.xfy9326.milink.nfc.utils.isXiaomiHyperOS
 import tool.xfy9326.milink.nfc.utils.readBinary
@@ -94,7 +93,7 @@ class MainViewModel : ViewModel() {
 
     fun requestClearNdefWriteDialog() {
         _uiState.update {
-            it.copy(ndefWriteDialogData = NdefWriteData(EmptyNdefMessage, false))
+            it.copy(ndefWriteDialogData = NdefWriteData(msg = null, readOnly = false))
         }
     }
 

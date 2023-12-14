@@ -24,6 +24,7 @@ import tool.xfy9326.milink.nfc.data.NdefWriteData
 import tool.xfy9326.milink.nfc.ui.screen.HomeScreen
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.vm.MainViewModel
+import tool.xfy9326.milink.nfc.utils.EmptyNdefMessage
 import tool.xfy9326.milink.nfc.utils.MIME_ALL
 import tool.xfy9326.milink.nfc.utils.enableNdefReaderMode
 import tool.xfy9326.milink.nfc.utils.ignoreTagUntilRemoved
@@ -132,12 +133,17 @@ class MainActivity : ComponentActivity() {
                     makeToast(getString(R.string.nfc_write_error_no_read_only))
                     return@onSuccess
                 }
-                if (writeData.msg.byteArrayLength > it.maxSize) {
-                    makeToast(getString(R.string.nfc_write_error_max_size))
-                    return@onSuccess
-                }
+
+                val ndefMsg = writeData.msg?.let { msg ->
+                    if (msg.byteArrayLength > it.maxSize) {
+                        makeToast(getString(R.string.nfc_write_error_max_size))
+                        return@onSuccess
+                    }
+                    msg
+                } ?: EmptyNdefMessage
+
                 try {
-                    it.writeNdefMessage(writeData.msg)
+                    it.writeNdefMessage(ndefMsg)
                 } catch (e: Exception) {
                     makeToast(getString(R.string.nfc_write_error))
                     return@onSuccess

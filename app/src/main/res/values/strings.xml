@@ -14,7 +14,7 @@
     <string name="nfc_read_xiaomi_ndef">读取小米NFC标签</string>
     <string name="nfc_read_xiaomi_ndef_summary">读取并解析小米NFC协议的NFC标签</string>
     <string name="nfc_clear_ndef">清空NFC标签</string>
-    <string name="nfc_clear_ndef_summary">使NFC标签失去功能（不完全抹除旧数据）</string>
+    <string name="nfc_clear_ndef_summary">使NFC标签失去功能（会残留部分旧数据）</string>
     <string name="nfc_format_xiaomi_tap">创建空小米碰碰贴</string>
     <string name="nfc_format_xiaomi_tap_summary">格式化支持NDEF的NFC标签为小米碰碰贴2</string>
     <string name="nfc_write_bin_ndef">复制NDEF到NFC标签</string>
@@ -27,6 +27,7 @@
     <string name="write_screen_mirror_nfc">一碰妙享NFC标签</string>
     <string name="write_screen_mirror_nfc_desc">向NFC标签中覆盖写入小米一碰妙享的数据，仅支持NDEF格式的NFC标签。\n\n如果写入失败，可能是因为写入NFC标签时连接断开，请多尝试几次。\n\n如果投屏时多次出现连接失败，可以使用“测试屏幕镜像”功能并尝试重启小米电脑管家。</string>
     <string name="tap_and_write_nfc_tag">靠近NFC标签以写入数据</string>
+    <string name="tap_and_clear_nfc_tag">靠近NFC标签以写入空数据</string>
     <string name="tap_and_write_nfc_tag_read_only">靠近NFC标签以写入只读数据</string>
     <string name="tap_and_read_nfc_tag">靠近NFC标签以读取数据</string>
     <string name="nfc_write_bytes">写入数据：%1$d字节</string>
