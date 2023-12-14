@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.TapAndPlay
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.outlined.FileCopy
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.ScreenShare
 import androidx.compose.material3.Divider
@@ -65,6 +66,7 @@ private fun Preview() {
     AppTheme {
         HomeScreen(
             onNavToXiaomiNfcReader = {},
+            onRequestWriteNdefBin = {},
             onExit = {}
         )
     }
@@ -74,6 +76,7 @@ private fun Preview() {
 fun HomeScreen(
     viewModel: MainViewModel = viewModel(),
     onNavToXiaomiNfcReader: () -> Unit,
+    onRequestWriteNdefBin: () -> Unit,
     onExit: () -> Unit
 ) {
     val context = LocalContext.current
@@ -99,6 +102,7 @@ fun HomeScreen(
                 },
                 onNavToXiaomiNfcReader = onNavToXiaomiNfcReader,
                 onRequestClearNfc = viewModel::requestClearNdefWriteDialog,
+                onRequestWriteNdefBin = onRequestWriteNdefBin,
                 onRequestFormatXiaomiTap = viewModel::requestFormatXiaomiTapNdefWriteDialog
             )
         }
@@ -161,6 +165,7 @@ private fun Content(
     onNavToScreenMirror: () -> Unit,
     onNavToXiaomiNfcReader: () -> Unit,
     onRequestClearNfc: () -> Unit,
+    onRequestWriteNdefBin: () -> Unit,
     onRequestFormatXiaomiTap: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
@@ -214,6 +219,12 @@ private fun Content(
                 title = stringResource(id = R.string.nfc_format_xiaomi_tap),
                 summary = stringResource(id = R.string.nfc_format_xiaomi_tap_summary),
                 onClick = onRequestFormatXiaomiTap
+            )
+            EntryCard(
+                icon = Icons.Outlined.FileCopy,
+                title = stringResource(id = R.string.nfc_write_bin_ndef),
+                summary = stringResource(id = R.string.nfc_write_bin_ndef_summary),
+                onClick = onRequestWriteNdefBin
             )
             EntryCard(
                 icon = Icons.Default.ClearAll,

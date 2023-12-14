@@ -18,9 +18,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.FileOpen
 import androidx.compose.material.icons.filled.Nfc
-import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.outlined.FileOpen
+import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedCard
@@ -153,11 +153,11 @@ private fun TopBar(
         },
         actions = {
             IconButton(onClick = onRequestImportNdefBin) {
-                Icon(imageVector = Icons.Default.FileOpen, contentDescription = stringResource(id = R.string.import_text))
+                Icon(imageVector = Icons.Outlined.FileOpen, contentDescription = stringResource(id = R.string.import_text))
             }
             AnimatedVisibility(visible = canExportNdefBin) {
                 IconButton(onClick = onRequestExportNdefBin) {
-                    Icon(imageVector = Icons.Default.Save, contentDescription = stringResource(id = R.string.export))
+                    Icon(imageVector = Icons.Outlined.Save, contentDescription = stringResource(id = R.string.export))
                 }
             }
         }

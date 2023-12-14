@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
@@ -23,6 +24,7 @@ import tool.xfy9326.milink.nfc.data.NdefWriteData
 import tool.xfy9326.milink.nfc.ui.screen.HomeScreen
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.vm.MainViewModel
+import tool.xfy9326.milink.nfc.utils.MIME_BINARY
 import tool.xfy9326.milink.nfc.utils.enableNdefReaderMode
 import tool.xfy9326.milink.nfc.utils.ignoreTagUntilRemoved
 import tool.xfy9326.milink.nfc.utils.showToast
@@ -32,6 +34,13 @@ import tool.xfy9326.milink.nfc.utils.useCatching
 
 class MainActivity : ComponentActivity() {
     private val viewModel by viewModels<MainViewModel>()
+    private val readNdefBin = registerForActivityResult(ActivityResultContracts.GetContent()) {
+        if (it == null) {
+            showToast(getString(R.string.import_canceled))
+        } else {
+            viewModel.requestNdefBinWriteDialog(it)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -41,11 +50,23 @@ class MainActivity : ComponentActivity() {
             AppTheme {
                 HomeScreen(
                     onNavToXiaomiNfcReader = { startActivity<XiaomiNfcReaderActivity>() },
+                    onRequestWriteNdefBin = { readNdefBin.launch(MIME_BINARY) },
                     onExit = { finishAndRemoveTask() }
                 )
             }
         }
+        observeViewModel()
         setupNfcReaderListener()
+    }
+
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.instantMsg.collect {
+                    showToast(getString(it.resId))
+                }
+            }
+        }
     }
 
     private fun setupNfcReaderListener() {
