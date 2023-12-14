@@ -29,6 +29,7 @@ import tool.xfy9326.milink.nfc.data.ui.NfcTagAppDataUI
 import tool.xfy9326.milink.nfc.data.ui.NfcTagInfoUI
 import tool.xfy9326.milink.nfc.data.ui.XiaomiNfcPayloadUI
 import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
+import tool.xfy9326.milink.nfc.utils.NdefIO
 import tool.xfy9326.milink.nfc.utils.readBinary
 import tool.xfy9326.milink.nfc.utils.writeBinary
 
@@ -123,7 +124,7 @@ class XiaomiNfcReaderViewModel : ViewModel() {
                 return@launch
             }
 
-            val ndefMsg = runCatching { NdefMessage(bytes) }.getOrNull()
+            val ndefMsg = NdefIO.readNdefMessage(bytes)
             if (ndefMsg == null) {
                 _instantMsg.emit(InstantMsg.NDEF_PARSE_FAILED)
                 return@launch

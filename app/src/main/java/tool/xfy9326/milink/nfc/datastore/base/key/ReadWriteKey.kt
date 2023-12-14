@@ -30,6 +30,9 @@ suspend fun ExtendedDataStore.hasKey(key: ReadWriteKey<*>): Boolean =
 fun <T : Any> ExtendedDataStore.stateKey(key: ReadWriteKey<T>, coroutineScope: CoroutineScope): StateFlow<T?> =
     readValueFlow(key).stateIn(coroutineScope, SharingStarted.WhileSubscribed(), null)
 
+fun <D : ExtendedDataStore, T : Any> ExtendedDataStore.stateDefaultKey(key: ReadWriteDefaultKey<D, T>, coroutineScope: CoroutineScope): StateFlow<T> =
+    readValueFlow(key).stateIn(coroutineScope, SharingStarted.WhileSubscribed(), key.defaultValue())
+
 fun ExtendedDataStore.stateHasKey(key: ReadWriteKey<*>, coroutineScope: CoroutineScope): StateFlow<Boolean> =
     hasKeyFlow(key).stateIn(coroutineScope, SharingStarted.WhileSubscribed(), false)
 
@@ -43,6 +46,15 @@ suspend fun ExtendedDataStore.removeKey(vararg keys: ReadWriteKey<*>) {
 }
 
 interface ReadWriteKey<T> {
+    suspend fun hasValue(): Boolean
+
+    suspend fun getValue(): T
+
+    suspend fun setValue(value: T)
+
+    suspend fun removeValue()
+
+
     fun hasValue(preferences: Preferences): Boolean
 
     suspend fun getValue(preferences: Preferences): T
@@ -52,7 +64,20 @@ interface ReadWriteKey<T> {
     fun removeValue(mutablePreferences: MutablePreferences)
 }
 
-abstract class ReadWriteDefaultKey<T>(val preferencesKey: Preferences.Key<T>) : ReadWriteKey<T> {
+abstract class DataStoreReadWriteKey<D : ExtendedDataStore, T>(val dataStore: D) : ReadWriteKey<T> {
+    override suspend fun hasValue(): Boolean = dataStore.read { hasValue(it) }
+
+    override suspend fun getValue(): T = dataStore.read { getValue(it) }
+
+    override suspend fun setValue(value: T) = dataStore.edit { setValue(it, value) }
+
+    override suspend fun removeValue() = dataStore.edit { removeValue(it) }
+}
+
+abstract class ReadWriteDefaultKey<D : ExtendedDataStore, T>(
+    dataStore: D,
+    val preferencesKey: Preferences.Key<T>
+) : DataStoreReadWriteKey<D, T>(dataStore) {
     abstract fun defaultValue(): T
 
     override fun hasValue(preferences: Preferences): Boolean = preferencesKey in preferences
@@ -68,7 +93,10 @@ abstract class ReadWriteDefaultKey<T>(val preferencesKey: Preferences.Key<T>) : 
     }
 }
 
-abstract class ReadWriteSuspendDefaultKey<T>(val preferencesKey: Preferences.Key<T>) : ReadWriteKey<T> {
+abstract class ReadWriteSuspendDefaultKey<D : ExtendedDataStore, T>(
+    dataStore: D,
+    val preferencesKey: Preferences.Key<T>
+) : DataStoreReadWriteKey<D, T>(dataStore) {
     abstract suspend fun defaultValue(): T
 
     override fun hasValue(preferences: Preferences): Boolean = preferencesKey in preferences
@@ -84,9 +112,10 @@ abstract class ReadWriteSuspendDefaultKey<T>(val preferencesKey: Preferences.Key
     }
 }
 
-abstract class ReadWriteDefaultEnumKey<T : Enum<T>>(
+abstract class ReadWriteDefaultEnumKey<D : ExtendedDataStore, T : Enum<T>>(
+    dataStore: D,
     preferencesKey: Preferences.Key<String>
-) : ReadWriteDefaultKey<String>(preferencesKey) {
+) : ReadWriteDefaultKey<D, String>(dataStore, preferencesKey) {
     final override fun defaultValue(): String = defaultEnumValue().name
 
     final override suspend fun getValue(preferences: Preferences): String = super.getValue(preferences)
@@ -104,9 +133,10 @@ abstract class ReadWriteDefaultEnumKey<T : Enum<T>>(
     }
 }
 
-abstract class ReadWriteSuspendDefaultEnumKey<T : Enum<T>>(
+abstract class ReadWriteSuspendDefaultEnumKey<D : ExtendedDataStore, T : Enum<T>>(
+    dataStore: D,
     preferencesKey: Preferences.Key<String>
-) : ReadWriteSuspendDefaultKey<String>(preferencesKey) {
+) : ReadWriteSuspendDefaultKey<D, String>(dataStore, preferencesKey) {
     final override suspend fun defaultValue(): String = defaultEnumValue().name
 
     final override suspend fun getValue(preferences: Preferences): String = super.getValue(preferences)
@@ -124,9 +154,10 @@ abstract class ReadWriteSuspendDefaultEnumKey<T : Enum<T>>(
     }
 }
 
-abstract class ReadWriteDefaultEnumSetKey<T : Enum<T>>(
+abstract class ReadWriteDefaultEnumSetKey<D : ExtendedDataStore, T : Enum<T>>(
+    dataStore: D,
     preferencesKey: Preferences.Key<Set<String>>
-) : ReadWriteDefaultKey<Set<String>>(preferencesKey) {
+) : ReadWriteDefaultKey<D, Set<String>>(dataStore, preferencesKey) {
     final override fun defaultValue(): Set<String> = defaultEnumSetValue().let {
         buildSet(it.size) { for (enum in it) add(enum.name) }
     }
@@ -147,9 +178,10 @@ abstract class ReadWriteDefaultEnumSetKey<T : Enum<T>>(
     }
 }
 
-abstract class ReadWriteSuspendDefaultEnumSetKey<T : Enum<T>>(
+abstract class ReadWriteSuspendDefaultEnumSetKey<D : ExtendedDataStore, T : Enum<T>>(
+    dataStore: D,
     preferencesKey: Preferences.Key<Set<String>>
-) : ReadWriteSuspendDefaultKey<Set<String>>(preferencesKey) {
+) : ReadWriteSuspendDefaultKey<D, Set<String>>(dataStore, preferencesKey) {
     final override suspend fun defaultValue(): Set<String> = defaultEnumSetValue().let {
         buildSet(it.size) { for (enum in it) add(enum.name) }
     }

@@ -31,10 +31,7 @@ data class NfcTagDeviceRecord(
                 (action == NfcTagActionRecord.Action.IOT || action == NfcTagActionRecord.Action.IOT_ENV)
             ) {
                 AppDataValueType.IOT_ACTION
-            } else if (
-                ndefType == XiaomiNdefPayloadType.MI_CONNECT_SERVICE &&
-                bytes.copyOfRange(0, PREFIX_APP_DATA_MAP.size).contentEquals(PREFIX_APP_DATA_MAP)
-            ) {
+            } else if (ndefType == XiaomiNdefPayloadType.MI_CONNECT_SERVICE && bytes.startsWith(PREFIX_APP_DATA_MAP)) {
                 AppDataValueType.ATTRIBUTES_MAP
             } else {
                 AppDataValueType.UNKNOWN
@@ -51,9 +48,7 @@ data class NfcTagDeviceRecord(
 
         fun decodeAppDataValueMap(bytes: ByteArray): Map<DeviceAttribute, ByteArray> {
             val buffer = ByteBuffer.wrap(bytes)
-            require(bytes.copyOfRange(0, PREFIX_APP_DATA_MAP.size).contentEquals(PREFIX_APP_DATA_MAP)) {
-                "Not an valid DeviceAttribute.APP_DATA map byte array"
-            }
+            require(bytes.startsWith(PREFIX_APP_DATA_MAP)) { "Not an valid DeviceAttribute.APP_DATA map byte array" }
             return buffer.getShortKeyBytesMap().mapKeys { DeviceAttribute.parse(it.key) }
         }
 

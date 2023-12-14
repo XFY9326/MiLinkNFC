@@ -1,7 +1,6 @@
 package tool.xfy9326.milink.nfc.ui.vm
 
 import android.net.Uri
-import android.nfc.NdefMessage
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,6 +21,7 @@ import tool.xfy9326.milink.nfc.datastore.base.key.readValue
 import tool.xfy9326.milink.nfc.datastore.base.key.writeValue
 import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
 import tool.xfy9326.milink.nfc.utils.EmptyNdefMessage
+import tool.xfy9326.milink.nfc.utils.NdefIO
 import tool.xfy9326.milink.nfc.utils.isXiaomiHyperOS
 import tool.xfy9326.milink.nfc.utils.readBinary
 
@@ -82,7 +82,7 @@ class MainViewModel : ViewModel() {
                 return@launch
             }
 
-            val ndefMsg = runCatching { NdefMessage(bytes) }.getOrNull()
+            val ndefMsg = NdefIO.readNdefMessage(bytes)
             if (ndefMsg == null) {
                 _instantMsg.emit(InstantMsg.NDEF_PARSE_FAILED)
                 return@launch
@@ -99,8 +99,11 @@ class MainViewModel : ViewModel() {
     }
 
     fun requestFormatXiaomiTapNdefWriteDialog() {
-        _uiState.update {
-            it.copy(ndefWriteDialogData = NdefWriteData(XiaomiNfc.EmptyMiTap.newNdefMessage(Unit), false))
+        viewModelScope.launch(Dispatchers.IO) {
+            val ndefMsg = XiaomiNfc.EmptyMiTap.newNdefMessage(Unit, AppDataStore.shrinkNdefMsg.getValue())
+            _uiState.update {
+                it.copy(ndefWriteDialogData = NdefWriteData(ndefMsg, false))
+            }
         }
     }
 

@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">MiLink NFC</string>
     <string name="about">关于</string>
+    <string name="settings">设置</string>
     <string name="author">作者：%1$s</string>
     <string name="open_source">项目开源：</string>
     <string name="open_source_license">开源协议：MIT</string>
@@ -134,6 +135,9 @@
     <string name="export_failed">导出失败</string>
     <string name="no_cached_ndef_data">暂无无缓存的NDEF数据</string>
     <string name="ndef_parse_failed">无法解析的NDEF文件</string>
+    <string name="settings_ndef_writing">NDEF写入</string>
+    <string name="settings_shrink_ndef_message">缩减NDEF数据</string>
+    <string name="settings_shrink_ndef_message_summary">只保留必要的数据以减小数据量</string>
 
     <string name="version" translatable="false">%1$s (%2$d)</string>
     <string name="author_name" translatable="false">XFY9326</string>

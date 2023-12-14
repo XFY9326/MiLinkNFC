@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.FileCopy
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.ScreenShare
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -101,6 +102,9 @@ fun HomeScreen(
                     navController.navigate(ScreenMirrorRoute)
                 },
                 onNavToXiaomiNfcReader = onNavToXiaomiNfcReader,
+                onNavToSettings = {
+                    navController.navigate(SettingsRoute)
+                },
                 onRequestClearNfc = viewModel::requestClearNdefWriteDialog,
                 onRequestWriteNdefBin = onRequestWriteNdefBin,
                 onRequestFormatXiaomiTap = viewModel::requestFormatXiaomiTapNdefWriteDialog
@@ -125,6 +129,13 @@ fun HomeScreen(
         composable(ScreenMirrorRoute) {
             ScreenMirrorScreen(
                 onRequestWriteNfc = viewModel::requestNdefWriteDialog,
+                onNavBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable(SettingsRoute) {
+            SettingsScreen(
                 onNavBack = {
                     navController.popBackStack()
                 }
@@ -164,6 +175,7 @@ private fun Content(
     onNavToMiCirculate: () -> Unit,
     onNavToScreenMirror: () -> Unit,
     onNavToXiaomiNfcReader: () -> Unit,
+    onNavToSettings: () -> Unit,
     onRequestClearNfc: () -> Unit,
     onRequestWriteNdefBin: () -> Unit,
     onRequestFormatXiaomiTap: () -> Unit,
@@ -176,7 +188,12 @@ private fun Content(
         modifier = Modifier
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = { TopBar(scrollBehavior = scrollBehavior) },
+        topBar = {
+            TopBar(
+                scrollBehavior = scrollBehavior,
+                onNavToSettings = onNavToSettings
+            )
+        },
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
     ) { innerPadding ->
         Column(
@@ -238,7 +255,8 @@ private fun Content(
 
 @Composable
 private fun TopBar(
-    scrollBehavior: TopAppBarScrollBehavior
+    scrollBehavior: TopAppBarScrollBehavior,
+    onNavToSettings: () -> Unit
 ) {
     val uriHandler = LocalUriHandler.current
     val context = LocalContext.current
@@ -253,9 +271,10 @@ private fun TopBar(
             }) {
                 Icon(imageVector = Icons.Default.Update, contentDescription = stringResource(id = R.string.check_update))
             }
-            IconButton(onClick = {
-                openAboutDialog = true
-            }) {
+            IconButton(onClick = onNavToSettings) {
+                Icon(imageVector = Icons.Outlined.Settings, contentDescription = stringResource(id = R.string.settings))
+            }
+            IconButton(onClick = { openAboutDialog = true }) {
                 Icon(imageVector = Icons.Outlined.Info, contentDescription = stringResource(id = R.string.about))
             }
         },

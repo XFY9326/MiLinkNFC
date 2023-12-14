@@ -113,7 +113,8 @@ class ScreenMirrorViewModel : ViewModel() {
     fun requestWriteNfc(nfcTagData: ScreenMirror.NFCTag, ndefWriteHandler: (NdefWriteData) -> Unit) {
         viewModelScope.launch {
             if (validateBluetoothMac(nfcTagData.bluetoothMac)) {
-                val data = NdefWriteData(XiaomiNfc.ScreenMirror.newNdefMessage(nfcTagData.toConfig()), nfcTagData.readOnly)
+                val ndefMsg = XiaomiNfc.ScreenMirror.newNdefMessage(nfcTagData.toConfig(), AppDataStore.shrinkNdefMsg.getValue())
+                val data = NdefWriteData(ndefMsg, nfcTagData.readOnly)
                 ndefWriteHandler(data)
             }
         }

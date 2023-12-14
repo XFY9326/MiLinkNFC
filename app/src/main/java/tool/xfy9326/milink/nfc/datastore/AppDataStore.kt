@@ -1,6 +1,7 @@
 package tool.xfy9326.milink.nfc.datastore
 
 import tool.xfy9326.milink.nfc.AppContext
+import tool.xfy9326.milink.nfc.data.AppSettings
 import tool.xfy9326.milink.nfc.data.HuaweiRedirect
 import tool.xfy9326.milink.nfc.data.NfcActionIntentType
 import tool.xfy9326.milink.nfc.data.ScreenMirror
@@ -76,17 +77,41 @@ object AppDataStore : ExtendedDataStore("app") {
         }
     }
 
+    val shrinkNdefMsg by booleanDefaultKey(defaultValue = false)
+
+    fun getAppSettings() =
+        readFlow {
+            AppSettings(
+                shrinkNdefMsg = shrinkNdefMsg.getValue(it),
+            )
+        }
+
+    suspend fun setAppSettings(appSettings: AppSettings) {
+        edit {
+            shrinkNdefMsg.setValue(it, appSettings.shrinkNdefMsg)
+        }
+    }
+
     object Defaults {
-        val tilesScreenMirror = ScreenMirror(
-            deviceType = tilesScreenMirrorDeviceType.defaultEnumValue(),
-            actionIntentType = tilesScreenMirrorIntentType.defaultEnumValue(),
-            bluetoothMac = tilesScreenMirrorBluetoothMac.defaultValue(),
-            enableLyra = true
-        )
-        val huaweiRedirect = HuaweiRedirect(
-            deviceType = huaweiRedirectDeviceType.defaultEnumValue(),
-            actionIntentType = huaweiRedirectIntentType.defaultEnumValue(),
-            enableLyra = true
-        )
+        val tilesScreenMirror by lazy {
+            ScreenMirror(
+                deviceType = tilesScreenMirrorDeviceType.defaultEnumValue(),
+                actionIntentType = tilesScreenMirrorIntentType.defaultEnumValue(),
+                bluetoothMac = tilesScreenMirrorBluetoothMac.defaultValue(),
+                enableLyra = true
+            )
+        }
+        val huaweiRedirect by lazy {
+            HuaweiRedirect(
+                deviceType = huaweiRedirectDeviceType.defaultEnumValue(),
+                actionIntentType = huaweiRedirectIntentType.defaultEnumValue(),
+                enableLyra = true
+            )
+        }
+        val appSettings by lazy {
+            AppSettings(
+                shrinkNdefMsg = shrinkNdefMsg.defaultValue()
+            )
+        }
     }
 }

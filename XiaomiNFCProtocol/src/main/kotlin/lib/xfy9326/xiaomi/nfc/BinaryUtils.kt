@@ -2,6 +2,14 @@ package lib.xfy9326.xiaomi.nfc
 
 import java.nio.ByteBuffer
 
+internal fun ByteArray.startsWith(byteArray: ByteArray): Boolean {
+    if (this.size < byteArray.size) return false
+    for (i in indices) {
+        if (this[i] != byteArray[i]) return false
+    }
+    return true
+}
+
 internal fun List<ByteArray>.totalBytes(): Int =
     fold(0) { acc, bytes -> acc + bytes.size }
 

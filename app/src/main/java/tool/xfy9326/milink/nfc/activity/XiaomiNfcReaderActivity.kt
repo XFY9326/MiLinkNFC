@@ -20,6 +20,7 @@ import tool.xfy9326.milink.nfc.data.NdefReadData
 import tool.xfy9326.milink.nfc.ui.screen.XiaomiNfcReaderScreen
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.vm.XiaomiNfcReaderViewModel
+import tool.xfy9326.milink.nfc.utils.MIME_ALL
 import tool.xfy9326.milink.nfc.utils.MIME_BINARY
 import tool.xfy9326.milink.nfc.utils.enableNdefReaderMode
 import tool.xfy9326.milink.nfc.utils.ignoreTagUntilRemoved
@@ -54,7 +55,7 @@ class XiaomiNfcReaderActivity : ComponentActivity() {
                         onBackPressedDispatcher.onBackPressed()
                     },
                     onRequestImportNdefBin = {
-                        importNdefBin.launch(MIME_BINARY)
+                        importNdefBin.launch(MIME_ALL)
                     }
                 )
             }

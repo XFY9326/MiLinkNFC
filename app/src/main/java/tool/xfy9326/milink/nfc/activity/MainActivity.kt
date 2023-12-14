@@ -24,7 +24,7 @@ import tool.xfy9326.milink.nfc.data.NdefWriteData
 import tool.xfy9326.milink.nfc.ui.screen.HomeScreen
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.vm.MainViewModel
-import tool.xfy9326.milink.nfc.utils.MIME_BINARY
+import tool.xfy9326.milink.nfc.utils.MIME_ALL
 import tool.xfy9326.milink.nfc.utils.enableNdefReaderMode
 import tool.xfy9326.milink.nfc.utils.ignoreTagUntilRemoved
 import tool.xfy9326.milink.nfc.utils.showToast
@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
             AppTheme {
                 HomeScreen(
                     onNavToXiaomiNfcReader = { startActivity<XiaomiNfcReaderActivity>() },
-                    onRequestWriteNdefBin = { readNdefBin.launch(MIME_BINARY) },
+                    onRequestWriteNdefBin = { readNdefBin.launch(MIME_ALL) },
                     onExit = { finishAndRemoveTask() }
                 )
             }
