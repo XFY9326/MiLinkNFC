@@ -5,6 +5,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.graphics.drawable.Icon
 import android.os.Build
+import android.os.Parcelable
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import tool.xfy9326.milink.nfc.AppContext
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.data.HuaweiRedirect
@@ -44,13 +46,23 @@ class ScreenMirrorViewModel : ViewModel() {
         TILES_ADD_FAILED(R.string.tiles_add_failed);
     }
 
+    @Parcelize
+    data class NFCTag(
+        val deviceType: ScreenMirror.DeviceType = ScreenMirror.DeviceType.PC,
+        val bluetoothMac: String = EMPTY,
+        val enableLyra: Boolean = true,
+        val readOnly: Boolean = false
+    ) : Parcelable {
+        fun toConfig() =
+            XiaomiNfc.ScreenMirror.Config(
+                deviceType = deviceType.handOffType,
+                bluetoothMac = bluetoothMac,
+                enableLyra = enableLyra
+            )
+    }
+
     data class UiState(
-        val screenMirrorNFCTag: ScreenMirror.NFCTag = ScreenMirror.NFCTag(
-            deviceType = ScreenMirror.DeviceType.PC,
-            bluetoothMac = EMPTY,
-            readOnly = false,
-            enableLyra = true
-        ),
+        val nfcTag: NFCTag = NFCTag(),
         val testScreenMirror: ScreenMirror = ScreenMirror(
             deviceType = ScreenMirror.DeviceType.PC,
             actionIntentType = NfcActionIntentType.FAKE_NFC_TAG,
@@ -69,16 +81,16 @@ class ScreenMirrorViewModel : ViewModel() {
     val instantMsg: SharedFlow<InstantMsg> = _instantMsg.asSharedFlow()
 
     init {
-        checkLyraSupport()
         viewModelScope.launch(Dispatchers.IO) {
+            checkLyraSupport()
             initDataStoreListeners()
         }
     }
 
-    private suspend fun validateBluetoothMac(btMac: String): Boolean {
-        if (btMac.isBlank()) {
+    private suspend fun validateMacAddress(bluetoothMac: String): Boolean {
+        if (bluetoothMac.isBlank()) {
             _instantMsg.emit(InstantMsg.EMPTY_MAC_ADDRESS)
-        } else if (!btMac.isValidMacAddress()) {
+        } else if (!bluetoothMac.isValidMacAddress()) {
             _instantMsg.emit(InstantMsg.INVALID_MAC_ADDRESS)
         } else {
             return true
@@ -90,7 +102,7 @@ class ScreenMirrorViewModel : ViewModel() {
         if (!MiContinuityUtils.isLocalDeviceSupportLyra(AppContext)) {
             _uiState.update {
                 it.copy(
-                    screenMirrorNFCTag = it.screenMirrorNFCTag.copy(enableLyra = false),
+                    nfcTag = it.nfcTag.copy(enableLyra = false),
                     testScreenMirror = it.testScreenMirror.copy(enableLyra = false)
                 )
             }
@@ -110,9 +122,9 @@ class ScreenMirrorViewModel : ViewModel() {
         }
     }
 
-    fun requestWriteNfc(nfcTagData: ScreenMirror.NFCTag, ndefWriteHandler: (NdefWriteData) -> Unit) {
+    fun requestWriteNfc(nfcTagData: NFCTag, ndefWriteHandler: (NdefWriteData) -> Unit) {
         viewModelScope.launch {
-            if (validateBluetoothMac(nfcTagData.bluetoothMac)) {
+            if (validateMacAddress(nfcTagData.bluetoothMac)) {
                 val ndefMsg = XiaomiNfc.ScreenMirror.newNdefMessage(nfcTagData.toConfig(), AppDataStore.shrinkNdefMsg.getValue())
                 val data = NdefWriteData(ndefMsg, nfcTagData.readOnly)
                 ndefWriteHandler(data)
@@ -120,12 +132,12 @@ class ScreenMirrorViewModel : ViewModel() {
         }
     }
 
-    fun openMiLinkVersionDialog() {
+    fun openMiLinkVersionDialog(context: Context) {
         viewModelScope.launch(Dispatchers.Default) {
             _uiState.update {
                 val data = MiLinkVersionDialogData(
-                    lyraSupported = MiContinuityUtils.isLocalDeviceSupportLyra(AppContext),
-                    packageData = MiContinuityUtils.getNfcRelatedPackageDataMap(AppContext)
+                    lyraSupported = MiContinuityUtils.isLocalDeviceSupportLyra(context),
+                    packageData = MiContinuityUtils.getNfcRelatedPackageDataMap(context)
                 )
                 it.copy(miLinkPackageDialogData = data)
             }
@@ -140,7 +152,7 @@ class ScreenMirrorViewModel : ViewModel() {
 
     fun sendScreenMirror(context: Context, screenMirror: ScreenMirror) {
         viewModelScope.launch {
-            if (validateBluetoothMac(screenMirror.bluetoothMac)) {
+            if (validateMacAddress(screenMirror.bluetoothMac)) {
                 val config = screenMirror.toConfig()
                 when (screenMirror.actionIntentType) {
                     NfcActionIntentType.FAKE_NFC_TAG -> XiaomiNfc.ScreenMirror.newNdefDiscoveredIntent(null, null, config).also {
@@ -184,7 +196,7 @@ class ScreenMirrorViewModel : ViewModel() {
     fun saveTilesScreenMirror() {
         viewModelScope.launch(Dispatchers.IO) {
             val screenMirror = uiState.value.tilesScreenMirror
-            if (validateBluetoothMac(screenMirror.bluetoothMac)) {
+            if (validateMacAddress(screenMirror.bluetoothMac)) {
                 AppDataStore.setTilesScreenMirror(screenMirror)
                 _instantMsg.emit(InstantMsg.SAVE_SUCCESS)
             }

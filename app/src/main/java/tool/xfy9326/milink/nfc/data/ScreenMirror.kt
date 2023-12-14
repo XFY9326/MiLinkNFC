@@ -27,20 +27,5 @@ data class ScreenMirror(
             bluetoothMac = bluetoothMac,
             enableLyra = enableLyra
         )
-
-    @Parcelize
-    data class NFCTag(
-        val deviceType: DeviceType,
-        val bluetoothMac: String,
-        val enableLyra: Boolean,
-        val readOnly: Boolean,
-    ) : Parcelable {
-        fun toConfig() =
-            XiaomiNfc.ScreenMirror.Config(
-                deviceType = deviceType.handOffType,
-                bluetoothMac = bluetoothMac,
-                enableLyra = enableLyra
-            )
-    }
 }
 

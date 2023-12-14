@@ -100,7 +100,7 @@ class MainViewModel : ViewModel() {
 
     fun requestFormatXiaomiTapNdefWriteDialog() {
         viewModelScope.launch(Dispatchers.IO) {
-            val ndefMsg = XiaomiNfc.EmptyMiTap.newNdefMessage(Unit, AppDataStore.shrinkNdefMsg.getValue())
+            val ndefMsg = XiaomiNfc.EmptyMiTap.newNdefMessage((System.currentTimeMillis() / 1000).toInt(), AppDataStore.shrinkNdefMsg.getValue())
             _uiState.update {
                 it.copy(ndefWriteDialogData = NdefWriteData(ndefMsg, false))
             }

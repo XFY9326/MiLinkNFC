@@ -92,11 +92,11 @@ fun HomeScreen(
     ) {
         composable(HomeRoute) {
             Content(
-                onNavToMiPlay = {
-                    navController.navigate(MiPlayRoute)
+                onNavToMiTapSoundBox = {
+                    navController.navigate(MiTapSoundBoxRoute)
                 },
-                onNavToMiCirculate = {
-                    navController.navigate(MiCirculateRoute)
+                onNavToCirculate = {
+                    navController.navigate(CirculateRoute)
                 },
                 onNavToScreenMirror = {
                     navController.navigate(ScreenMirrorRoute)
@@ -110,16 +110,16 @@ fun HomeScreen(
                 onRequestFormatXiaomiTap = viewModel::requestFormatXiaomiTapNdefWriteDialog
             )
         }
-        composable(MiPlayRoute) {
-            MiPlayScreen(
+        composable(MiTapSoundBoxRoute) {
+            MiTapSoundBox(
                 onRequestWriteNfc = viewModel::requestNdefWriteDialog,
                 onNavBack = {
                     navController.popBackStack()
                 }
             )
         }
-        composable(MiCirculateRoute) {
-            MiCirculateScreen(
+        composable(CirculateRoute) {
+            CirculateScreen(
                 onRequestWriteNfc = viewModel::requestNdefWriteDialog,
                 onNavBack = {
                     navController.popBackStack()
@@ -171,8 +171,8 @@ fun HomeScreen(
 
 @Composable
 private fun Content(
-    onNavToMiPlay: () -> Unit,
-    onNavToMiCirculate: () -> Unit,
+    onNavToMiTapSoundBox: () -> Unit,
+    onNavToCirculate: () -> Unit,
     onNavToScreenMirror: () -> Unit,
     onNavToXiaomiNfcReader: () -> Unit,
     onNavToSettings: () -> Unit,
@@ -208,15 +208,15 @@ private fun Content(
         ) {
             EntryCard(
                 icon = Icons.Default.TapAndPlay,
-                title = stringResource(id = R.string.mi_play_nfc),
-                summary = stringResource(id = R.string.mi_play_nfc_summary),
-                onClick = onNavToMiPlay
+                title = stringResource(id = R.string.mi_tap_sound_box_nfc),
+                summary = stringResource(id = R.string.mi_tap_sound_box_nfc_summary),
+                onClick = onNavToMiTapSoundBox
             )
             EntryCard(
                 icon = Icons.Default.Devices,
-                title = stringResource(id = R.string.mi_circulate_nfc),
-                summary = stringResource(id = R.string.mi_circulate_nfc_summary),
-                onClick = onNavToMiCirculate
+                title = stringResource(id = R.string.circulate_nfc),
+                summary = stringResource(id = R.string.circulate_nfc_summary),
+                onClick = onNavToCirculate
             )
             EntryCard(
                 icon = Icons.Outlined.ScreenShare,

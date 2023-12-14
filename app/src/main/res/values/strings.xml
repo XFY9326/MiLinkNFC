@@ -7,10 +7,10 @@
     <string name="open_source_license">开源协议：MIT</string>
     <string name="xiaomi_screen_mirror_nfc">一碰妙享</string>
     <string name="xiaomi_screen_mirror_nfc_summary">通过NFC快速连接小米电脑管家</string>
-    <string name="mi_play_nfc">音频接力</string>
-    <string name="mi_play_nfc_summary">基于小米NFC碰一碰提供音频接力到音箱</string>
-    <string name="mi_circulate_nfc">小米妙播</string>
-    <string name="mi_circulate_nfc_summary">使用NFC将内容流转到音箱</string>
+    <string name="mi_tap_sound_box_nfc">音频接力</string>
+    <string name="mi_tap_sound_box_nfc_summary">基于小米碰一碰将音频接力到蓝牙音箱</string>
+    <string name="circulate_nfc">内容流转</string>
+    <string name="circulate_nfc_summary">使用NFC将当前内容流转到指定MAC的设备</string>
     <string name="nfc_read_xiaomi_ndef">读取小米NFC标签</string>
     <string name="nfc_read_xiaomi_ndef_summary">读取并解析小米NFC协议的NFC标签</string>
     <string name="nfc_clear_ndef">清空NFC标签</string>
@@ -20,6 +20,10 @@
     <string name="nfc_write_bin_ndef">复制NDEF到NFC标签</string>
     <string name="nfc_write_bin_ndef_summary">选择导出的NDEF文件以写入NFC标签</string>
     <string name="nfc_writer">NFC写入</string>
+    <string name="write_mi_tap_sound_box_nfc">音频接力NFC标签</string>
+    <string name="write_mi_tap_sound_box_nfc_desc">向NFC标签中覆盖写入音频接力的数据，仅支持NDEF格式的NFC标签。\n\n如果写入失败，可能是因为写入NFC标签时连接断开，请多尝试几次。\n\n使用NFC标签前请确保手机曾经配对连接过这个蓝牙设备，WIFI MAC地址和IOT设备名称可以不填写（或许填写后有特殊作用）。\n\n这个NFC标签的功能原理是自动连接蓝牙设备，所以理论上可以支持任何蓝牙音箱。\n\n如果希望填写但不知道IOT设备名称，可以在第三方收集整理的米家产品库搜索。</string>
+    <string name="write_circulate_nfc">内容流转NFC标签</string>
+    <string name="write_circulate_nfc_desc">向NFC标签中覆盖写入内容流转的数据，仅支持NDEF格式的NFC标签。\n\n如果写入失败，可能是因为写入NFC标签时连接断开，请多尝试几次。</string>
     <string name="write_screen_mirror_nfc">一碰妙享NFC标签</string>
     <string name="write_screen_mirror_nfc_desc">向NFC标签中覆盖写入小米一碰妙享的数据，仅支持NDEF格式的NFC标签。\n\n如果写入失败，可能是因为写入NFC标签时连接断开，请多尝试几次。\n\n如果投屏时多次出现连接失败，可以使用“测试屏幕镜像”功能并尝试重启小米电脑管家。</string>
     <string name="tap_and_write_nfc_tag">靠近NFC标签以写入数据</string>
@@ -43,15 +47,17 @@
     <string name="nfc_write_error_no_read_only">不可设为只读</string>
     <string name="nfc_write_error_not_writeable">不可写入</string>
     <string name="nfc_new_tag_found">检测到NFC标签</string>
+    <string name="test_circulate">测试内容流转</string>
+    <string name="test_circulate_desc">模拟NFC内容流转，向指定WLAN和蓝牙MAC地址的设备进行内容流转。\n\n触发方式：\n“虚拟NFC标签”：可能使投屏服务出错，但不受系统版本限制。\n“互联通信服务”：直接控制投屏服务，但可能因为系统版本不符无法触发。\n\n建议在后台播放音乐时测试，不支持的设备可能会导致互联互通功能一段时间无响应（可以尝试在设置中重启）。</string>
     <string name="test_screen_mirror">测试屏幕镜像</string>
-    <string name="test_screen_mirror_desc">模拟NFC一碰妙享，向指定蓝牙Mac地址的设备发送屏幕镜像（需安装小米电脑管家）。\n\n触发方式：\n“虚拟NFC标签”：可能使投屏服务出错，但不受系统版本限制。\n“互联通信服务”：直接控制投屏服务，但可能因为系统版本不符无法触发。\n\nLyra连接：\n可以提高查找连接设备的速度并避免设备重复显示，但是并非所有设备的版本都支持。\n无特殊需求建议启用，但是使用前最好先测试一下。</string>
+    <string name="test_screen_mirror_desc">模拟NFC一碰妙享，向指定蓝牙MAC地址的设备发送屏幕镜像（需安装小米电脑管家）。\n\n触发方式：\n“虚拟NFC标签”：可能使投屏服务出错，但不受系统版本限制。\n“互联通信服务”：直接控制投屏服务，但可能因为系统版本不符无法触发。\n\nLyra连接：\n可以提高查找连接设备的速度并避免设备重复显示，但是并非所有设备的版本都支持。\n无特殊需求建议启用，但是使用前最好先测试一下。</string>
     <string name="tiles_screen_mirror">通知栏磁贴快捷操作</string>
     <string name="tiles_screen_mirror_desc">使用预设的触发方式，通过点击通知栏中的“一碰妙享”磁贴触发屏幕镜像。\n\n如果处于系统“文件”或“相册”应用中并选择了文件或图片，则可以触发文件发送功能。</string>
     <string name="tiles_add_success">磁贴添加成功</string>
     <string name="tiles_already_added">磁贴已添加</string>
     <string name="tiles_add_failed">磁贴添加失败</string>
     <string name="huawei_nfc_redirect">转发华为NFC一碰传</string>
-    <string name="huawei_nfc_redirect_desc">使用小米一碰妙享处理华为电脑的一碰传所指向的蓝牙Mac地址的设备（需安装小米电脑管家）。\n\n默认情况下需要主动打开NFC弹出的网址通知才能触发，如果启用“通知监听服务”即可自动处理此类事件。\n\n由于系统后台运行限制，必须在应用设置中打开本应用的“自启动”功能，并将“省电策略”设置为“无限制”才可以保证后台运行时响应通知消息（将应用锁定在后台可以有更好的效果）。\n\n如果弹出“正在运行中”的通知，可以将此通知设置为不再显示（并不影响后台运行）。\n\n本应用开源并且无联网权限，后台运行时只会处理指定NFC标签的通知，并不会产生大量耗电。</string>
+    <string name="huawei_nfc_redirect_desc">使用小米一碰妙享处理华为电脑的一碰传所指向的蓝牙MAC地址的设备（需安装小米电脑管家）。\n\n默认情况下需要主动打开NFC弹出的网址通知才能触发，如果启用“通知监听服务”即可自动处理此类事件。\n\n由于系统后台运行限制，必须在应用设置中打开本应用的“自启动”功能，并将“省电策略”设置为“无限制”才可以保证后台运行时响应通知消息（将应用锁定在后台可以有更好的效果）。\n\n如果弹出“正在运行中”的通知，可以将此通知设置为不再显示（并不影响后台运行）。\n\n本应用开源并且无联网权限，后台运行时只会处理指定NFC标签的通知，并不会产生大量耗电。</string>
     <string name="open_app_settings_for_autostart">打开应用设置</string>
     <string name="open_notification_service_settings">打开“通知监听服务”设置</string>
     <string name="notification_channel_foreground_service">前台服务通知</string>
@@ -62,20 +68,27 @@
     <string name="save">保存</string>
     <string name="save_success">保存成功！</string>
     <string name="write_tag">写入</string>
+    <string name="send">发送</string>
     <string name="screen_mirror">投屏</string>
+    <string name="action_mirror">屏幕镜像</string>
     <string name="handoff_device_type">设备类型</string>
     <string name="device_type_tv">电视</string>
     <string name="device_type_pc">电脑</string>
     <string name="device_type_car">汽车</string>
     <string name="device_type_pad">平板</string>
+    <string name="device_type_router">路由器</string>
+    <string name="device_type_sound_box">音箱</string>
+    <string name="device_type_laptop">笔记本</string>
+    <string name="device_type_phone">手机</string>
     <string name="nfc_action_intent">触发方式</string>
     <string name="nfc_action_intent_fake_nfc_tag">虚拟NFC标签</string>
     <string name="nfc_action_intent_mi_connect_service">互联通信服务</string>
-    <string name="enter_mac_address">Mac地址</string>
-    <string name="empty_mac_address">Mac地址为空！</string>
-    <string name="invalid_mac_address">Mac地址格式错误！</string>
-    <string name="bluetooth_mac_not_found">未找到蓝牙Mac地址</string>
-    <string name="bluetooth_mac_not_set">未设置蓝牙Mac地址</string>
+    <string name="enter_wifi_mac_address">WIFI MAC地址</string>
+    <string name="enter_bluetooth_mac_address">蓝牙 MAC地址</string>
+    <string name="empty_mac_address">MAC地址为空！</string>
+    <string name="invalid_mac_address">MAC地址格式错误！</string>
+    <string name="bluetooth_mac_not_found">未找到蓝牙MAC地址</string>
+    <string name="bluetooth_mac_not_set">未设置蓝牙MAC地址</string>
     <string name="enable_lyra_ability">启用Lyra连接</string>
     <string name="no_lyra_ability">本机当前版本不支持Lyra连接</string>
     <string name="has_lyra_ability">本机当前版本支持Lyra连接</string>
@@ -138,6 +151,8 @@
     <string name="settings_ndef_writing">NDEF写入</string>
     <string name="settings_shrink_ndef_message">缩减NDEF数据</string>
     <string name="settings_shrink_ndef_message_summary">只保留必要的数据以减小数据量</string>
+    <string name="iot_model_name">IOT设备名称</string>
+    <string name="open_iot_spec">搜索设备</string>
 
     <string name="version" translatable="false">%1$s (%2$d)</string>
     <string name="author_name" translatable="false">XFY9326</string>
@@ -146,5 +161,7 @@
     <string name="code_platform_gitee" translatable="false">Gitee</string>
     <string name="code_url_gitee" translatable="false">https://gitee.com/XFY9326/MiLinkNFC</string>
     <string name="app_releases_url">https://gitee.com/XFY9326/MiLinkNFC/releases</string>
-    <string name="placeholder_mac_address" translatable="false">00:00:00:00:00:00</string>
+    <string name="placeholder_mac_address" translatable="false">00:FF:00:FF:00:FF</string>
+    <string name="placeholder_iot_model_name" translatable="false">xiaomi.wifispeaker.</string>
+    <string name="mi_iot_spec_url" translatable="false">https://home.miot-spec.com/</string>
 </resources>

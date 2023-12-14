@@ -22,7 +22,6 @@ import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Transform
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -42,7 +41,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -63,8 +61,8 @@ import tool.xfy9326.milink.nfc.ui.common.MacAddressTextField
 import tool.xfy9326.milink.nfc.ui.common.MiConnectActionSettings
 import tool.xfy9326.milink.nfc.ui.common.ScreenMirrorController
 import tool.xfy9326.milink.nfc.ui.common.SelectorTextField
-import tool.xfy9326.milink.nfc.ui.dialog.MessageAlertDialog
 import tool.xfy9326.milink.nfc.ui.dialog.MiLinkVersionDialog
+import tool.xfy9326.milink.nfc.ui.dialog.NfcReadOnlyAlertDialog
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.theme.LocalAppThemeColorScheme
 import tool.xfy9326.milink.nfc.ui.vm.ScreenMirrorViewModel
@@ -111,7 +109,7 @@ fun ScreenMirrorScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = viewModel::openMiLinkVersionDialog) {
+                    IconButton(onClick = { viewModel.openMiLinkVersionDialog(context) }) {
                         Icon(imageVector = Icons.Default.HelpOutline, contentDescription = stringResource(id = R.string.local_app_versions))
                     }
                 },
@@ -137,7 +135,7 @@ fun ScreenMirrorScreen(
             )
             WriteNfcFunctionCard(
                 modifier = Modifier.padding(horizontal = 8.dp),
-                nfcTagData = uiState.value.screenMirrorNFCTag,
+                nfcTagData = uiState.value.nfcTag,
                 onRequestWriteNfc = { viewModel.requestWriteNfc(it, onRequestWriteNfc) }
             )
             TilesScreenMirrorFunctionCard(
@@ -183,7 +181,7 @@ private fun EventHandler(
 
 @Composable
 private fun TestScreenMirrorFunctionCard(
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     screenMirror: ScreenMirror,
     onSendScreenMirror: (ScreenMirror) -> Unit
 ) {
@@ -223,9 +221,9 @@ private fun TestScreenMirrorFunctionCard(
 
 @Composable
 private fun WriteNfcFunctionCard(
-    modifier: Modifier = Modifier,
-    nfcTagData: ScreenMirror.NFCTag,
-    onRequestWriteNfc: (ScreenMirror.NFCTag) -> Unit,
+    modifier: Modifier,
+    nfcTagData: ScreenMirrorViewModel.NFCTag,
+    onRequestWriteNfc: (ScreenMirrorViewModel.NFCTag) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -255,6 +253,7 @@ private fun WriteNfcFunctionCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 6.dp),
+                title = stringResource(id = R.string.enter_bluetooth_mac_address),
                 value = editNfcTagData.bluetoothMac,
                 upperCase = true,
                 onValueChange = { editNfcTagData = editNfcTagData.copy(bluetoothMac = it) }
@@ -300,17 +299,11 @@ private fun WriteNfcFunctionCard(
         }
     }
     if (readOnlyAlert) {
-        MessageAlertDialog(
-            title = stringResource(id = R.string.dangerous_action_alert),
-            message = stringResource(id = R.string.set_nfc_read_only_desc),
-            icon = Icons.Default.Warning,
-            iconTint = Color.Red,
+        NfcReadOnlyAlertDialog(
             onConfirm = {
                 editNfcTagData = editNfcTagData.copy(readOnly = true)
                 readOnlyAlert = false
             },
-            addMessagePrefixSpaces = true,
-            showCancel = true,
             onDismissRequest = { readOnlyAlert = false }
         )
     }
@@ -318,7 +311,7 @@ private fun WriteNfcFunctionCard(
 
 @Composable
 private fun TilesScreenMirrorFunctionCard(
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     screenMirror: ScreenMirror,
     onChanged: (ScreenMirror) -> Unit,
     onRequestAddTiles: () -> Unit,
@@ -373,7 +366,7 @@ private fun TilesScreenMirrorFunctionCard(
 
 @Composable
 private fun HuaweiRedirectFunctionCard(
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     redirectData: HuaweiRedirect,
     onChanged: (HuaweiRedirect) -> Unit,
     onSave: () -> Unit

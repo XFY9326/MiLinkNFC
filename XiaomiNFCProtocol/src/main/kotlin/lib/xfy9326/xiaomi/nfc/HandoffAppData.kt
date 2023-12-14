@@ -97,7 +97,7 @@ data class HandoffAppData(
     enum class PayloadKey(val value: Byte, val isText: Boolean? = null) {
         UNKNOWN(0),
         ACTION_SUFFIX(101, true),
-        BT_MAC(1, true),
+        BLUETOOTH_MAC(1, true),
         WIFI_MAC(2, true),
         WIRED_MAC(3, true),
         EXT_ABILITY(121, false);

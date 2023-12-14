@@ -54,7 +54,6 @@ object XiaomiNfc {
             NdefRecord.createUri(URI_MI_HOME.toUri())
         )
 
-    @Suppress("MemberVisibilityCanBePrivate")
     abstract class NfcAction<T, A : AppsData>(
         private val majorVersion: Int,
         private val minorVersion: Int,
@@ -81,6 +80,7 @@ object XiaomiNfc {
             }
         }
 
+        @Suppress("MemberVisibilityCanBePrivate")
         fun encode(config: T): XiaomiNfcPayload<A> =
             XiaomiNfcPayload(
                 majorVersion = majorVersion,
@@ -95,7 +95,7 @@ object XiaomiNfc {
         }
     }
 
-    object EmptyMiTap : NfcAction<Unit, NfcTagAppData>(
+    object EmptyMiTap : NfcAction<Int, NfcTagAppData>(
         majorVersion = 1,
         minorVersion = 2,
         idHash = 0,
@@ -106,20 +106,19 @@ object XiaomiNfc {
         private const val MINOR_VERSION = 0.toByte()
         private const val FLAGS = 0.toByte()
         private const val DEVICE_NUMBER = 0.toByte()
-        private const val WRITE_TIME = 0
 
-        override fun newNdefMessage(config: Unit, shrink: Boolean): NdefMessage =
+        override fun newNdefMessage(config: Int, shrink: Boolean): NdefMessage =
             if (shrink) {
                 super.newNdefMessage(config, true)
             } else {
                 newMiTapNdefMessage(newNdefRecord(config))
             }
 
-        override fun encodeAppsData(config: Unit): NfcTagAppData =
+        override fun encodeAppsData(config: Int): NfcTagAppData =
             NfcTagAppData(
                 majorVersion = MAJOR_VERSION,
                 minorVersion = MINOR_VERSION,
-                writeTime = WRITE_TIME,
+                writeTime = config,
                 flags = FLAGS,
                 records = listOf(
                     NfcTagDeviceRecord.newInstance(
@@ -138,7 +137,7 @@ object XiaomiNfc {
             )
     }
 
-    object SoundBoxPlay : NfcAction<SoundBoxPlay.Config, NfcTagAppData>(
+    object MiTapSoundBox : NfcAction<MiTapSoundBox.Config, NfcTagAppData>(
         majorVersion = 1,
         minorVersion = 2,
         idHash = 0,
@@ -152,9 +151,9 @@ object XiaomiNfc {
 
         class Config(
             val writeTime: Int,
-            val wifiMac: ByteArray,
+            val wifiMac: ByteArray?,
             val bluetoothMac: ByteArray,
-            val model: String
+            val model: String?
         )
 
         override fun newNdefMessage(config: Config, shrink: Boolean): NdefMessage =
@@ -175,11 +174,16 @@ object XiaomiNfc {
                         deviceType = NfcTagDeviceRecord.DeviceType.MI_SOUND_BOX,
                         flags = FLAGS,
                         deviceNumber = DEVICE_NUMBER,
-                        attributesMap = mapOf(
-                            NfcTagDeviceRecord.DeviceAttribute.WIFI_MAC_ADDRESS to config.wifiMac,
-                            NfcTagDeviceRecord.DeviceAttribute.BLUETOOTH_MAC_ADDRESS to config.bluetoothMac,
-                            NfcTagDeviceRecord.DeviceAttribute.MODEL to config.model.toByteArray(Charsets.UTF_8)
-                        )
+                        attributesMap = mutableMapOf(
+                            NfcTagDeviceRecord.DeviceAttribute.BLUETOOTH_MAC_ADDRESS to config.bluetoothMac
+                        ).apply {
+                            config.wifiMac?.let {
+                                this[NfcTagDeviceRecord.DeviceAttribute.WIFI_MAC_ADDRESS] = it
+                            }
+                            config.model?.let {
+                                this[NfcTagDeviceRecord.DeviceAttribute.MODEL] = it.toByteArray(Charsets.UTF_8)
+                            }
+                        }
                     ),
                     NfcTagActionRecord.newInstance(
                         action = NfcTagActionRecord.Action.AUTO,
@@ -191,7 +195,7 @@ object XiaomiNfc {
             )
     }
 
-    object SoundBoxCirculate : NfcAction<SoundBoxCirculate.Config, NfcTagAppData>(
+    object Circulate : NfcAction<Circulate.Config, NfcTagAppData>(
         majorVersion = 1,
         minorVersion = 11,
         idHash = 0,
@@ -211,6 +215,7 @@ object XiaomiNfc {
 
         class Config(
             val writeTime: Int,
+            val deviceType: NfcTagDeviceRecord.DeviceType,
             val wifiMac: ByteArray,
             val bluetoothMac: ByteArray
         )
@@ -223,7 +228,7 @@ object XiaomiNfc {
                 flags = FLAGS,
                 records = listOf(
                     NfcTagDeviceRecord.newInstance(
-                        deviceType = NfcTagDeviceRecord.DeviceType.MI_SOUND_BOX,
+                        deviceType = config.deviceType,
                         flags = FLAGS,
                         deviceNumber = DEVICE_NUMBER,
                         attributesMap = mapOf(
@@ -241,7 +246,8 @@ object XiaomiNfc {
             )
 
         @SuppressLint("WrongConstant")
-        fun sendBroadcast(context: Context, appData: NfcTagAppData) {
+        fun sendBroadcast(context: Context, config: Config) {
+            val appData = encode(config).appsData
             Intent(ACTION).apply {
                 addFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP)
                 addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
@@ -250,10 +256,10 @@ object XiaomiNfc {
                 appData.getFirstDeviceAttributesMap(ndefRecordType).let { map ->
                     val idHash = map[NfcTagDeviceRecord.DeviceAttribute.ID_HASH]?.let { Base64.encodeToString(it, Base64.DEFAULT) } ?: EMPTY
                     val wifiMac = map[NfcTagDeviceRecord.DeviceAttribute.WIFI_MAC_ADDRESS]?.toHexString(true) ?: EMPTY
-                    val btMac = map[NfcTagDeviceRecord.DeviceAttribute.BLUETOOTH_MAC_ADDRESS]?.toHexString(true) ?: EMPTY
+                    val bluetoothMac = map[NfcTagDeviceRecord.DeviceAttribute.BLUETOOTH_MAC_ADDRESS]?.toHexString(true) ?: EMPTY
                     putExtra(EXTRA_ID_HASH, idHash)
                     putExtra(EXTRA_WIFI_MAC, wifiMac)
-                    putExtra(EXTRA_BLUETOOTH_MAC, btMac)
+                    putExtra(EXTRA_BLUETOOTH_MAC, bluetoothMac)
                 }
             }.also {
                 context.sendBroadcast(it, PERMISSION_RECEIVE_ENDPOINT)
@@ -261,56 +267,47 @@ object XiaomiNfc {
         }
     }
 
-    object ScreenMirror : NfcAction<ScreenMirror.Config, HandoffAppData>(
+    abstract class HandoffNfcAction<T : HandoffNfcAction.Config> : NfcAction<T, HandoffAppData>(
         majorVersion = 1,
         minorVersion = 13,
         idHash = null,
         protocol = XiaomiNfcProtocol.HandOff,
         ndefRecordType = XiaomiNdefPayloadType.MI_CONNECT_SERVICE
     ) {
-        private const val MAJOR_VERSION = 0x27.toByte()
-        private const val MINOR_VERSION = 0x17.toByte()
+        companion object {
+            private const val MAJOR_VERSION = 0x27.toByte()
+            private const val MINOR_VERSION = 0x17.toByte()
 
-        private const val ACTION_PREFIX = "com.xiaomi.nfc.action."
-        private const val EXTRA_PROTOCOL_VALUE_KEY = "protocol_value_key"
-        private const val KEY_DEVICE_TYPE = "device_type_key"
-        private const val KEY_PROTOCOL_PAYLOAD = "protocol_payload_key"
+            private const val ACTION_PREFIX = "com.xiaomi.nfc.action."
+            private const val EXTRA_PROTOCOL_VALUE_KEY = "protocol_value_key"
+            private const val KEY_DEVICE_TYPE = "device_type_key"
+            private const val KEY_PROTOCOL_PAYLOAD = "protocol_payload_key"
 
-        private const val ACTION_TAG_DISCOVERED = "TAG_DISCOVERED"
-        private const val ACTION_SUFFIX_MIRROR = "MIRROR"
+            private const val ACTION_TAG_DISCOVERED = "TAG_DISCOVERED"
+        }
 
-        private const val FLAG_ABILITY_LYRA = 0x00000001.toByte()
+        interface Config {
+            val deviceType: HandoffAppData.DeviceType
+        }
 
-        class Config(
-            val deviceType: HandoffAppData.DeviceType,
-            val bluetoothMac: String,
-            val enableLyra: Boolean
-        )
-
-        override fun encodeAppsData(config: Config): HandoffAppData =
+        override fun encodeAppsData(config: T): HandoffAppData =
             HandoffAppData.newInstance(
                 majorVersion = MAJOR_VERSION,
                 minorVersion = MINOR_VERSION,
                 deviceType = config.deviceType,
                 attributesMap = emptyMap(),
                 action = ACTION_TAG_DISCOVERED,
-                payloadsMap = config.buildPayloadsMap()
+                payloadsMap = onBuildPayloadsMap(config)
             )
 
-        private fun Config.buildPayloadsMap(): Map<HandoffAppData.PayloadKey, ByteArray> =
-            mutableMapOf(
-                HandoffAppData.PayloadKey.ACTION_SUFFIX to ACTION_SUFFIX_MIRROR.toByteArray(Charsets.UTF_8),
-                HandoffAppData.PayloadKey.BT_MAC to bluetoothMac.toByteArray(Charsets.UTF_8)
-            ).also {
-                if (enableLyra) it[HandoffAppData.PayloadKey.EXT_ABILITY] = byteArrayOf(FLAG_ABILITY_LYRA)
-            }
+        protected abstract fun onBuildPayloadsMap(config: T): Map<HandoffAppData.PayloadKey, ByteArray>
 
         @SuppressLint("WrongConstant")
-        fun sendBroadcast(context: Context, config: Config) {
+        fun sendBroadcast(context: Context, config: T) {
             val jsonObject = JSONObject().apply {
                 put(KEY_DEVICE_TYPE, config.deviceType.value)
                 put(KEY_PROTOCOL_PAYLOAD,
-                    HandoffAppData.encodePayloadsMap(config.buildPayloadsMap()).let {
+                    HandoffAppData.encodePayloadsMap(onBuildPayloadsMap(config)).let {
                         Base64.encodeToString(it, Base64.DEFAULT)
                     }
                 )
@@ -325,5 +322,24 @@ object XiaomiNfc {
                 context.sendBroadcast(it, PERMISSION_RECEIVE_ENDPOINT)
             }
         }
+    }
+
+    object ScreenMirror : HandoffNfcAction<ScreenMirror.Config>() {
+        private const val ACTION_SUFFIX_MIRROR = "MIRROR"
+        private const val FLAG_ABILITY_LYRA = 0x00000001.toByte()
+
+        class Config(
+            override val deviceType: HandoffAppData.DeviceType,
+            val bluetoothMac: String,
+            val enableLyra: Boolean
+        ) : HandoffNfcAction.Config
+
+        override fun onBuildPayloadsMap(config: Config): Map<HandoffAppData.PayloadKey, ByteArray> =
+            mutableMapOf(
+                HandoffAppData.PayloadKey.ACTION_SUFFIX to ACTION_SUFFIX_MIRROR.toByteArray(Charsets.UTF_8),
+                HandoffAppData.PayloadKey.BLUETOOTH_MAC to config.bluetoothMac.toByteArray(Charsets.UTF_8)
+            ).also {
+                if (config.enableLyra) it[HandoffAppData.PayloadKey.EXT_ABILITY] = byteArrayOf(FLAG_ABILITY_LYRA)
+            }
     }
 }

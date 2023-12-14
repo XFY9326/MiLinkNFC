@@ -73,7 +73,7 @@ class ProtocolTest {
             action = "TAG_DISCOVERED",
             payloadsMap = mutableMapOf(
                 HandoffAppData.PayloadKey.ACTION_SUFFIX to "MIRROR".toByteArray(Charsets.UTF_8),
-                HandoffAppData.PayloadKey.BT_MAC to "00:00:00:00:00:00".toByteArray(Charsets.UTF_8)
+                HandoffAppData.PayloadKey.BLUETOOTH_MAC to "00:00:00:00:00:00".toByteArray(Charsets.UTF_8)
             )
         )
 

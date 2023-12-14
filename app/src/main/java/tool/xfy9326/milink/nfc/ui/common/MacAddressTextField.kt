@@ -29,6 +29,7 @@ private fun Preview() {
     AppTheme {
         MacAddressTextField(
             value = "",
+            title = "MAC",
             upperCase = true,
             onValueChange = {}
         )
@@ -38,6 +39,7 @@ private fun Preview() {
 @Composable
 fun MacAddressTextField(
     modifier: Modifier = Modifier,
+    title: String,
     upperCase: Boolean = false,
     value: String,
     onValueChange: (String) -> Unit,
@@ -53,10 +55,10 @@ fun MacAddressTextField(
         },
         modifier = modifier,
         label = {
-            Text(stringResource(id = R.string.enter_mac_address))
+            Text(text = title)
         },
         placeholder = {
-            Text(stringResource(id = R.string.placeholder_mac_address), color = Color.Gray)
+            Text(text = stringResource(id = R.string.placeholder_mac_address), color = Color.Gray)
         },
         trailingIcon = if (value.isEmpty()) null else {
             {

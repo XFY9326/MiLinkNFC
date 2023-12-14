@@ -62,6 +62,7 @@ fun ScreenMirrorController(
         Spacer(modifier = Modifier.height(10.dp))
         MacAddressTextField(
             modifier = Modifier.fillMaxWidth(),
+            title = stringResource(id = R.string.enter_bluetooth_mac_address),
             value = screenMirror.bluetoothMac,
             upperCase = true,
             onValueChange = { onChanged(screenMirror.copy(bluetoothMac = it)) }
