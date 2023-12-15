@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material.icons.filled.DataObject
 import androidx.compose.material.icons.filled.Devices
+import androidx.compose.material.icons.filled.GroupAdd
 import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.TapAndPlay
 import androidx.compose.material.icons.filled.Update
@@ -180,6 +181,9 @@ private fun Content(
     onRequestWriteNdefBin: () -> Unit,
     onRequestFormatXiaomiTap: () -> Unit,
 ) {
+    val context = LocalContext.current
+    val uriHandler = LocalUriHandler.current
+
     val scrollState = rememberScrollState()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val snackBarHostState = remember { SnackbarHostState() }
@@ -248,6 +252,15 @@ private fun Content(
                 title = stringResource(id = R.string.nfc_clear_ndef),
                 summary = stringResource(id = R.string.nfc_clear_ndef_summary),
                 onClick = onRequestClearNfc
+            )
+            Divider(modifier = Modifier.fillMaxWidth())
+            EntryCard(
+                icon = Icons.Default.GroupAdd,
+                title = stringResource(id = R.string.add_qq_group),
+                summary = stringResource(id = R.string.add_qq_group_desc),
+                onClick = {
+                    uriHandler.openUri(context.getString(R.string.qq_group_url))
+                }
             )
         }
     }

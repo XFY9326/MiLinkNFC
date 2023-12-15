@@ -154,6 +154,8 @@
     <string name="settings_shrink_ndef_message_summary">只保留必要的数据以减小数据量</string>
     <string name="iot_model_name">IOT设备名称</string>
     <string name="open_iot_spec">搜索设备</string>
+    <string name="add_qq_group">使用交流</string>
+    <string name="add_qq_group_desc">加入QQ群以获得更多信息</string>
 
     <string name="version" translatable="false">%1$s (%2$d)</string>
     <string name="author_name" translatable="false">XFY9326</string>
@@ -165,4 +167,5 @@
     <string name="placeholder_mac_address" translatable="false">00:FF:00:FF:00:FF</string>
     <string name="placeholder_iot_model_name" translatable="false">xiaomi.wifispeaker.</string>
     <string name="mi_iot_spec_url" translatable="false">https://home.miot-spec.com/</string>
+    <string name="qq_group_url" translatable="false">https://qm.qq.com/q/QaVLSn9Rao</string>
 </resources>
