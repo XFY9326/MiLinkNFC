@@ -30,7 +30,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.5"
+        kotlinCompilerExtensionVersion = "1.5.6"
     }
 
     buildTypes {
@@ -92,7 +92,7 @@ dependencies {
 
     // AndroidX
     implementation("androidx.datastore:datastore-preferences:1.0.0")
-    implementation("androidx.activity:activity-compose:1.8.1")
+    implementation("androidx.activity:activity-compose:1.8.2")
 
     // Compose BOM
     val composeBom = platform("androidx.compose:compose-bom:2023.10.01")
@@ -111,7 +111,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion")
 
-    val navVersion = "2.7.5"
+    val navVersion = "2.7.6"
     implementation("androidx.navigation:navigation-compose:$navVersion")
 
     testImplementation("junit:junit:4.13.2")
