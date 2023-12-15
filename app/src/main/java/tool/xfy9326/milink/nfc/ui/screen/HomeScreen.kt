@@ -50,6 +50,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navOptions
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.ui.common.EntryCard
 import tool.xfy9326.milink.nfc.ui.common.SlideAnimationNavHost
@@ -94,17 +95,29 @@ fun HomeScreen(
         composable(HomeRoute) {
             Content(
                 onNavToMiTapSoundBox = {
-                    navController.navigate(MiTapSoundBoxRoute)
+                    navController.navigate(
+                        MiTapSoundBoxRoute,
+                        navOptions { launchSingleTop = true }
+                    )
                 },
                 onNavToCirculate = {
-                    navController.navigate(CirculateRoute)
+                    navController.navigate(
+                        CirculateRoute,
+                        navOptions { launchSingleTop = true }
+                    )
                 },
                 onNavToScreenMirror = {
-                    navController.navigate(ScreenMirrorRoute)
+                    navController.navigate(
+                        ScreenMirrorRoute,
+                        navOptions { launchSingleTop = true }
+                    )
                 },
                 onNavToXiaomiNfcReader = onNavToXiaomiNfcReader,
                 onNavToSettings = {
-                    navController.navigate(SettingsRoute)
+                    navController.navigate(
+                        SettingsRoute,
+                        navOptions { launchSingleTop = true }
+                    )
                 },
                 onRequestClearNfc = viewModel::requestClearNdefWriteDialog,
                 onRequestWriteNdefBin = onRequestWriteNdefBin,
@@ -115,7 +128,7 @@ fun HomeScreen(
             MiTapSoundBox(
                 onRequestWriteNfc = viewModel::requestNdefWriteDialog,
                 onNavBack = {
-                    navController.popBackStack()
+                    navController.popBackStack(HomeRoute, false)
                 }
             )
         }
@@ -123,7 +136,7 @@ fun HomeScreen(
             CirculateScreen(
                 onRequestWriteNfc = viewModel::requestNdefWriteDialog,
                 onNavBack = {
-                    navController.popBackStack()
+                    navController.popBackStack(HomeRoute, false)
                 }
             )
         }
@@ -131,14 +144,14 @@ fun HomeScreen(
             ScreenMirrorScreen(
                 onRequestWriteNfc = viewModel::requestNdefWriteDialog,
                 onNavBack = {
-                    navController.popBackStack()
+                    navController.popBackStack(HomeRoute, false)
                 }
             )
         }
         composable(SettingsRoute) {
             SettingsScreen(
                 onNavBack = {
-                    navController.popBackStack()
+                    navController.popBackStack(HomeRoute, false)
                 }
             )
         }
