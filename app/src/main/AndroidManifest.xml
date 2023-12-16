@@ -16,6 +16,9 @@
     <queries>
         <package android:name="com.xiaomi.mi_connect_service" />
         <package android:name="com.milink.service" />
+        <package android:name="com.xiaomi.mirror" />
+        <package android:name="com.android.fileexplorer" />
+        <package android:name="com.miui.gallery" />
     </queries>
 
     <application
