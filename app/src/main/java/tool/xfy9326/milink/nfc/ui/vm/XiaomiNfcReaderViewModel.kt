@@ -34,16 +34,17 @@ import tool.xfy9326.milink.nfc.utils.NdefIO
 import tool.xfy9326.milink.nfc.utils.readBinary
 
 class XiaomiNfcReaderViewModel : ViewModel() {
-    enum class InstantMsg(@StringRes val resId: Int, val isToast: Boolean = false) {
-        NEW_TAG_FOUND(R.string.nfc_new_tag_found, true),
-        EXPORT_SUCCESS(R.string.export_success, true),
-        EXPORT_FAILED(R.string.export_failed, true),
-        IMPORT_SUCCESS(R.string.import_success, true),
-        IMPORT_FAILED(R.string.import_failed, true),
-        NDEF_PARSE_FAILED(R.string.ndef_parse_failed, true),
+    enum class InstantMsg(@StringRes val resId: Int) {
+        NEW_TAG_FOUND(R.string.nfc_new_tag_found),
+        EXPORT_SUCCESS(R.string.export_success),
+        EXPORT_FAILED(R.string.export_failed),
+        IMPORT_SUCCESS(R.string.import_success),
+        IMPORT_FAILED(R.string.import_failed),
+        NDEF_PARSE_FAILED(R.string.ndef_parse_failed),
         NDEF_RECORD_NOT_FOUND(R.string.xiaomi_ndef_not_found),
         NOT_XIAOMI_NFC(R.string.xiaomi_ndef_not_nfc),
         PARSE_ERROR(R.string.xiaomi_ndef_parse_error),
+        CONTENT_PARSE_ERROR(R.string.xiaomi_ndef_content_parse_error),
         VERSION_ERROR(R.string.xiaomi_ndef_version_error),
         NO_CACHED_NDEF_DATA(R.string.no_cached_ndef_data);
     }
@@ -176,7 +177,7 @@ class XiaomiNfcReaderViewModel : ViewModel() {
         }
         val payload = runCatching { miConnectPayload.toXiaomiNfcPayload(protocol) }.getOrNull()
         if (payload == null) {
-            _instantMsg.emit(InstantMsg.PARSE_ERROR)
+            _instantMsg.emit(InstantMsg.CONTENT_PARSE_ERROR)
             return false
         }
 

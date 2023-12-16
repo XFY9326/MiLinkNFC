@@ -74,8 +74,8 @@ data class HandoffAppData(
             .putInt(deviceType)
             .put(attributesMap.size.toByte())
             .putByteKeyBytesMap(attributesMap)
-            .put(action.length.toByte())
-            .put(action.toByteArray(Charsets.UTF_8))
+            .put(actionBytes.size.toByte())
+            .put(actionBytes)
             .putByteKeyBytesMap(payloadsMap)
             .array()
     }

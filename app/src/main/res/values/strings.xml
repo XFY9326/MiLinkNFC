@@ -107,6 +107,7 @@
     <string name="xiaomi_ndef_not_nfc">非小米NFC数据</string>
     <string name="xiaomi_ndef_version_error">无法判断小米NFC协议版本</string>
     <string name="xiaomi_ndef_parse_error">NFC标签解析失败</string>
+    <string name="xiaomi_ndef_content_parse_error">NFC标签内容解析失败</string>
     <string name="content_true">是</string>
     <string name="content_false">否</string>
     <string name="exit">退出</string>

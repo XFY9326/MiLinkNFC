@@ -25,13 +25,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -74,7 +71,6 @@ fun XiaomiNfcReaderScreen(
     onRequestImportNdefBin: () -> Unit
 ) {
     val scrollState = rememberScrollState()
-    val snackBarHostState = remember { SnackbarHostState() }
 
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -87,8 +83,7 @@ fun XiaomiNfcReaderScreen(
                 onRequestExportNdefBin = viewModel::requestExportNdefBin,
                 onRequestImportNdefBin = onRequestImportNdefBin
             )
-        },
-        snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
+        }
     ) { innerPadding ->
         Crossfade(targetState = uiState.value.nfcInfo, label = ANIMATION_LABEL_CONTENT) { nfcInfo ->
             nfcInfo?.let {
@@ -132,7 +127,6 @@ fun XiaomiNfcReaderScreen(
         }
     }
     EventHandler(
-        snackBarHostState = snackBarHostState,
         viewModel = viewModel
     )
 }
@@ -165,19 +159,12 @@ private fun TopBar(
 }
 
 @Composable
-private fun EventHandler(
-    snackBarHostState: SnackbarHostState,
-    viewModel: XiaomiNfcReaderViewModel,
-) {
+private fun EventHandler(viewModel: XiaomiNfcReaderViewModel) {
     val context = LocalContext.current
 
-    LaunchedEffect(snackBarHostState) {
+    LaunchedEffect(Unit) {
         viewModel.instantMsg.collectLatest {
-            if (it.isToast) {
-                context.showToast(text = context.getString(it.resId))
-            } else {
-                snackBarHostState.showSnackbar(message = context.getString(it.resId))
-            }
+            context.showToast(text = context.getString(it.resId))
         }
     }
 }

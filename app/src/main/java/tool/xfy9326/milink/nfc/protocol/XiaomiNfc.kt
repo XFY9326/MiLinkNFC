@@ -17,8 +17,6 @@ import lib.xfy9326.xiaomi.nfc.NfcTagDeviceRecord
 import lib.xfy9326.xiaomi.nfc.XiaomiNdefPayloadType
 import lib.xfy9326.xiaomi.nfc.XiaomiNfcPayload
 import lib.xfy9326.xiaomi.nfc.XiaomiNfcProtocol
-import lib.xfy9326.xiaomi.nfc.decodeAsMiConnectPayload
-import lib.xfy9326.xiaomi.nfc.toXiaomiNfcPayload
 import org.json.JSONObject
 import tool.xfy9326.milink.nfc.utils.EMPTY
 import tool.xfy9326.milink.nfc.utils.toHexString
@@ -89,10 +87,6 @@ object XiaomiNfc {
                 protocol = protocol,
                 appsData = encodeAppsData(config)
             )
-
-        fun decode(bytes: ByteArray): XiaomiNfcPayload<A> {
-            return bytes.decodeAsMiConnectPayload().toXiaomiNfcPayload(protocol)
-        }
     }
 
     object EmptyMiTap : NfcAction<Int, NfcTagAppData>(
