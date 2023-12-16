@@ -71,7 +71,6 @@
     <string name="write_tag">写入</string>
     <string name="send">发送</string>
     <string name="screen_mirror">投屏</string>
-    <string name="action_mirror">屏幕镜像</string>
     <string name="handoff_device_type">设备类型</string>
     <string name="device_type_tv">电视</string>
     <string name="device_type_pc">电脑</string>

@@ -78,7 +78,6 @@ object XiaomiNfc {
             }
         }
 
-        @Suppress("MemberVisibilityCanBePrivate")
         fun encode(config: T): XiaomiNfcPayload<A> =
             XiaomiNfcPayload(
                 majorVersion = majorVersion,

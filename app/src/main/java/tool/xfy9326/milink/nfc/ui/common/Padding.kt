@@ -1,5 +1,3 @@
-@file:Suppress("unused")
-
 package tool.xfy9326.milink.nfc.ui.common
 
 import androidx.compose.foundation.layout.PaddingValues
