@@ -21,7 +21,6 @@ import tool.xfy9326.milink.nfc.ui.screen.XiaomiNfcReaderScreen
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.vm.XiaomiNfcReaderViewModel
 import tool.xfy9326.milink.nfc.utils.MIME_ALL
-import tool.xfy9326.milink.nfc.utils.MIME_BINARY
 import tool.xfy9326.milink.nfc.utils.enableNdefReaderMode
 import tool.xfy9326.milink.nfc.utils.ignoreTagUntilRemoved
 import tool.xfy9326.milink.nfc.utils.isNullOrEmpty
@@ -30,7 +29,7 @@ import tool.xfy9326.milink.nfc.utils.tryConnect
 
 class XiaomiNfcReaderActivity : ComponentActivity() {
     private val viewModel by viewModels<XiaomiNfcReaderViewModel>()
-    private val exportNdefBin = registerForActivityResult(ActivityResultContracts.CreateDocument(MIME_BINARY)) {
+    private val exportNdefBin = registerForActivityResult(ActivityResultContracts.CreateDocument(MIME_ALL)) {
         if (it == null) {
             showToast(getString(R.string.export_canceled))
         } else {

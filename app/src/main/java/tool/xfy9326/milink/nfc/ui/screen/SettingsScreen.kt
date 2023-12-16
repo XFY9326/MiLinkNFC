@@ -84,7 +84,7 @@ fun SettingsScreen(
                     .padding(vertical = 6.dp),
                 innerPadding = innerPadding.updateBy(vertical = 10.dp, horizontal = 22.dp),
                 group = SettingsGroup(
-                    title = stringResource(id = R.string.settings_ndef_writing),
+                    title = stringResource(id = R.string.settings_ndef),
                     items = getSettingsItems(viewModel, uiState.value.appSettings)
                 )
             )
@@ -100,6 +100,14 @@ private fun getSettingsItems(viewModel: SettingsViewModel, appSettings: AppSetti
         checked = appSettings.shrinkNdefMsg,
         onValueChanged = {
             viewModel.updateAppSettings(appSettings.copy(shrinkNdefMsg = it))
+        }
+    ),
+    SettingsItem.Switch(
+        title = stringResource(id = R.string.settings_export_nxp_ndef),
+        summary = stringResource(id = R.string.settings_export_nxp_ndef_summary),
+        checked = appSettings.exportNxpNdefFormat,
+        onValueChanged = {
+            viewModel.updateAppSettings(appSettings.copy(exportNxpNdefFormat = it))
         }
     )
 )

@@ -78,17 +78,20 @@ object AppDataStore : ExtendedDataStore("app") {
     }
 
     val shrinkNdefMsg by booleanDefaultKey(defaultValue = false)
+    val exportNxpNdefFormat by booleanDefaultKey(defaultValue = false)
 
     fun getAppSettings() =
         readFlow {
             AppSettings(
                 shrinkNdefMsg = shrinkNdefMsg.getValue(it),
+                exportNxpNdefFormat = exportNxpNdefFormat.getValue(it)
             )
         }
 
     suspend fun setAppSettings(appSettings: AppSettings) {
         edit {
             shrinkNdefMsg.setValue(it, appSettings.shrinkNdefMsg)
+            exportNxpNdefFormat.setValue(it, appSettings.exportNxpNdefFormat)
         }
     }
 
@@ -110,7 +113,8 @@ object AppDataStore : ExtendedDataStore("app") {
         }
         val appSettings by lazy {
             AppSettings(
-                shrinkNdefMsg = shrinkNdefMsg.defaultValue()
+                shrinkNdefMsg = shrinkNdefMsg.defaultValue(),
+                exportNxpNdefFormat = exportNxpNdefFormat.defaultValue()
             )
         }
     }

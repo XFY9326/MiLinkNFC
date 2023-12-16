@@ -6,7 +6,6 @@ const val EMPTY = ""
 const val SPACE = " "
 
 const val MIME_ALL = "*/*"
-const val MIME_BINARY = "application/octet-stream"
 
 inline fun <T : Closeable?, R> T.useCatching(block: T.() -> R): Result<R> = runCatching { use(block) }
 

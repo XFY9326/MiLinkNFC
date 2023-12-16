@@ -28,10 +28,10 @@ import tool.xfy9326.milink.nfc.data.ui.HandoffAppDataUI
 import tool.xfy9326.milink.nfc.data.ui.NfcTagAppDataUI
 import tool.xfy9326.milink.nfc.data.ui.NfcTagInfoUI
 import tool.xfy9326.milink.nfc.data.ui.XiaomiNfcPayloadUI
+import tool.xfy9326.milink.nfc.datastore.AppDataStore
 import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
 import tool.xfy9326.milink.nfc.utils.NdefIO
 import tool.xfy9326.milink.nfc.utils.readBinary
-import tool.xfy9326.milink.nfc.utils.writeBinary
 
 class XiaomiNfcReaderViewModel : ViewModel() {
     enum class InstantMsg(@StringRes val resId: Int, val isToast: Boolean = false) {
@@ -87,7 +87,8 @@ class XiaomiNfcReaderViewModel : ViewModel() {
     fun requestExportNdefBin() {
         viewModelScope.launch {
             prepareNdefReadCache()?.let {
-                _exportNdefBin.emit("NDEF_${it.scanTime}.bin")
+                val fileName = NdefIO.getExportFileName(it.scanTime, AppDataStore.exportNxpNdefFormat.getValue())
+                _exportNdefBin.emit(fileName)
             }
         }
     }
@@ -95,7 +96,7 @@ class XiaomiNfcReaderViewModel : ViewModel() {
     fun exportNdefBin(uri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
             prepareNdefReadCache()?.let {
-                val result = uri.writeBinary(it.content)
+                val result = NdefIO.writeNdefMessage(uri, it.content, AppDataStore.exportNxpNdefFormat.getValue())
                 _instantMsg.emit(if (result) InstantMsg.EXPORT_SUCCESS else InstantMsg.EXPORT_FAILED)
             }
         }

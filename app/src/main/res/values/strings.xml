@@ -149,9 +149,11 @@
     <string name="export_failed">导出失败</string>
     <string name="no_cached_ndef_data">暂无无缓存的NDEF数据</string>
     <string name="ndef_parse_failed">无法解析的NDEF文件</string>
-    <string name="settings_ndef_writing">NDEF写入</string>
+    <string name="settings_ndef">NDEF</string>
     <string name="settings_shrink_ndef_message">缩减NDEF数据</string>
     <string name="settings_shrink_ndef_message_summary">只保留必要的数据以减小数据量</string>
+    <string name="settings_export_nxp_ndef">导出为TagWriter的NDEF格式</string>
+    <string name="settings_export_nxp_ndef_summary">导出文本文件格式而不是二进制格式</string>
     <string name="iot_model_name">IOT设备名称</string>
     <string name="open_iot_spec">搜索设备</string>
     <string name="add_qq_group">使用交流</string>
