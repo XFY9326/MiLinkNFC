@@ -31,7 +31,7 @@ class HuaweiShareNfcActivity : Activity() {
                 val config = huaweiRedirect.toConfig(bluetoothMac)
                 when (huaweiRedirect.actionIntentType) {
                     NfcActionIntentType.FAKE_NFC_TAG -> XiaomiNfc.ScreenMirror.newNdefDiscoveredIntent(nfcTag, nfcId, config).also {
-                        ContextCompat.startActivity(this, intent, null)
+                        ContextCompat.startActivity(this, it, null)
                     }
 
                     NfcActionIntentType.MI_CONNECT_SERVICE -> XiaomiNfc.ScreenMirror.sendBroadcast(this, config)
