@@ -1,6 +1,7 @@
 package tool.xfy9326.milink.nfc.ui.vm
 
 import android.net.Uri
+import android.nfc.NfcAdapter
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
+import tool.xfy9326.milink.nfc.AppContext
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.data.NdefWriteData
 import tool.xfy9326.milink.nfc.datastore.AppDataStore
@@ -32,6 +34,8 @@ class MainViewModel : ViewModel() {
     enum class InstantMsg(@StringRes val resId: Int) {
         IMPORT_FAILED(R.string.import_failed),
         NDEF_PARSE_FAILED(R.string.ndef_parse_failed),
+        NOT_SUPPORT_NFC(R.string.not_support_nfc),
+        NFC_DISABLED(R.string.nfc_disabled)
     }
 
     data class UiState(
@@ -92,23 +96,28 @@ class MainViewModel : ViewModel() {
     }
 
     fun requestClearNdefWriteDialog() {
-        _uiState.update {
-            it.copy(ndefWriteDialogData = NdefWriteData(msg = null, readOnly = false))
-        }
+        requestNdefWriteDialog(NdefWriteData(msg = null, readOnly = false))
     }
 
     fun requestFormatXiaomiTapNdefWriteDialog() {
         viewModelScope.launch(Dispatchers.IO) {
             val ndefMsg = XiaomiNfc.EmptyMiTap.newNdefMessage((System.currentTimeMillis() / 1000).toInt(), AppDataStore.shrinkNdefMsg.getValue())
-            _uiState.update {
-                it.copy(ndefWriteDialogData = NdefWriteData(ndefMsg, false))
-            }
+            requestNdefWriteDialog(NdefWriteData(ndefMsg, false))
         }
     }
 
     fun requestNdefWriteDialog(ndefWriteData: NdefWriteData) {
-        _uiState.update {
-            it.copy(ndefWriteDialogData = ndefWriteData)
+        viewModelScope.launch {
+            val nfcAdapter = NfcAdapter.getDefaultAdapter(AppContext)
+            if (nfcAdapter == null) {
+                _instantMsg.emit(InstantMsg.NOT_SUPPORT_NFC)
+            } else if (!nfcAdapter.isEnabled) {
+                _instantMsg.emit(InstantMsg.NFC_DISABLED)
+            } else {
+                _uiState.update {
+                    it.copy(ndefWriteDialogData = ndefWriteData)
+                }
+            }
         }
     }
 

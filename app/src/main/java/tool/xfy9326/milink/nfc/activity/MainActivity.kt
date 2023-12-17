@@ -5,7 +5,6 @@ import android.nfc.Tag
 import android.nfc.tech.Ndef
 import android.nfc.tech.NdefFormatable
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -18,7 +17,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import tool.xfy9326.milink.nfc.AppContext
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.data.NdefWriteData
 import tool.xfy9326.milink.nfc.ui.screen.HomeScreen
@@ -50,7 +48,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AppTheme {
                 HomeScreen(
-                    onNavToXiaomiNfcReader = { startActivity<XiaomiNfcReaderActivity>() },
+                    onNavToXiaomiNfcReader = { startReaderActivity() },
                     onRequestWriteNdefBin = { readNdefBin.launch(MIME_ALL) },
                     onExit = { finishAndRemoveTask() }
                 )
@@ -70,6 +68,17 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun startReaderActivity() {
+        val nfcAdapter = NfcAdapter.getDefaultAdapter(this)
+        if (nfcAdapter == null) {
+            showToast(getString(R.string.not_support_nfc))
+        } else if (!nfcAdapter.isEnabled) {
+            showToast(getString(R.string.nfc_disabled))
+        } else {
+            startActivity<XiaomiNfcReaderActivity>()
+        }
+    }
+
     private fun setupNfcReaderListener() {
         val nfcAdapter = NfcAdapter.getDefaultAdapter(this)
         if (nfcAdapter != null) {
@@ -85,7 +94,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
         } else {
-            Toast.makeText(AppContext, R.string.not_support_nfc, Toast.LENGTH_LONG).show()
+            showToast(getString(R.string.not_support_nfc))
         }
     }
 
