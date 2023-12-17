@@ -15,6 +15,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.OpenInNew
@@ -57,6 +58,7 @@ import tool.xfy9326.milink.nfc.ui.common.MacAddressTextField
 import tool.xfy9326.milink.nfc.ui.dialog.NfcReadOnlyAlertDialog
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.vm.MiTapSoundBoxViewModel
+import tool.xfy9326.milink.nfc.utils.EMPTY
 
 const val MiTapSoundBoxRoute = "mi_tap_sound_box"
 
@@ -164,6 +166,15 @@ private fun WriteNfcFunctionCard(
                 },
                 placeholder = {
                     Text(text = stringResource(id = R.string.placeholder_iot_model_name), color = Color.Gray)
+                },
+                trailingIcon = if (editNfcTagData.model.isEmpty()) null else {
+                    {
+                        IconButton(onClick = {
+                            editNfcTagData = editNfcTagData.copy(model = EMPTY)
+                        }) {
+                            Icon(imageVector = Icons.Default.Clear, contentDescription = stringResource(id = R.string.clear))
+                        }
+                    }
                 },
                 value = editNfcTagData.model,
                 onValueChange = {
