@@ -1,6 +1,6 @@
 package lib.xfy9326.xiaomi.nfc
 
-sealed class XiaomiNfcProtocol<T : AppsData>(val flag: Byte) {
+sealed class XiaomiNfcProtocol<T : AppsData>(internal val flag: Byte) {
     companion object {
         private const val FLAG_V1 = 0.toByte()
         private const val FLAG_V2 = 1.toByte()

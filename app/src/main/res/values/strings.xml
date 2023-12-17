@@ -170,4 +170,7 @@
     <string name="placeholder_iot_model_name" translatable="false">xiaomi.wifispeaker.</string>
     <string name="mi_iot_spec_url" translatable="false">https://home.miot-spec.com/</string>
     <string name="qq_group_url" translatable="false">https://qm.qq.com/q/QaVLSn9Rao</string>
+    <string name="protocol_v1" translatable="false">V1</string>
+    <string name="protocol_v2" translatable="false">V2</string>
+    <string name="protocol_handoff" translatable="false">HandOff</string>
 </resources>

@@ -245,7 +245,7 @@ private fun XiaomiNfcPayloadCard(modifier: Modifier = Modifier, data: XiaomiNfcP
             title = stringResource(id = R.string.info_xiaomi_payload),
             data = mutableMapOf(
                 stringResource(id = R.string.nfc_field_version) to "${data.majorVersion} ${data.minorVersion}",
-                stringResource(id = R.string.nfc_field_protocol) to data.protocol,
+                stringResource(id = R.string.nfc_field_protocol) to stringResource(id = data.protocol.resId)
             ).also {
                 if (data.idHash != null) it[stringResource(id = R.string.nfc_field_id_hash)] = data.idHash
             }

@@ -81,18 +81,17 @@ class XiaomiNfcReaderActivity : ComponentActivity() {
             adapter.enableNdefReaderMode(this) {
                 val ndef = Ndef.get(it)
                 if (ndef != null) {
-                    lifecycleScope.launch {
+                    lifecycleScope.launch(Dispatchers.IO) {
                         readNdef(adapter, ndef)
                     }
-                    return@enableNdefReaderMode
-                }
-                val ndefFormatable = NdefFormatable.get(it)
-                if (ndefFormatable != null) {
-                    makeToast(getString(R.string.nfc_ndef_formatable))
                 } else {
-                    makeToast(getString(R.string.nfc_not_ndef))
+                    if (NdefFormatable.get(it) != null) {
+                        makeToast(getString(R.string.nfc_ndef_formatable))
+                    } else {
+                        makeToast(getString(R.string.nfc_not_ndef))
+                    }
+                    viewModel.clearNfcReadData()
                 }
-                viewModel.clearNfcReadData()
             }
         }
     }
