@@ -14,8 +14,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.BluetoothSearching
 import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.Devices
 import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Checkbox
@@ -156,7 +156,7 @@ private fun TestCirculateFunctionCard(
 
     FunctionCard(
         modifier = modifier.fillMaxWidth(),
-        icon = Icons.Default.BluetoothSearching,
+        icon = Icons.Default.Devices,
         title = stringResource(id = R.string.test_circulate),
         description = stringResource(id = R.string.test_circulate_desc)
     ) {
@@ -184,7 +184,7 @@ private fun TestCirculateFunctionCard(
                     }
                 )
             }
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(14.dp))
             MacAddressTextField(
                 modifier = Modifier.fillMaxWidth(),
                 title = stringResource(id = R.string.enter_wifi_mac_address),
@@ -244,7 +244,7 @@ private fun WriteNfcFunctionCard(
                     editNfcTagData = editNfcTagData.copy(deviceType = Circulate.DeviceType.valueOf(it))
                 }
             )
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(14.dp))
             MacAddressTextField(
                 modifier = Modifier.fillMaxWidth(),
                 title = stringResource(id = R.string.enter_wifi_mac_address),

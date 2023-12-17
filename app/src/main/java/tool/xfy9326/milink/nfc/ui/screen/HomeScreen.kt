@@ -10,12 +10,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BluetoothAudio
 import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material.icons.filled.DataObject
 import androidx.compose.material.icons.filled.Devices
 import androidx.compose.material.icons.filled.GroupAdd
 import androidx.compose.material.icons.filled.Nfc
-import androidx.compose.material.icons.filled.TapAndPlay
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.FileCopy
@@ -224,7 +224,7 @@ private fun Content(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             EntryCard(
-                icon = Icons.Default.TapAndPlay,
+                icon = Icons.Default.BluetoothAudio,
                 title = stringResource(id = R.string.mi_tap_sound_box_nfc),
                 summary = stringResource(id = R.string.mi_tap_sound_box_nfc_summary),
                 onClick = onNavToMiTapSoundBox

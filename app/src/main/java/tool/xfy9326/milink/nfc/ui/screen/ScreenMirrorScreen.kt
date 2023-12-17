@@ -14,7 +14,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AppShortcut
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.BluetoothSearching
 import androidx.compose.material.icons.filled.Cast
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.HelpOutline
@@ -22,6 +21,7 @@ import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Transform
+import androidx.compose.material.icons.outlined.ScreenShare
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -191,7 +191,7 @@ private fun TestScreenMirrorFunctionCard(
 
     FunctionCard(
         modifier = modifier.fillMaxWidth(),
-        icon = Icons.Default.BluetoothSearching,
+        icon = Icons.Outlined.ScreenShare,
         title = stringResource(id = R.string.test_screen_mirror),
         description = stringResource(id = R.string.test_screen_mirror_desc)
     ) {
