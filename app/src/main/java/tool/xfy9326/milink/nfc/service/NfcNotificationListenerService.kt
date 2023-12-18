@@ -68,7 +68,7 @@ class NfcNotificationListenerService : NotificationListenerService() {
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         if (sbn.packageName == PACKAGE_NAME_NFC && sbn.notification.channelId == NFC_NOTIFICATION_CHANNEL_ID) {
             val text = sbn.notification.extras.getString(Notification.EXTRA_TEXT) ?: return
-            if (HuaweiHandoffNfc.NFC_URI_CONTENT in text && sbn.notification.actions.isNotEmpty()) {
+            if (HuaweiHandoffNfc.hasNfcUriContent(text) && sbn.notification.actions.isNotEmpty()) {
                 val cancelStr = getString(android.R.string.cancel)
                 sbn.notification.actions.first { it.title != cancelStr }?.actionIntent?.send()
             }

@@ -63,6 +63,8 @@
                 <data android:scheme="https" />
                 <data android:host="consumer.huawei.com" />
                 <data android:pathPrefix="/en/support/huaweisharewelcome/" />
+                <data android:host="www.honor.cn" />
+                <data android:pathPrefix="/support/magic_link/" />
             </intent-filter>
         </activity>
 
