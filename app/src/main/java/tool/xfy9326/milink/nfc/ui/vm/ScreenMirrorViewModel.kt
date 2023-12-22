@@ -12,15 +12,17 @@ import androidx.core.content.getSystemService
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import kotlinx.parcelize.Parcelize
 import tool.xfy9326.milink.nfc.AppContext
 import tool.xfy9326.milink.nfc.R
@@ -81,10 +83,8 @@ class ScreenMirrorViewModel : ViewModel() {
     val instantMsg: SharedFlow<InstantMsg> = _instantMsg.asSharedFlow()
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
-            checkLyraSupport()
-            initDataStoreListeners()
-        }
+        checkLyraSupport()
+        initDataStoreListeners()
     }
 
     private suspend fun validateMacAddress(bluetoothMac: String): Boolean {
@@ -99,33 +99,34 @@ class ScreenMirrorViewModel : ViewModel() {
     }
 
     private fun checkLyraSupport() {
-        if (!MiContinuityUtils.isLocalDeviceSupportLyra(AppContext)) {
-            _uiState.update {
-                it.copy(
-                    nfcTag = it.nfcTag.copy(enableLyra = false),
-                    testScreenMirror = it.testScreenMirror.copy(enableLyra = false)
-                )
+        viewModelScope.launch {
+            if (!MiContinuityUtils.isLocalDeviceSupportLyra(AppContext)) {
+                _uiState.update {
+                    it.copy(
+                        nfcTag = it.nfcTag.copy(enableLyra = false),
+                        testScreenMirror = it.testScreenMirror.copy(enableLyra = false)
+                    )
+                }
             }
         }
     }
 
-    private suspend fun initDataStoreListeners() = coroutineScope {
-        launch {
-            AppDataStore.getTilesScreenMirror().collect { data ->
-                _uiState.update { it.copy(tilesScreenMirror = data) }
-            }
-        }
-        launch {
-            AppDataStore.getHuaweiRedirect().collect { data ->
-                _uiState.update { it.copy(huaweiRedirect = data) }
-            }
-        }
+    private fun initDataStoreListeners() {
+        AppDataStore.getTilesScreenMirror().onEach { data ->
+            _uiState.update { it.copy(tilesScreenMirror = data) }
+        }.launchIn(viewModelScope + Dispatchers.IO)
+        AppDataStore.getHuaweiRedirect().onEach { data ->
+            _uiState.update { it.copy(huaweiRedirect = data) }
+        }.launchIn(viewModelScope + Dispatchers.IO)
     }
 
     fun requestWriteNfc(nfcTagData: NFCTag, ndefWriteHandler: (NdefWriteData) -> Unit) {
         viewModelScope.launch {
             if (validateMacAddress(nfcTagData.bluetoothMac)) {
-                val ndefMsg = XiaomiNfc.ScreenMirror.newNdefMessage(nfcTagData.toConfig(), AppDataStore.shrinkNdefMsg.getValue())
+                val ndefMsg = XiaomiNfc.ScreenMirror.newNdefMessage(
+                    nfcTagData.toConfig(),
+                    AppDataStore.shrinkNdefMsg.getValue()
+                )
                 val data = NdefWriteData(ndefMsg, nfcTagData.readOnly)
                 ndefWriteHandler(data)
             }
@@ -155,11 +156,18 @@ class ScreenMirrorViewModel : ViewModel() {
             if (validateMacAddress(screenMirror.bluetoothMac)) {
                 val config = screenMirror.toConfig()
                 when (screenMirror.actionIntentType) {
-                    NfcActionIntentType.FAKE_NFC_TAG -> XiaomiNfc.ScreenMirror.newNdefDiscoveredIntent(null, null, config).also {
+                    NfcActionIntentType.FAKE_NFC_TAG -> XiaomiNfc.ScreenMirror.newNdefDiscoveredIntent(
+                        null,
+                        null,
+                        config
+                    ).also {
                         ContextCompat.startActivity(context, it, null)
                     }
 
-                    NfcActionIntentType.MI_CONNECT_SERVICE -> XiaomiNfc.ScreenMirror.sendBroadcast(context, config)
+                    NfcActionIntentType.MI_CONNECT_SERVICE -> XiaomiNfc.ScreenMirror.sendBroadcast(
+                        context,
+                        config
+                    )
                 }
             }
         }

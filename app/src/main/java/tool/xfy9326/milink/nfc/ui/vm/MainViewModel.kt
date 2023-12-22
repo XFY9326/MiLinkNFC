@@ -55,15 +55,15 @@ class MainViewModel : ViewModel() {
     val instantMsg: SharedFlow<InstantMsg> = _instantMsg.asSharedFlow()
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
-            checkNotSupportedOS()
-        }
+        checkNotSupportedOS()
     }
 
-    private suspend fun checkNotSupportedOS() {
-        if (!isXiaomiHyperOS() && !AppDataStore.readValue(AppDataStore.confirmedNotSupportedOSAlert)) {
-            _uiState.update {
-                it.copy(showNotSupportedOSDialog = true)
+    private fun checkNotSupportedOS() {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (!isXiaomiHyperOS() && !AppDataStore.readValue(AppDataStore.confirmedNotSupportedOSAlert)) {
+                _uiState.update {
+                    it.copy(showNotSupportedOSDialog = true)
+                }
             }
         }
     }
@@ -101,7 +101,10 @@ class MainViewModel : ViewModel() {
 
     fun requestFormatXiaomiTapNdefWriteDialog() {
         viewModelScope.launch(Dispatchers.IO) {
-            val ndefMsg = XiaomiNfc.EmptyMiTap.newNdefMessage((System.currentTimeMillis() / 1000).toInt(), AppDataStore.shrinkNdefMsg.getValue())
+            val ndefMsg = XiaomiNfc.EmptyMiTap.newNdefMessage(
+                (System.currentTimeMillis() / 1000).toInt(),
+                AppDataStore.shrinkNdefMsg.getValue()
+            )
             requestNdefWriteDialog(NdefWriteData(ndefMsg, false))
         }
     }
