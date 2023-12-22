@@ -69,9 +69,16 @@ class MiTapSoundBoxViewModel : ViewModel() {
 
     fun requestWriteNfc(nfcTagData: NFCTag, ndefWriteHandler: (NdefWriteData) -> Unit) {
         viewModelScope.launch {
-            if (validateMacAddress(nfcTagData.wifiMac, true) && validateMacAddress(nfcTagData.bluetoothMac, false)) {
+            if (validateMacAddress(
+                    nfcTagData.wifiMac,
+                    true
+                ) && validateMacAddress(nfcTagData.bluetoothMac, false)
+            ) {
                 val writeTime = (System.currentTimeMillis() / 1000).toInt()
-                val ndefMsg = XiaomiNfc.MiTapSoundBox.newNdefMessage(nfcTagData.toConfig(writeTime), AppDataStore.shrinkNdefMsg.getValue())
+                val ndefMsg = XiaomiNfc.MiTapSoundBox.newNdefMessage(
+                    nfcTagData.toConfig(writeTime),
+                    AppDataStore.shrinkNdefMsg.getValue()
+                )
                 val data = NdefWriteData(ndefMsg, nfcTagData.readOnly)
                 ndefWriteHandler(data)
             }

@@ -27,13 +27,22 @@ suspend fun ExtendedDataStore.hasKey(key: ReadWriteKey<*>): Boolean =
     hasKeyFlow(key).first()
 
 
-fun <T : Any> ExtendedDataStore.stateKey(key: ReadWriteKey<T>, coroutineScope: CoroutineScope): StateFlow<T?> =
+fun <T : Any> ExtendedDataStore.stateKey(
+    key: ReadWriteKey<T>,
+    coroutineScope: CoroutineScope
+): StateFlow<T?> =
     readValueFlow(key).stateIn(coroutineScope, SharingStarted.WhileSubscribed(), null)
 
-fun <D : ExtendedDataStore, T : Any> ExtendedDataStore.stateDefaultKey(key: ReadWriteDefaultKey<D, T>, coroutineScope: CoroutineScope): StateFlow<T> =
+fun <D : ExtendedDataStore, T : Any> ExtendedDataStore.stateDefaultKey(
+    key: ReadWriteDefaultKey<D, T>,
+    coroutineScope: CoroutineScope
+): StateFlow<T> =
     readValueFlow(key).stateIn(coroutineScope, SharingStarted.WhileSubscribed(), key.defaultValue())
 
-fun ExtendedDataStore.stateHasKey(key: ReadWriteKey<*>, coroutineScope: CoroutineScope): StateFlow<Boolean> =
+fun ExtendedDataStore.stateHasKey(
+    key: ReadWriteKey<*>,
+    coroutineScope: CoroutineScope
+): StateFlow<Boolean> =
     hasKeyFlow(key).stateIn(coroutineScope, SharingStarted.WhileSubscribed(), false)
 
 
@@ -82,7 +91,8 @@ abstract class ReadWriteDefaultKey<D : ExtendedDataStore, T>(
 
     override fun hasValue(preferences: Preferences): Boolean = preferencesKey in preferences
 
-    override suspend fun getValue(preferences: Preferences): T = preferences[preferencesKey] ?: defaultValue()
+    override suspend fun getValue(preferences: Preferences): T =
+        preferences[preferencesKey] ?: defaultValue()
 
     override fun setValue(mutablePreferences: MutablePreferences, value: T) {
         mutablePreferences[preferencesKey] = value
@@ -101,7 +111,8 @@ abstract class ReadWriteSuspendDefaultKey<D : ExtendedDataStore, T>(
 
     override fun hasValue(preferences: Preferences): Boolean = preferencesKey in preferences
 
-    override suspend fun getValue(preferences: Preferences): T = preferences[preferencesKey] ?: defaultValue()
+    override suspend fun getValue(preferences: Preferences): T =
+        preferences[preferencesKey] ?: defaultValue()
 
     override fun setValue(mutablePreferences: MutablePreferences, value: T) {
         mutablePreferences[preferencesKey] = value
@@ -118,9 +129,11 @@ abstract class ReadWriteDefaultEnumKey<D : ExtendedDataStore, T : Enum<T>>(
 ) : ReadWriteDefaultKey<D, String>(dataStore, preferencesKey) {
     final override fun defaultValue(): String = defaultEnumValue().name
 
-    final override suspend fun getValue(preferences: Preferences): String = super.getValue(preferences)
+    final override suspend fun getValue(preferences: Preferences): String =
+        super.getValue(preferences)
 
-    final override fun setValue(mutablePreferences: MutablePreferences, value: String) = super.setValue(mutablePreferences, value)
+    final override fun setValue(mutablePreferences: MutablePreferences, value: String) =
+        super.setValue(mutablePreferences, value)
 
     abstract fun defaultEnumValue(): T
 
@@ -139,9 +152,11 @@ abstract class ReadWriteSuspendDefaultEnumKey<D : ExtendedDataStore, T : Enum<T>
 ) : ReadWriteSuspendDefaultKey<D, String>(dataStore, preferencesKey) {
     final override suspend fun defaultValue(): String = defaultEnumValue().name
 
-    final override suspend fun getValue(preferences: Preferences): String = super.getValue(preferences)
+    final override suspend fun getValue(preferences: Preferences): String =
+        super.getValue(preferences)
 
-    final override fun setValue(mutablePreferences: MutablePreferences, value: String) = super.setValue(mutablePreferences, value)
+    final override fun setValue(mutablePreferences: MutablePreferences, value: String) =
+        super.setValue(mutablePreferences, value)
 
     abstract suspend fun defaultEnumValue(): T
 
@@ -162,9 +177,11 @@ abstract class ReadWriteDefaultEnumSetKey<D : ExtendedDataStore, T : Enum<T>>(
         buildSet(it.size) { for (enum in it) add(enum.name) }
     }
 
-    final override suspend fun getValue(preferences: Preferences): Set<String> = super.getValue(preferences)
+    final override suspend fun getValue(preferences: Preferences): Set<String> =
+        super.getValue(preferences)
 
-    final override fun setValue(mutablePreferences: MutablePreferences, value: Set<String>) = super.setValue(mutablePreferences, value)
+    final override fun setValue(mutablePreferences: MutablePreferences, value: Set<String>) =
+        super.setValue(mutablePreferences, value)
 
     abstract fun defaultEnumSetValue(): Set<T>
 
@@ -186,9 +203,11 @@ abstract class ReadWriteSuspendDefaultEnumSetKey<D : ExtendedDataStore, T : Enum
         buildSet(it.size) { for (enum in it) add(enum.name) }
     }
 
-    final override suspend fun getValue(preferences: Preferences): Set<String> = super.getValue(preferences)
+    final override suspend fun getValue(preferences: Preferences): Set<String> =
+        super.getValue(preferences)
 
-    final override fun setValue(mutablePreferences: MutablePreferences, value: Set<String>) = super.setValue(mutablePreferences, value)
+    final override fun setValue(mutablePreferences: MutablePreferences, value: Set<String>) =
+        super.setValue(mutablePreferences, value)
 
     abstract suspend fun defaultEnumSetValue(): Set<T>
 

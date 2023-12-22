@@ -79,7 +79,10 @@ fun MacAddressTextField(
                     isError = false
                     onValueChange(EMPTY)
                 }) {
-                    Icon(imageVector = Icons.Default.Clear, contentDescription = stringResource(id = R.string.clear))
+                    Icon(
+                        imageVector = Icons.Default.Clear,
+                        contentDescription = stringResource(id = R.string.clear)
+                    )
                 }
             }
         },
@@ -137,10 +140,14 @@ private fun TextRange.applyOffset(offset: Int): TextRange =
         this
     }
 
-private fun TextFieldValue.formatMacAddress(lastValue: TextFieldValue, upperCase: Boolean): TextFieldValue {
+private fun TextFieldValue.formatMacAddress(
+    lastValue: TextFieldValue,
+    upperCase: Boolean
+): TextFieldValue {
     val isAdd = text.length > lastValue.text.length
     var newText = text.formatMacAddress(upperCase)
-    var newSelection = selection.applyOffset(newText.length - text.length).coerceIn(0, newText.length)
+    var newSelection =
+        selection.applyOffset(newText.length - text.length).coerceIn(0, newText.length)
     if (isAdd) {
         val pos = newSelection.start
         if (pos == newSelection.end && pos in 2..<MAC_ADDRESS_LENGTH) {

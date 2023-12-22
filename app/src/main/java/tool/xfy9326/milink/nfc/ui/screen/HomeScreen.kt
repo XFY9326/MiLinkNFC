@@ -167,7 +167,10 @@ fun HomeScreen(
             showCancel = true,
             addMessagePrefixSpaces = true,
             cancelText = stringResource(id = R.string.exit),
-            properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+            properties = DialogProperties(
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false
+            ),
             onDismissRequest = onExit
         )
     }
@@ -295,13 +298,22 @@ private fun TopBar(
             IconButton(onClick = {
                 uriHandler.openUri(context.getString(R.string.app_releases_url))
             }) {
-                Icon(imageVector = Icons.Default.Update, contentDescription = stringResource(id = R.string.check_update))
+                Icon(
+                    imageVector = Icons.Default.Update,
+                    contentDescription = stringResource(id = R.string.check_update)
+                )
             }
             IconButton(onClick = onNavToSettings) {
-                Icon(imageVector = Icons.Outlined.Settings, contentDescription = stringResource(id = R.string.settings))
+                Icon(
+                    imageVector = Icons.Outlined.Settings,
+                    contentDescription = stringResource(id = R.string.settings)
+                )
             }
             IconButton(onClick = { openAboutDialog = true }) {
-                Icon(imageVector = Icons.Outlined.Info, contentDescription = stringResource(id = R.string.about))
+                Icon(
+                    imageVector = Icons.Outlined.Info,
+                    contentDescription = stringResource(id = R.string.about)
+                )
             }
         },
         scrollBehavior = scrollBehavior

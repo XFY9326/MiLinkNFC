@@ -105,12 +105,18 @@ fun ScreenMirrorScreen(
                 title = { Text(text = stringResource(id = R.string.xiaomi_screen_mirror_nfc)) },
                 navigationIcon = {
                     IconButton(onClick = onNavBack) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = stringResource(id = R.string.nav_back))
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = stringResource(id = R.string.nav_back)
+                        )
                     }
                 },
                 actions = {
                     IconButton(onClick = { viewModel.openMiLinkVersionDialog(context) }) {
-                        Icon(imageVector = Icons.Default.HelpOutline, contentDescription = stringResource(id = R.string.local_app_versions))
+                        Icon(
+                            imageVector = Icons.Default.HelpOutline,
+                            contentDescription = stringResource(id = R.string.local_app_versions)
+                        )
                     }
                 },
                 scrollBehavior = scrollBehavior
@@ -244,9 +250,14 @@ private fun WriteNfcFunctionCard(
                     .padding(bottom = 10.dp),
                 label = stringResource(id = R.string.handoff_device_type),
                 selectKey = editNfcTagData.deviceType.name,
-                keyTextMap = ScreenMirror.DeviceType.entries.associate { it.name to stringResource(id = it.resId) },
+                keyTextMap = ScreenMirror.DeviceType.entries.associate {
+                    it.name to stringResource(
+                        id = it.resId
+                    )
+                },
                 onKeySelected = {
-                    editNfcTagData = editNfcTagData.copy(deviceType = ScreenMirror.DeviceType.valueOf(it))
+                    editNfcTagData =
+                        editNfcTagData.copy(deviceType = ScreenMirror.DeviceType.valueOf(it))
                 }
             )
             MacAddressTextField(
@@ -394,7 +405,10 @@ private fun HuaweiRedirectFunctionCard(
                 icon = Icons.Default.OpenInNew,
                 onClick = { context.openAppSettings() }
             )
-            Divider(modifier = Modifier.padding(top = 8.dp, bottom = 2.dp), color = colorScheme.onSurfaceVariant)
+            Divider(
+                modifier = Modifier.padding(top = 8.dp, bottom = 2.dp),
+                color = colorScheme.onSurfaceVariant
+            )
             MiConnectActionSettings(
                 modifier = Modifier
                     .fillMaxWidth()

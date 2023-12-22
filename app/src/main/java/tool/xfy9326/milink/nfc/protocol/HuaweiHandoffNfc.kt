@@ -15,7 +15,11 @@ object HuaweiHandoffNfc {
     private const val NFC_HONOR_URI_CONTENT = "www.honor.cn/support/magic_link/"
 
     fun parseBluetoothMac(intent: Intent): String? =
-        IntentCompat.getParcelableArrayExtra(intent, NfcAdapter.EXTRA_NDEF_MESSAGES, NdefMessage::class.java)
+        IntentCompat.getParcelableArrayExtra(
+            intent,
+            NfcAdapter.EXTRA_NDEF_MESSAGES,
+            NdefMessage::class.java
+        )
             ?.asSequence()?.filterIsInstance<NdefMessage>()?.flatMap {
                 it.records.asSequence()
             }?.filterNotNull()?.firstOrNull {

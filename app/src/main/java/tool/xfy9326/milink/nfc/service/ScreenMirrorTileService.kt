@@ -14,7 +14,10 @@ import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
 
 class ScreenMirrorTileService : TileService() {
     override fun onClick() {
-        val screenMirror = runBlocking { AppDataStore.getTilesScreenMirror().firstOrNull() ?: AppDataStore.Defaults.tilesScreenMirror }
+        val screenMirror = runBlocking {
+            AppDataStore.getTilesScreenMirror().firstOrNull()
+                ?: AppDataStore.Defaults.tilesScreenMirror
+        }
         when (screenMirror.actionIntentType) {
             NfcActionIntentType.FAKE_NFC_TAG ->
                 XiaomiNfc.ScreenMirror.newNdefDiscoveredIntent(null, null, screenMirror.toConfig())
@@ -23,7 +26,13 @@ class ScreenMirrorTileService : TileService() {
                 ScreenMirrorActionActivity.newIntent(this@ScreenMirrorTileService, screenMirror)
         }.let {
             it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            PendingIntentActivityWrapper(this@ScreenMirrorTileService, 1, it, PendingIntent.FLAG_ONE_SHOT, false)
+            PendingIntentActivityWrapper(
+                this@ScreenMirrorTileService,
+                1,
+                it,
+                PendingIntent.FLAG_ONE_SHOT,
+                false
+            )
         }.let {
             TileServiceCompat.startActivityAndCollapse(this@ScreenMirrorTileService, it)
         }

@@ -36,12 +36,16 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
-            manifestPlaceholders["ApplicationId"] = defaultConfig.applicationId + applicationIdSuffix
+            manifestPlaceholders["ApplicationId"] =
+                defaultConfig.applicationId + applicationIdSuffix
         }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
 
             packaging {
                 resources.excludes += "DebugProbesKt.bin"

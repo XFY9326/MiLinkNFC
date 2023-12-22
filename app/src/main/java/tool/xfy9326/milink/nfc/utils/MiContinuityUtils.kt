@@ -10,7 +10,8 @@ object MiContinuityUtils {
     private const val PKG_FILE_EXPLORER = "com.android.fileexplorer"
     private const val PKG_GALLERY = "com.miui.gallery"
 
-    private const val PKG_META_DATA_XIAOMI_CONTINUITY_VERSION_NAME = "com.xiaomi.continuity.VERSION_NAME"
+    private const val PKG_META_DATA_XIAOMI_CONTINUITY_VERSION_NAME =
+        "com.xiaomi.continuity.VERSION_NAME"
 
     private val ONE_TAP_RELATED_PACKAGE_NAMES = arrayOf(
         PKG_MI_CONNECT_SERVICE,
@@ -24,6 +25,7 @@ object MiContinuityUtils {
         ONE_TAP_RELATED_PACKAGE_NAMES.associateWith { context.getPackageData(it) }
 
     fun isLocalDeviceSupportLyra(context: Context): Boolean {
-        return context.getPackageMetaData(PKG_MI_CONNECT_SERVICE)?.getString(PKG_META_DATA_XIAOMI_CONTINUITY_VERSION_NAME) != null
+        return context.getPackageMetaData(PKG_MI_CONNECT_SERVICE)
+            ?.getString(PKG_META_DATA_XIAOMI_CONTINUITY_VERSION_NAME) != null
     }
 }

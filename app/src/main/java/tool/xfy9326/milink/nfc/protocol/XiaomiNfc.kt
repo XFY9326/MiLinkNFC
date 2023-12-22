@@ -24,7 +24,8 @@ import tool.xfy9326.milink.nfc.utils.toHexString
 object XiaomiNfc {
     private const val FLAG_BIND_TREAT_LIKE_VISIBLE_FOREGROUND_SERVICE = 268435456
 
-    private const val PERMISSION_RECEIVE_ENDPOINT = "com.xiaomi.mi_connect_service.permission.RECEIVE_ENDPOINT"
+    private const val PERMISSION_RECEIVE_ENDPOINT =
+        "com.xiaomi.mi_connect_service.permission.RECEIVE_ENDPOINT"
     private const val URI_MI_HOME = "https://g.home.mi.com"
 
     private const val PKG_MI_CONNECT_SERVICE = "com.xiaomi.mi_connect_service"
@@ -39,7 +40,10 @@ object XiaomiNfc {
             }.getOrNull()
         }.firstOrNull()
 
-    fun getXiaomiNfcPayloadBytes(ndefMessage: NdefMessage, type: XiaomiNdefPayloadType): ByteArray? =
+    fun getXiaomiNfcPayloadBytes(
+        ndefMessage: NdefMessage,
+        type: XiaomiNdefPayloadType
+    ): ByteArray? =
         ndefMessage.records.asSequence().filterNotNull().filter {
             it.tnf == NdefRecord.TNF_EXTERNAL_TYPE && it.type.toString(Charsets.US_ASCII) == type.value
         }.firstOrNull()?.payload
@@ -65,7 +69,12 @@ object XiaomiNfc {
             NdefMessage(newNdefRecord(config))
 
         protected fun newNdefRecord(config: T): NdefRecord =
-            NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE, ndefRecordType.bytes.takeIf { it.isNotEmpty() }, null, encode(config).encode())
+            NdefRecord(
+                NdefRecord.TNF_EXTERNAL_TYPE,
+                ndefRecordType.bytes.takeIf { it.isNotEmpty() },
+                null,
+                encode(config).encode()
+            )
 
         fun newNdefDiscoveredIntent(tag: Tag?, id: ByteArray?, config: T): Intent {
             return Intent(NfcAdapter.ACTION_NDEF_DISCOVERED).apply {
@@ -174,7 +183,8 @@ object XiaomiNfc {
                                 this[NfcTagDeviceRecord.DeviceAttribute.WIFI_MAC_ADDRESS] = it
                             }
                             config.model?.let {
-                                this[NfcTagDeviceRecord.DeviceAttribute.MODEL] = it.toByteArray(Charsets.UTF_8)
+                                this[NfcTagDeviceRecord.DeviceAttribute.MODEL] =
+                                    it.toByteArray(Charsets.UTF_8)
                             }
                         }
                     ),
@@ -247,9 +257,19 @@ object XiaomiNfc {
                 addFlags(FLAG_BIND_TREAT_LIKE_VISIBLE_FOREGROUND_SERVICE)
                 putExtra(EXTRA_ACTION, NfcTagActionRecord.Action.CUSTOM.value.toInt())
                 appData.getFirstDeviceAttributesMap(ndefRecordType).let { map ->
-                    val idHash = map[NfcTagDeviceRecord.DeviceAttribute.ID_HASH]?.let { Base64.encodeToString(it, Base64.DEFAULT) } ?: EMPTY
-                    val wifiMac = map[NfcTagDeviceRecord.DeviceAttribute.WIFI_MAC_ADDRESS]?.toHexString(true) ?: EMPTY
-                    val bluetoothMac = map[NfcTagDeviceRecord.DeviceAttribute.BLUETOOTH_MAC_ADDRESS]?.toHexString(true) ?: EMPTY
+                    val idHash = map[NfcTagDeviceRecord.DeviceAttribute.ID_HASH]?.let {
+                        Base64.encodeToString(
+                            it,
+                            Base64.DEFAULT
+                        )
+                    } ?: EMPTY
+                    val wifiMac =
+                        map[NfcTagDeviceRecord.DeviceAttribute.WIFI_MAC_ADDRESS]?.toHexString(true)
+                            ?: EMPTY
+                    val bluetoothMac =
+                        map[NfcTagDeviceRecord.DeviceAttribute.BLUETOOTH_MAC_ADDRESS]?.toHexString(
+                            true
+                        ) ?: EMPTY
                     putExtra(EXTRA_ID_HASH, idHash)
                     putExtra(EXTRA_WIFI_MAC, wifiMac)
                     putExtra(EXTRA_BLUETOOTH_MAC, bluetoothMac)
@@ -332,7 +352,8 @@ object XiaomiNfc {
                 HandoffAppData.PayloadKey.ACTION_SUFFIX to ACTION_SUFFIX_MIRROR.toByteArray(Charsets.UTF_8),
                 HandoffAppData.PayloadKey.BLUETOOTH_MAC to config.bluetoothMac.toByteArray(Charsets.UTF_8)
             ).also {
-                if (config.enableLyra) it[HandoffAppData.PayloadKey.EXT_ABILITY] = byteArrayOf(FLAG_ABILITY_LYRA)
+                if (config.enableLyra) it[HandoffAppData.PayloadKey.EXT_ABILITY] =
+                    byteArrayOf(FLAG_ABILITY_LYRA)
             }
     }
 }

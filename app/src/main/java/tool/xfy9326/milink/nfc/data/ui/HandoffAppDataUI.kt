@@ -21,7 +21,8 @@ class HandoffAppDataUI(
         majorVersion = handoffAppData.majorVersion.toHexString(true),
         minorVersion = handoffAppData.minorVersion.toHexString(true),
         deviceType = handoffAppData.enumDeviceType.name,
-        attributesMap = handoffAppData.attributesMap.map { it.key.toHexString(true) to it.value.toHexText() }.toMap(),
+        attributesMap = handoffAppData.attributesMap.map { it.key.toHexString(true) to it.value.toHexText() }
+            .toMap(),
         action = handoffAppData.action,
         payloadsMap = handoffAppData.enumPayloadsMap.map {
             it.key.name to if (it.key.isText == true) {
@@ -47,6 +48,7 @@ class NfcTagAppDataUI(
         writeTime = SimpleDateFormat.getDateTimeInstance().format(nfcTagAppData.writeTime * 1000L),
         flags = nfcTagAppData.flags.toHexString(true),
         actionRecord = nfcTagAppData.firstOrNullActionRecord()?.let { NfcTagActionRecordUI(it) },
-        deviceRecord = nfcTagAppData.firstOrNullDeviceRecord()?.let { NfcTagDeviceRecordUI(it, nfcTagAppData.firstAction(), ndefPayloadType) }
+        deviceRecord = nfcTagAppData.firstOrNullDeviceRecord()
+            ?.let { NfcTagDeviceRecordUI(it, nfcTagAppData.firstAction(), ndefPayloadType) }
     )
 }

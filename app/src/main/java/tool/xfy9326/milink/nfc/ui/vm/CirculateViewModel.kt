@@ -77,7 +77,10 @@ class CirculateViewModel : ViewModel() {
         viewModelScope.launch {
             if (validateMacAddress(nfcTagData.wifiMac) && validateMacAddress(nfcTagData.bluetoothMac)) {
                 val writeTime = (System.currentTimeMillis() / 1000).toInt()
-                val ndefMsg = XiaomiNfc.Circulate.newNdefMessage(nfcTagData.toConfig(writeTime), AppDataStore.shrinkNdefMsg.getValue())
+                val ndefMsg = XiaomiNfc.Circulate.newNdefMessage(
+                    nfcTagData.toConfig(writeTime),
+                    AppDataStore.shrinkNdefMsg.getValue()
+                )
                 val data = NdefWriteData(ndefMsg, nfcTagData.readOnly)
                 ndefWriteHandler(data)
             }
@@ -89,11 +92,18 @@ class CirculateViewModel : ViewModel() {
             if (validateMacAddress(circulate.wifiMac) && validateMacAddress(circulate.bluetoothMac)) {
                 val config = circulate.toConfig((System.currentTimeMillis() / 1000).toInt())
                 when (circulate.actionIntentType) {
-                    NfcActionIntentType.FAKE_NFC_TAG -> XiaomiNfc.Circulate.newNdefDiscoveredIntent(null, null, config).also {
+                    NfcActionIntentType.FAKE_NFC_TAG -> XiaomiNfc.Circulate.newNdefDiscoveredIntent(
+                        null,
+                        null,
+                        config
+                    ).also {
                         ContextCompat.startActivity(context, it, null)
                     }
 
-                    NfcActionIntentType.MI_CONNECT_SERVICE -> XiaomiNfc.Circulate.sendBroadcast(context, config)
+                    NfcActionIntentType.MI_CONNECT_SERVICE -> XiaomiNfc.Circulate.sendBroadcast(
+                        context,
+                        config
+                    )
                 }
             }
         }

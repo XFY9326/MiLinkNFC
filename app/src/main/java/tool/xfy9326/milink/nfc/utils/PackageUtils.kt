@@ -28,7 +28,10 @@ fun Context.getPackageData(packageName: String): PackageData? =
 fun Context.getPackageMetaData(packageName: String): Bundle? =
     runCatching {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            packageManager.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(PackageManager.GET_META_DATA.toLong()))
+            packageManager.getPackageInfo(
+                packageName,
+                PackageManager.PackageInfoFlags.of(PackageManager.GET_META_DATA.toLong())
+            )
         } else {
             packageManager.getPackageInfo(packageName, PackageManager.GET_META_DATA)
         }

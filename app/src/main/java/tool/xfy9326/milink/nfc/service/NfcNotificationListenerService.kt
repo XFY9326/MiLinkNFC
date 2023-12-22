@@ -24,7 +24,8 @@ class NfcNotificationListenerService : NotificationListenerService() {
         fun toggleServiceIfStarted(context: Context) {
             if (context.isUsingNotificationService()) {
                 val packageManager = context.packageManager
-                val componentName = ComponentName(context, NfcNotificationListenerService::class.java)
+                val componentName =
+                    ComponentName(context, NfcNotificationListenerService::class.java)
                 packageManager.setComponentEnabledSetting(
                     componentName,
                     PackageManager.COMPONENT_ENABLED_STATE_DISABLED,

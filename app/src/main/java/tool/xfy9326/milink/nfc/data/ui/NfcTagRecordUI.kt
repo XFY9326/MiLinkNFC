@@ -30,7 +30,11 @@ class NfcTagDeviceRecordUI(
     val deviceNumber: String,
     val attributesMap: Map<String, String>,
 ) : NfcTagRecordUI {
-    constructor(deviceRecord: NfcTagDeviceRecord, action: NfcTagActionRecord.Action, ndefPayloadType: XiaomiNdefPayloadType) : this(
+    constructor(
+        deviceRecord: NfcTagDeviceRecord,
+        action: NfcTagActionRecord.Action,
+        ndefPayloadType: XiaomiNdefPayloadType
+    ) : this(
         deviceType = deviceRecord.enumDeviceType.name,
         flags = deviceRecord.flags.toHexString(true),
         deviceNumber = deviceRecord.deviceNumber.toHexString(true),

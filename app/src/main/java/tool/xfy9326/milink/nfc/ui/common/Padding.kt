@@ -60,9 +60,13 @@ fun PaddingValues.updateBy(
     val layoutDirection = LocalLayoutDirection.current
 
     return PaddingValues(
-        start = start?.let { calculateStartPadding(layoutDirection) + it } ?: calculateStartPadding(layoutDirection),
+        start = start?.let { calculateStartPadding(layoutDirection) + it } ?: calculateStartPadding(
+            layoutDirection
+        ),
         top = top?.let { calculateTopPadding() + it } ?: calculateTopPadding(),
-        end = end?.let { calculateEndPadding(layoutDirection) + it } ?: calculateEndPadding(layoutDirection),
+        end = end?.let { calculateEndPadding(layoutDirection) + it } ?: calculateEndPadding(
+            layoutDirection
+        ),
         bottom = bottom?.let { calculateBottomPadding() + it } ?: calculateBottomPadding(),
     )
 }

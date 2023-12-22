@@ -13,36 +13,75 @@ import androidx.datastore.preferences.core.stringSetPreferencesKey
 import tool.xfy9326.milink.nfc.datastore.base.ExtendedDataStore
 import kotlin.properties.ReadOnlyProperty
 
-private fun <D : ExtendedDataStore, T> defaultSuspendLazyKeyDelegate(defaultBlock: suspend () -> T, block: (String) -> Preferences.Key<T>) =
-    ReadOnlyProperty<D, ReadWriteSuspendDefaultKey<D, T>> { obj, property -> SuspendDefaultLazyKey(obj, block(property.name), defaultBlock) }
+private fun <D : ExtendedDataStore, T> defaultSuspendLazyKeyDelegate(
+    defaultBlock: suspend () -> T,
+    block: (String) -> Preferences.Key<T>
+) =
+    ReadOnlyProperty<D, ReadWriteSuspendDefaultKey<D, T>> { obj, property ->
+        SuspendDefaultLazyKey(
+            obj,
+            block(property.name),
+            defaultBlock
+        )
+    }
 
-fun <D : ExtendedDataStore> booleanSuspendDefaultLazyKey(name: String? = null, defaultBlock: suspend () -> Boolean) =
+fun <D : ExtendedDataStore> booleanSuspendDefaultLazyKey(
+    name: String? = null,
+    defaultBlock: suspend () -> Boolean
+) =
     defaultSuspendLazyKeyDelegate<D, Boolean>(defaultBlock) { booleanPreferencesKey(name ?: it) }
 
-fun <D : ExtendedDataStore> stringSuspendDefaultLazyKey(name: String? = null, defaultBlock: suspend () -> String) =
+fun <D : ExtendedDataStore> stringSuspendDefaultLazyKey(
+    name: String? = null,
+    defaultBlock: suspend () -> String
+) =
     defaultSuspendLazyKeyDelegate<D, String>(defaultBlock) { stringPreferencesKey(name ?: it) }
 
-fun <D : ExtendedDataStore> intSuspendDefaultLazyKey(name: String? = null, defaultBlock: suspend () -> Int) =
+fun <D : ExtendedDataStore> intSuspendDefaultLazyKey(
+    name: String? = null,
+    defaultBlock: suspend () -> Int
+) =
     defaultSuspendLazyKeyDelegate<D, Int>(defaultBlock) { intPreferencesKey(name ?: it) }
 
-fun <D : ExtendedDataStore> longSuspendDefaultLazyKey(name: String? = null, defaultBlock: suspend () -> Long) =
+fun <D : ExtendedDataStore> longSuspendDefaultLazyKey(
+    name: String? = null,
+    defaultBlock: suspend () -> Long
+) =
     defaultSuspendLazyKeyDelegate<D, Long>(defaultBlock) { longPreferencesKey(name ?: it) }
 
-fun <D : ExtendedDataStore> floatSuspendDefaultLazyKey(name: String? = null, defaultBlock: suspend () -> Float) =
+fun <D : ExtendedDataStore> floatSuspendDefaultLazyKey(
+    name: String? = null,
+    defaultBlock: suspend () -> Float
+) =
     defaultSuspendLazyKeyDelegate<D, Float>(defaultBlock) { floatPreferencesKey(name ?: it) }
 
-fun <D : ExtendedDataStore> doubleSuspendDefaultLazyKey(name: String? = null, defaultBlock: suspend () -> Double) =
+fun <D : ExtendedDataStore> doubleSuspendDefaultLazyKey(
+    name: String? = null,
+    defaultBlock: suspend () -> Double
+) =
     defaultSuspendLazyKeyDelegate<D, Double>(defaultBlock) { doublePreferencesKey(name ?: it) }
 
-fun <D : ExtendedDataStore> stringSetSuspendDefaultLazyKey(name: String? = null, defaultBlock: suspend () -> Set<String>) =
-    defaultSuspendLazyKeyDelegate<D, Set<String>>(defaultBlock) { stringSetPreferencesKey(name ?: it) }
+fun <D : ExtendedDataStore> stringSetSuspendDefaultLazyKey(
+    name: String? = null,
+    defaultBlock: suspend () -> Set<String>
+) =
+    defaultSuspendLazyKeyDelegate<D, Set<String>>(defaultBlock) {
+        stringSetPreferencesKey(
+            name ?: it
+        )
+    }
 
 fun <D : ExtendedDataStore, T : Enum<T>> enumSuspendDefaultLazyKey(
     name: String? = null,
     defaultBlock: suspend () -> T,
     parser: (String) -> T
 ) = ReadOnlyProperty<D, ReadWriteSuspendDefaultEnumKey<D, T>> { obj, property ->
-    SuspendDefaultEnumLazyKey(obj, stringPreferencesKey(name ?: property.name), defaultBlock, parser)
+    SuspendDefaultEnumLazyKey(
+        obj,
+        stringPreferencesKey(name ?: property.name),
+        defaultBlock,
+        parser
+    )
 }
 
 fun <D : ExtendedDataStore, T : Enum<T>> enumSetSuspendDefaultLazyKey(
@@ -50,7 +89,12 @@ fun <D : ExtendedDataStore, T : Enum<T>> enumSetSuspendDefaultLazyKey(
     defaultBlock: suspend () -> Set<T>,
     parser: (String) -> T
 ) = ReadOnlyProperty<D, ReadWriteSuspendDefaultEnumSetKey<D, T>> { obj, property ->
-    SuspendDefaultEnumSetLazyKey(obj, stringSetPreferencesKey(name ?: property.name), defaultBlock, parser)
+    SuspendDefaultEnumSetLazyKey(
+        obj,
+        stringSetPreferencesKey(name ?: property.name),
+        defaultBlock,
+        parser
+    )
 }
 
 

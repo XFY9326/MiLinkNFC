@@ -27,9 +27,25 @@ class ProtocolTest {
                     flags = 0,
                     deviceNumber = 0,
                     attributesMap = mapOf(
-                        NfcTagDeviceRecord.DeviceAttribute.WIFI_MAC_ADDRESS to byteArrayOf(0, 0, 0, 0, 0, 0),
-                        NfcTagDeviceRecord.DeviceAttribute.BLUETOOTH_MAC_ADDRESS to byteArrayOf(0, 0, 0, 0, 0, 0),
-                        NfcTagDeviceRecord.DeviceAttribute.MODEL to "xiaomi.wifispeaker.x08c".toByteArray(Charsets.UTF_8)
+                        NfcTagDeviceRecord.DeviceAttribute.WIFI_MAC_ADDRESS to byteArrayOf(
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0
+                        ),
+                        NfcTagDeviceRecord.DeviceAttribute.BLUETOOTH_MAC_ADDRESS to byteArrayOf(
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0
+                        ),
+                        NfcTagDeviceRecord.DeviceAttribute.MODEL to "xiaomi.wifispeaker.x08c".toByteArray(
+                            Charsets.UTF_8
+                        )
                     )
                 ),
                 NfcTagActionRecord.newInstance(
@@ -52,8 +68,22 @@ class ProtocolTest {
                     flags = 0,
                     deviceNumber = 0,
                     attributesMap = mapOf(
-                        NfcTagDeviceRecord.DeviceAttribute.WIFI_MAC_ADDRESS to byteArrayOf(0x11, 0x11, 0x11, 0x11, 0x11, 0x10),
-                        NfcTagDeviceRecord.DeviceAttribute.BLUETOOTH_MAC_ADDRESS to byteArrayOf(0x11, 0x11, 0x11, 0x11, 0x11, 0x11),
+                        NfcTagDeviceRecord.DeviceAttribute.WIFI_MAC_ADDRESS to byteArrayOf(
+                            0x11,
+                            0x11,
+                            0x11,
+                            0x11,
+                            0x11,
+                            0x10
+                        ),
+                        NfcTagDeviceRecord.DeviceAttribute.BLUETOOTH_MAC_ADDRESS to byteArrayOf(
+                            0x11,
+                            0x11,
+                            0x11,
+                            0x11,
+                            0x11,
+                            0x11
+                        ),
                     )
                 ),
                 NfcTagActionRecord.newInstance(

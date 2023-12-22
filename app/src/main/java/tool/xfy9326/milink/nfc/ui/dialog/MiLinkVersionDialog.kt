@@ -78,9 +78,15 @@ fun MiLinkVersionDialog(
                         .fillMaxWidth()
                         .padding(24.dp),
                 ) {
-                    Text(text = stringResource(id = R.string.local_app_versions), style = typography.titleLarge)
+                    Text(
+                        text = stringResource(id = R.string.local_app_versions),
+                        style = typography.titleLarge
+                    )
                     Spacer(modifier = Modifier.height(12.dp))
-                    Text(text = stringResource(id = R.string.local_app_versions_desc), style = typography.bodyMedium)
+                    Text(
+                        text = stringResource(id = R.string.local_app_versions_desc),
+                        style = typography.bodyMedium
+                    )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         text = stringResource(id = if (dialogData.lyraSupported) R.string.has_lyra_ability else R.string.no_lyra_ability),
@@ -130,7 +136,10 @@ private fun PackageDataCard(packageName: String, data: PackageData?) {
                     Text(text = data.applicationName, style = typography.titleMedium)
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(text = data.packageName, style = typography.bodySmall)
-                    Text(text = data.versionName ?: data.versionCode.toString(), style = typography.bodySmall)
+                    Text(
+                        text = data.versionName ?: data.versionCode.toString(),
+                        style = typography.bodySmall
+                    )
                 }
             } else {
                 Text(

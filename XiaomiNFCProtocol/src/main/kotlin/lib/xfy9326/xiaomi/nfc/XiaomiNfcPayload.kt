@@ -20,7 +20,15 @@ data class XiaomiNfcPayload<T : AppsData>(
             .addAppIds(MI_CONNECT_PROTOCOL_PAYLOAD_APP_ID)
             .addAppsData(ByteString.copyFrom(appsData.encode()))
             .apply {
-                this@XiaomiNfcPayload.idHash?.let { this.setIdHash(ByteString.copyFrom(byteArrayOf(it))) }
+                this@XiaomiNfcPayload.idHash?.let {
+                    this.setIdHash(
+                        ByteString.copyFrom(
+                            byteArrayOf(
+                                it
+                            )
+                        )
+                    )
+                }
             }
             .build()
         return MiConnectProtocol.Container.newBuilder()

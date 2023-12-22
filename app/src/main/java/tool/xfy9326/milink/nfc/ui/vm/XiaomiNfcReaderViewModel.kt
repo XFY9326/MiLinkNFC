@@ -88,7 +88,10 @@ class XiaomiNfcReaderViewModel : ViewModel() {
     fun requestExportNdefBin() {
         viewModelScope.launch {
             prepareNdefReadCache()?.let {
-                val fileName = NdefIO.getExportFileName(it.scanTime, AppDataStore.exportNxpNdefFormat.getValue())
+                val fileName = NdefIO.getExportFileName(
+                    it.scanTime,
+                    AppDataStore.exportNxpNdefFormat.getValue()
+                )
                 _exportNdefBin.emit(fileName)
             }
         }
@@ -97,7 +100,11 @@ class XiaomiNfcReaderViewModel : ViewModel() {
     fun exportNdefBin(uri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
             prepareNdefReadCache()?.let {
-                val result = NdefIO.writeNdefMessage(uri, it.content, AppDataStore.exportNxpNdefFormat.getValue())
+                val result = NdefIO.writeNdefMessage(
+                    uri,
+                    it.content,
+                    AppDataStore.exportNxpNdefFormat.getValue()
+                )
                 _instantMsg.emit(if (result) InstantMsg.EXPORT_SUCCESS else InstantMsg.EXPORT_FAILED)
             }
         }
@@ -150,7 +157,10 @@ class XiaomiNfcReaderViewModel : ViewModel() {
         }
     }
 
-    private suspend fun decodeXiaomiNfcPayload(tagInfo: NfcTagInfoUI?, ndefMessage: NdefMessage): Boolean {
+    private suspend fun decodeXiaomiNfcPayload(
+        tagInfo: NfcTagInfoUI?,
+        ndefMessage: NdefMessage
+    ): Boolean {
         val ndefType = XiaomiNfc.getXiaomiNfcPayloadType(ndefMessage)
         if (ndefType == null) {
             _instantMsg.emit(InstantMsg.NDEF_RECORD_NOT_FOUND)

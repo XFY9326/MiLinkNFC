@@ -57,10 +57,22 @@ abstract class ExtendedDataStore(name: String) {
     fun <T : Any> stateKey(key: Preferences.Key<T>, coroutineScope: CoroutineScope): StateFlow<T?> =
         readValueFlow(key).stateIn(coroutineScope, SharingStarted.WhileSubscribed(), null)
 
-    fun <T : Any> stateKey(key: Preferences.Key<T>, defaultValue: T, coroutineScope: CoroutineScope): StateFlow<T> =
-        readValueFlow(key, defaultValue).stateIn(coroutineScope, SharingStarted.WhileSubscribed(), defaultValue)
+    fun <T : Any> stateKey(
+        key: Preferences.Key<T>,
+        defaultValue: T,
+        coroutineScope: CoroutineScope
+    ): StateFlow<T> =
+        readValueFlow(key, defaultValue).stateIn(
+            coroutineScope,
+            SharingStarted.WhileSubscribed(),
+            defaultValue
+        )
 
-    fun <T> statePreferences(block: suspend (Preferences) -> T, initialValue: T, coroutineScope: CoroutineScope): StateFlow<T> =
+    fun <T> statePreferences(
+        block: suspend (Preferences) -> T,
+        initialValue: T,
+        coroutineScope: CoroutineScope
+    ): StateFlow<T> =
         readFlow(block).stateIn(coroutineScope, SharingStarted.WhileSubscribed(), initialValue)
 
     fun stateHasKey(key: Preferences.Key<*>, coroutineScope: CoroutineScope): StateFlow<Boolean> =
@@ -75,7 +87,10 @@ abstract class ExtendedDataStore(name: String) {
         datastore.edit(block)
     }
 
-    suspend fun <T> edit(edit: suspend (MutablePreferences) -> Unit, read: suspend (Preferences) -> T): T =
+    suspend fun <T> edit(
+        edit: suspend (MutablePreferences) -> Unit,
+        read: suspend (Preferences) -> T
+    ): T =
         read(datastore.edit(edit))
 
 

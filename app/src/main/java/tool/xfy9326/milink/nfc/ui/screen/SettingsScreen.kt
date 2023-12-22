@@ -64,7 +64,10 @@ fun SettingsScreen(
                 title = { Text(text = stringResource(id = R.string.settings)) },
                 navigationIcon = {
                     IconButton(onClick = onNavBack) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = stringResource(id = R.string.nav_back))
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = stringResource(id = R.string.nav_back)
+                        )
                     }
                 },
                 scrollBehavior = scrollBehavior

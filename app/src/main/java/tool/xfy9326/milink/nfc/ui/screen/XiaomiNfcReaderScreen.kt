@@ -101,7 +101,10 @@ fun XiaomiNfcReaderScreen(
                         NfcTagInfoCard(modifier = Modifier.padding(horizontal = 8.dp), data = tag)
                     }
                     NdefCard(modifier = Modifier.padding(horizontal = 8.dp), ndefType = it.ndefType)
-                    XiaomiNfcPayloadCard(modifier = Modifier.padding(horizontal = 8.dp), data = it.payload)
+                    XiaomiNfcPayloadCard(
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                        data = it.payload
+                    )
                     when (it.appData) {
                         is HandoffAppDataUI -> HandoffAppDataCard(
                             modifier = Modifier.padding(horizontal = 8.dp),
@@ -142,16 +145,25 @@ private fun TopBar(
         title = { Text(text = stringResource(id = R.string.nfc_read_xiaomi_ndef)) },
         navigationIcon = {
             IconButton(onClick = onNavBack) {
-                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = stringResource(id = R.string.nav_back))
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = stringResource(id = R.string.nav_back)
+                )
             }
         },
         actions = {
             IconButton(onClick = onRequestImportNdefBin) {
-                Icon(imageVector = Icons.Outlined.FileOpen, contentDescription = stringResource(id = R.string.import_text))
+                Icon(
+                    imageVector = Icons.Outlined.FileOpen,
+                    contentDescription = stringResource(id = R.string.import_text)
+                )
             }
             AnimatedVisibility(visible = canExportNdefBin) {
                 IconButton(onClick = onRequestExportNdefBin) {
-                    Icon(imageVector = Icons.Outlined.Save, contentDescription = stringResource(id = R.string.export))
+                    Icon(
+                        imageVector = Icons.Outlined.Save,
+                        contentDescription = stringResource(id = R.string.export)
+                    )
                 }
             }
         }
@@ -206,7 +218,11 @@ private fun NfcTagInfoCard(modifier: Modifier = Modifier, data: NfcTagInfoUI) {
             data = mapOf(
                 stringResource(id = R.string.nfc_field_tech) to data.techList.joinToString(),
                 stringResource(id = R.string.nfc_field_type) to data.type,
-                stringResource(id = R.string.nfc_field_size) to stringResource(id = R.string.current_and_total_bytes, data.currentSize, data.maxSize),
+                stringResource(id = R.string.nfc_field_size) to stringResource(
+                    id = R.string.current_and_total_bytes,
+                    data.currentSize,
+                    data.maxSize
+                ),
                 stringResource(id = R.string.nfc_field_writeable) to stringResource(id = data.writeable.stringResId()),
                 stringResource(id = R.string.nfc_field_can_make_read_only) to stringResource(id = data.canMakeReadOnly.stringResId())
             )
@@ -247,7 +263,8 @@ private fun XiaomiNfcPayloadCard(modifier: Modifier = Modifier, data: XiaomiNfcP
                 stringResource(id = R.string.nfc_field_version) to "${data.majorVersion} ${data.minorVersion}",
                 stringResource(id = R.string.nfc_field_protocol) to stringResource(id = data.protocol.resId)
             ).also {
-                if (data.idHash != null) it[stringResource(id = R.string.nfc_field_id_hash)] = data.idHash
+                if (data.idHash != null) it[stringResource(id = R.string.nfc_field_id_hash)] =
+                    data.idHash
             }
         )
     }
@@ -266,15 +283,17 @@ private fun HandoffAppDataCard(modifier: Modifier = Modifier, data: HandoffAppDa
                 stringResource(id = R.string.nfc_field_device_type) to data.deviceType,
             ).also {
                 if (data.attributesMap.isNotEmpty()) {
-                    it[stringResource(id = R.string.nfc_field_attributes)] = data.attributesMap.map { entry ->
-                        "${entry.key}: ${entry.value}"
-                    }.joinToString("\n")
+                    it[stringResource(id = R.string.nfc_field_attributes)] =
+                        data.attributesMap.map { entry ->
+                            "${entry.key}: ${entry.value}"
+                        }.joinToString("\n")
                 }
                 it[stringResource(id = R.string.nfc_field_action)] = data.action
                 if (data.payloadsMap.isNotEmpty()) {
-                    it[stringResource(id = R.string.nfc_field_properties)] = data.payloadsMap.map { entry ->
-                        "${entry.key}: ${entry.value}"
-                    }.joinToString("\n")
+                    it[stringResource(id = R.string.nfc_field_properties)] =
+                        data.payloadsMap.map { entry ->
+                            "${entry.key}: ${entry.value}"
+                        }.joinToString("\n")
                 }
             }
         )
@@ -309,7 +328,8 @@ private fun NfcTagAppDataCard(modifier: Modifier = Modifier, data: NfcTagAppData
                         stringResource(id = R.string.nfc_field_flags) to record.flags
                     ).also {
                         if (!record.conditionParameters.isNullOrEmpty()) {
-                            it[stringResource(id = R.string.nfc_field_condition_parameters)] = record.conditionParameters
+                            it[stringResource(id = R.string.nfc_field_condition_parameters)] =
+                                record.conditionParameters
                         }
                     }
                 )
@@ -328,9 +348,10 @@ private fun NfcTagAppDataCard(modifier: Modifier = Modifier, data: NfcTagAppData
                         stringResource(id = R.string.nfc_field_device_number) to record.deviceNumber,
                     ).also {
                         if (record.attributesMap.isNotEmpty()) {
-                            it[stringResource(id = R.string.nfc_field_attributes)] = record.attributesMap.map { entry ->
-                                "${entry.key}: ${entry.value}"
-                            }.joinToString("\n")
+                            it[stringResource(id = R.string.nfc_field_attributes)] =
+                                record.attributesMap.map { entry ->
+                                    "${entry.key}: ${entry.value}"
+                                }.joinToString("\n")
                         }
                     }
                 )

@@ -22,19 +22,34 @@ class HuaweiShareNfcActivity : Activity() {
         if (NfcAdapter.ACTION_NDEF_DISCOVERED == intent.action) {
             val bluetoothMac = HuaweiHandoffNfc.parseBluetoothMac(intent)
             if (bluetoothMac == null) {
-                Toast.makeText(applicationContext, R.string.bluetooth_mac_not_found, Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    applicationContext,
+                    R.string.bluetooth_mac_not_found,
+                    Toast.LENGTH_SHORT
+                ).show()
             } else {
-                val nfcTag = IntentCompat.getParcelableExtra(intent, NfcAdapter.EXTRA_TAG, Tag::class.java)
+                val nfcTag =
+                    IntentCompat.getParcelableExtra(intent, NfcAdapter.EXTRA_TAG, Tag::class.java)
                 val nfcId = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID)
 
-                val huaweiRedirect = runBlocking { AppDataStore.getHuaweiRedirect().firstOrNull() ?: AppDataStore.Defaults.huaweiRedirect }
+                val huaweiRedirect = runBlocking {
+                    AppDataStore.getHuaweiRedirect().firstOrNull()
+                        ?: AppDataStore.Defaults.huaweiRedirect
+                }
                 val config = huaweiRedirect.toConfig(bluetoothMac)
                 when (huaweiRedirect.actionIntentType) {
-                    NfcActionIntentType.FAKE_NFC_TAG -> XiaomiNfc.ScreenMirror.newNdefDiscoveredIntent(nfcTag, nfcId, config).also {
+                    NfcActionIntentType.FAKE_NFC_TAG -> XiaomiNfc.ScreenMirror.newNdefDiscoveredIntent(
+                        nfcTag,
+                        nfcId,
+                        config
+                    ).also {
                         ContextCompat.startActivity(this, it, null)
                     }
 
-                    NfcActionIntentType.MI_CONNECT_SERVICE -> XiaomiNfc.ScreenMirror.sendBroadcast(this, config)
+                    NfcActionIntentType.MI_CONNECT_SERVICE -> XiaomiNfc.ScreenMirror.sendBroadcast(
+                        this,
+                        config
+                    )
                 }
             }
         }

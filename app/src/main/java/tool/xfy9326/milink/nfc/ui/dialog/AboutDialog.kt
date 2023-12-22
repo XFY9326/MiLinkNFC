@@ -52,14 +52,30 @@ fun AboutDialog(onDismissRequest: () -> Unit) {
 
     val openSourceText = buildAnnotatedString {
         append(stringResource(id = R.string.open_source))
-        pushStringAnnotation(tag = TAG_GITHUB_URL, annotation = stringResource(id = R.string.code_url_github))
-        withStyle(style = SpanStyle(color = Color.Blue, textDecoration = TextDecoration.Underline)) {
+        pushStringAnnotation(
+            tag = TAG_GITHUB_URL,
+            annotation = stringResource(id = R.string.code_url_github)
+        )
+        withStyle(
+            style = SpanStyle(
+                color = Color.Blue,
+                textDecoration = TextDecoration.Underline
+            )
+        ) {
             append(stringResource(id = R.string.code_platform_github))
         }
         append(SPACE)
         append(SPACE)
-        pushStringAnnotation(tag = TAG_GITEE_URL, annotation = stringResource(id = R.string.code_url_gitee))
-        withStyle(style = SpanStyle(color = Color.Blue, textDecoration = TextDecoration.Underline)) {
+        pushStringAnnotation(
+            tag = TAG_GITEE_URL,
+            annotation = stringResource(id = R.string.code_url_gitee)
+        )
+        withStyle(
+            style = SpanStyle(
+                color = Color.Blue,
+                textDecoration = TextDecoration.Underline
+            )
+        ) {
             append(stringResource(id = R.string.code_platform_gitee))
         }
         pop()
@@ -88,23 +104,43 @@ fun AboutDialog(onDismissRequest: () -> Unit) {
                         style = typography.titleMedium
                     )
                     Text(
-                        text = stringResource(id = R.string.version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE),
+                        text = stringResource(
+                            id = R.string.version,
+                            BuildConfig.VERSION_NAME,
+                            BuildConfig.VERSION_CODE
+                        ),
                         style = typography.bodyMedium
                     )
                     Spacer(modifier = Modifier.height(14.dp))
-                    Text(text = stringResource(id = R.string.author, stringResource(id = R.string.author_name)), style = typography.bodyMedium)
+                    Text(
+                        text = stringResource(
+                            id = R.string.author,
+                            stringResource(id = R.string.author_name)
+                        ), style = typography.bodyMedium
+                    )
                     ClickableText(
                         text = openSourceText,
                         style = typography.bodyMedium
                     ) { offset ->
-                        openSourceText.getStringAnnotations(tag = TAG_GITHUB_URL, start = offset, end = offset).firstOrNull()?.let {
+                        openSourceText.getStringAnnotations(
+                            tag = TAG_GITHUB_URL,
+                            start = offset,
+                            end = offset
+                        ).firstOrNull()?.let {
                             uriHandler.openUri(it.item)
                         }
-                        openSourceText.getStringAnnotations(tag = TAG_GITEE_URL, start = offset, end = offset).firstOrNull()?.let {
+                        openSourceText.getStringAnnotations(
+                            tag = TAG_GITEE_URL,
+                            start = offset,
+                            end = offset
+                        ).firstOrNull()?.let {
                             uriHandler.openUri(it.item)
                         }
                     }
-                    Text(text = stringResource(id = R.string.open_source_license), style = typography.bodyMedium)
+                    Text(
+                        text = stringResource(id = R.string.open_source_license),
+                        style = typography.bodyMedium
+                    )
                 }
             }
         }

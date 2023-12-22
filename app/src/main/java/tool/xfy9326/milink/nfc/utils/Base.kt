@@ -7,7 +7,8 @@ const val SPACE = " "
 
 const val MIME_ALL = "*/*"
 
-inline fun <T : Closeable?, R> T.useCatching(block: T.() -> R): Result<R> = runCatching { use(block) }
+inline fun <T : Closeable?, R> T.useCatching(block: T.() -> R): Result<R> =
+    runCatching { use(block) }
 
 private val macAddressRegex = "^([0-9A-Fa-f]{2}:){5}([0-9A-Fa-f]{2})\$".toRegex()
 

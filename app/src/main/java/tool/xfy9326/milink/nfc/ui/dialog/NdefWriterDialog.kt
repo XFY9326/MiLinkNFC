@@ -109,7 +109,10 @@ fun NdefWriterDialog(
                     ndefWriteData.msg?.let {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = stringResource(id = R.string.nfc_write_bytes, it.byteArrayLength),
+                            text = stringResource(
+                                id = R.string.nfc_write_bytes,
+                                it.byteArrayLength
+                            ),
                             textAlign = TextAlign.Center,
                             style = typography.labelMedium
                         )

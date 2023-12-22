@@ -15,7 +15,10 @@ data class Circulate(
     val wifiMac: String,
     val bluetoothMac: String,
 ) : Parcelable {
-    enum class DeviceType(val nfcTagDeviceType: NfcTagDeviceRecord.DeviceType, @StringRes val resId: Int) {
+    enum class DeviceType(
+        val nfcTagDeviceType: NfcTagDeviceRecord.DeviceType,
+        @StringRes val resId: Int
+    ) {
         ROUTER(NfcTagDeviceRecord.DeviceType.MI_ROUTER, R.string.device_type_router),
         SOUND_BOX(NfcTagDeviceRecord.DeviceType.MI_SOUND_BOX, R.string.device_type_sound_box),
         LAPTOP(NfcTagDeviceRecord.DeviceType.MI_LAPTOP, R.string.device_type_laptop),

@@ -94,7 +94,10 @@ fun MiTapSoundBox(
                 title = { Text(text = stringResource(id = R.string.mi_tap_sound_box_nfc)) },
                 navigationIcon = {
                     IconButton(onClick = onNavBack) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = stringResource(id = R.string.nav_back))
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = stringResource(id = R.string.nav_back)
+                        )
                     }
                 },
                 scrollBehavior = scrollBehavior
@@ -165,14 +168,20 @@ private fun WriteNfcFunctionCard(
                     Text(text = stringResource(id = R.string.iot_model_name))
                 },
                 placeholder = {
-                    Text(text = stringResource(id = R.string.placeholder_iot_model_name), color = Color.Gray)
+                    Text(
+                        text = stringResource(id = R.string.placeholder_iot_model_name),
+                        color = Color.Gray
+                    )
                 },
                 trailingIcon = if (editNfcTagData.model.isEmpty()) null else {
                     {
                         IconButton(onClick = {
                             editNfcTagData = editNfcTagData.copy(model = EMPTY)
                         }) {
-                            Icon(imageVector = Icons.Default.Clear, contentDescription = stringResource(id = R.string.clear))
+                            Icon(
+                                imageVector = Icons.Default.Clear,
+                                contentDescription = stringResource(id = R.string.clear)
+                            )
                         }
                     }
                 },

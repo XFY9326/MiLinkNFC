@@ -94,7 +94,10 @@ fun CirculateScreen(
                 title = { Text(text = stringResource(id = R.string.circulate_nfc)) },
                 navigationIcon = {
                     IconButton(onClick = onNavBack) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = stringResource(id = R.string.nav_back))
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = stringResource(id = R.string.nav_back)
+                        )
                     }
                 },
                 scrollBehavior = scrollBehavior
@@ -169,18 +172,28 @@ private fun TestCirculateFunctionCard(
                     modifier = Modifier.weight(0.4f),
                     label = stringResource(id = R.string.handoff_device_type),
                     selectKey = editCirculate.deviceType.name,
-                    keyTextMap = Circulate.DeviceType.entries.associate { it.name to stringResource(id = it.resId) },
+                    keyTextMap = Circulate.DeviceType.entries.associate {
+                        it.name to stringResource(
+                            id = it.resId
+                        )
+                    },
                     onKeySelected = {
-                        editCirculate = editCirculate.copy(deviceType = Circulate.DeviceType.valueOf(it))
+                        editCirculate =
+                            editCirculate.copy(deviceType = Circulate.DeviceType.valueOf(it))
                     }
                 )
                 SelectorTextField(
                     modifier = Modifier.weight(0.6f),
                     label = stringResource(id = R.string.nfc_action_intent),
                     selectKey = editCirculate.actionIntentType.name,
-                    keyTextMap = NfcActionIntentType.entries.associate { it.name to stringResource(id = it.resId) },
+                    keyTextMap = NfcActionIntentType.entries.associate {
+                        it.name to stringResource(
+                            id = it.resId
+                        )
+                    },
                     onKeySelected = {
-                        editCirculate = editCirculate.copy(actionIntentType = NfcActionIntentType.valueOf(it))
+                        editCirculate =
+                            editCirculate.copy(actionIntentType = NfcActionIntentType.valueOf(it))
                     }
                 )
             }
@@ -241,7 +254,8 @@ private fun WriteNfcFunctionCard(
                 selectKey = editNfcTagData.deviceType.name,
                 keyTextMap = Circulate.DeviceType.entries.associate { it.name to stringResource(id = it.resId) },
                 onKeySelected = {
-                    editNfcTagData = editNfcTagData.copy(deviceType = Circulate.DeviceType.valueOf(it))
+                    editNfcTagData =
+                        editNfcTagData.copy(deviceType = Circulate.DeviceType.valueOf(it))
                 }
             )
             Spacer(modifier = Modifier.height(14.dp))

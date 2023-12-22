@@ -112,11 +112,18 @@ class MainActivity : ComponentActivity() {
                 formatNdefTag(nfcAdapter, ndefFormatable)
                 return@launch
             }
-            makeToast(getString(R.string.nfc_ndef_not_supported, tag.techList.joinToString { it.substringAfterLast(".") }))
+            makeToast(
+                getString(
+                    R.string.nfc_ndef_not_supported,
+                    tag.techList.joinToString { it.substringAfterLast(".") })
+            )
         }
     }
 
-    private suspend fun formatNdefTag(nfcAdapter: NfcAdapter, ndefFormatable: NdefFormatable): Unit = withContext(Dispatchers.IO) {
+    private suspend fun formatNdefTag(
+        nfcAdapter: NfcAdapter,
+        ndefFormatable: NdefFormatable
+    ): Unit = withContext(Dispatchers.IO) {
         ndefFormatable.tryConnect().onSuccess {
             it.useCatching {
                 format(null)
@@ -131,7 +138,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private suspend fun writeNdefTag(nfcAdapter: NfcAdapter, ndef: Ndef, writeData: NdefWriteData): Unit = withContext(Dispatchers.IO) {
+    private suspend fun writeNdefTag(
+        nfcAdapter: NfcAdapter,
+        ndef: Ndef,
+        writeData: NdefWriteData
+    ): Unit = withContext(Dispatchers.IO) {
         ndef.tryConnect().onSuccess {
             it.useCatching {
                 if (!it.isWritable) {

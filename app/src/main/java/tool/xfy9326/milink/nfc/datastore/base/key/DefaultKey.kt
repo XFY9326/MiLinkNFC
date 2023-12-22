@@ -13,8 +13,17 @@ import androidx.datastore.preferences.core.stringSetPreferencesKey
 import tool.xfy9326.milink.nfc.datastore.base.ExtendedDataStore
 import kotlin.properties.ReadOnlyProperty
 
-private fun <D : ExtendedDataStore, T> defaultKeyDelegate(defaultValue: T, block: (String) -> Preferences.Key<T>) =
-    ReadOnlyProperty<D, ReadWriteDefaultKey<D, T>> { obj, property -> DefaultKey(obj, block(property.name), defaultValue) }
+private fun <D : ExtendedDataStore, T> defaultKeyDelegate(
+    defaultValue: T,
+    block: (String) -> Preferences.Key<T>
+) =
+    ReadOnlyProperty<D, ReadWriteDefaultKey<D, T>> { obj, property ->
+        DefaultKey(
+            obj,
+            block(property.name),
+            defaultValue
+        )
+    }
 
 fun <D : ExtendedDataStore> booleanDefaultKey(name: String? = null, defaultValue: Boolean) =
     defaultKeyDelegate<D, Boolean>(defaultValue) { booleanPreferencesKey(name ?: it) }
@@ -37,12 +46,20 @@ fun <D : ExtendedDataStore> doubleDefaultKey(name: String? = null, defaultValue:
 fun <D : ExtendedDataStore> stringSetDefaultKey(name: String? = null, defaultValue: Set<String>) =
     defaultKeyDelegate<D, Set<String>>(defaultValue) { stringSetPreferencesKey(name ?: it) }
 
-fun <D : ExtendedDataStore, T : Enum<T>> enumDefaultKey(name: String? = null, defaultValue: T, parser: (String) -> T) =
+fun <D : ExtendedDataStore, T : Enum<T>> enumDefaultKey(
+    name: String? = null,
+    defaultValue: T,
+    parser: (String) -> T
+) =
     ReadOnlyProperty<D, ReadWriteDefaultEnumKey<D, T>> { obj, property ->
         DefaultEnumKey(obj, stringPreferencesKey(name ?: property.name), defaultValue, parser)
     }
 
-fun <D : ExtendedDataStore, T : Enum<T>> enumSetDefaultKey(name: String? = null, defaultValue: Set<T>, parser: (String) -> T) =
+fun <D : ExtendedDataStore, T : Enum<T>> enumSetDefaultKey(
+    name: String? = null,
+    defaultValue: Set<T>,
+    parser: (String) -> T
+) =
     ReadOnlyProperty<D, ReadWriteDefaultEnumSetKey<D, T>> { obj, property ->
         DefaultEnumSetKey(obj, stringSetPreferencesKey(name ?: property.name), defaultValue, parser)
     }

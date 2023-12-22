@@ -85,11 +85,12 @@ fun MessageAlertDialog(
                 modifier = Modifier.verticalScroll(scrollState),
                 text = showMessage, onTextLayout = if (addMessagePrefixSpaces) {
                     {
-                        showMessage = if (locale.language == java.util.Locale.CHINA.language && it.lineCount > 1) {
-                            "\u3000\u3000" + message
-                        } else {
-                            message
-                        }
+                        showMessage =
+                            if (locale.language == java.util.Locale.CHINA.language && it.lineCount > 1) {
+                                "\u3000\u3000" + message
+                            } else {
+                                message
+                            }
                     }
                 } else {
                     {}

@@ -35,7 +35,11 @@ sealed class NfcTagRecord(private val type: Byte) : BinaryData {
                 condition = buffer.get(),
                 deviceNumber = buffer.get(),
                 flags = buffer.get(),
-                conditionParameters = if (buffer.hasRemaining()) ByteArray(buffer.remaining()).also { buffer.get(it) } else null
+                conditionParameters = if (buffer.hasRemaining()) ByteArray(buffer.remaining()).also {
+                    buffer.get(
+                        it
+                    )
+                } else null
             )
         }
     }

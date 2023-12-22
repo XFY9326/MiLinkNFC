@@ -35,7 +35,8 @@ data class HandoffAppData(
                 minorVersion = buffer.get(),
                 deviceType = buffer.getInt(),
                 attributesMap = buffer.getByteKeyBytesMap(buffer.get().toInt()),
-                action = ByteArray(buffer.get().toInt()).also { buffer.get(it) }.toString(Charsets.UTF_8),
+                action = ByteArray(buffer.get().toInt()).also { buffer.get(it) }
+                    .toString(Charsets.UTF_8),
                 payloadsMap = buffer.getByteKeyBytesMap()
             )
         }
