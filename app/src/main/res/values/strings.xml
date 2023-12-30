@@ -30,7 +30,7 @@
     <string name="tap_and_clear_nfc_tag">靠近NFC标签以写入空数据</string>
     <string name="tap_and_write_nfc_tag_read_only">靠近NFC标签以写入只读数据</string>
     <string name="tap_and_read_nfc_tag">靠近NFC标签以读取数据</string>
-    <string name="nfc_write_bytes">写入数据：%1$d字节</string>
+    <string name="nfc_write_bytes">%1$d字节</string>
     <string name="nfc_using_conflict">设备正在使用中</string>
     <string name="nfc_write_success">写入成功</string>
     <string name="nfc_connect_failed">连接失败</string>

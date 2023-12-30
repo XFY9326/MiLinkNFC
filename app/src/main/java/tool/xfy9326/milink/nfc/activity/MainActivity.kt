@@ -83,7 +83,7 @@ class MainActivity : ComponentActivity() {
         val nfcAdapter = NfcAdapter.getDefaultAdapter(this)
         if (nfcAdapter != null) {
             lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                repeatOnLifecycle(Lifecycle.State.RESUMED) {
                     viewModel.nfcWriteData.collect { data ->
                         data?.let {
                             nfcAdapter.enableNdefReaderMode(this@MainActivity) {
