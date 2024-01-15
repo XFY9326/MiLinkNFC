@@ -87,6 +87,9 @@
     <string name="enter_bluetooth_mac_address">蓝牙 MAC地址</string>
     <string name="empty_mac_address">MAC地址为空！</string>
     <string name="invalid_mac_address">MAC地址格式错误！</string>
+    <string name="bluetooth_empty_mac_address">蓝牙MAC地址为空！</string>
+    <string name="bluetooth_invalid_mac_address">蓝牙MAC地址格式错误！</string>
+    <string name="wifi_invalid_mac_address">WIFI MAC地址格式错误！</string>
     <string name="bluetooth_mac_not_found">未找到蓝牙MAC地址</string>
     <string name="bluetooth_mac_not_set">未设置蓝牙MAC地址</string>
     <string name="enable_lyra_ability">启用Lyra连接</string>
@@ -140,11 +143,9 @@
     <string name="nfc_field_condition_parameters">条件参数</string>
     <string name="nfc_field_attributes">属性</string>
     <string name="import_text">导入</string>
-    <string name="import_canceled">已取消导入</string>
     <string name="import_success">导入成功</string>
     <string name="import_failed">导出失败</string>
     <string name="export">导出</string>
-    <string name="export_canceled">已取消导出</string>
     <string name="export_success">导出成功</string>
     <string name="export_failed">导出失败</string>
     <string name="no_cached_ndef_data">暂无无缓存的NDEF数据</string>

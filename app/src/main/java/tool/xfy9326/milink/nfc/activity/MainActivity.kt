@@ -34,9 +34,7 @@ import tool.xfy9326.milink.nfc.utils.useCatching
 class MainActivity : ComponentActivity() {
     private val viewModel by viewModels<MainViewModel>()
     private val readNdefBin = registerForActivityResult(ActivityResultContracts.GetContent()) {
-        if (it == null) {
-            showToast(getString(R.string.import_canceled))
-        } else {
+        if (it != null) {
             viewModel.requestNdefBinWriteDialog(it)
         }
     }

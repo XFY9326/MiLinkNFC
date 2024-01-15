@@ -31,16 +31,12 @@ class XiaomiNfcReaderActivity : ComponentActivity() {
     private val viewModel by viewModels<XiaomiNfcReaderViewModel>()
     private val exportNdefBin =
         registerForActivityResult(ActivityResultContracts.CreateDocument(MIME_ALL)) {
-            if (it == null) {
-                showToast(getString(R.string.export_canceled))
-            } else {
+            if (it != null) {
                 viewModel.exportNdefBin(it)
             }
         }
     private val importNdefBin = registerForActivityResult(ActivityResultContracts.GetContent()) {
-        if (it == null) {
-            showToast(getString(R.string.import_canceled))
-        } else {
+        if (it != null) {
             viewModel.updateNfcReadData(it)
         }
     }

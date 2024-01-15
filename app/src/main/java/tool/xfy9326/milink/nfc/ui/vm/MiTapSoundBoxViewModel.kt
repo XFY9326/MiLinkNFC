@@ -22,8 +22,9 @@ import tool.xfy9326.milink.nfc.utils.isValidMacAddress
 
 class MiTapSoundBoxViewModel : ViewModel() {
     enum class InstantMsg(@StringRes val resId: Int) {
-        INVALID_MAC_ADDRESS(R.string.invalid_mac_address),
-        EMPTY_MAC_ADDRESS(R.string.empty_mac_address),
+        WIFI_INVALID_MAC_ADDRESS(R.string.wifi_invalid_mac_address),
+        BLUETOOTH_INVALID_MAC_ADDRESS(R.string.bluetooth_invalid_mac_address),
+        BLUETOOTH_EMPTY_MAC_ADDRESS(R.string.bluetooth_empty_mac_address),
     }
 
     @Parcelize
@@ -52,15 +53,15 @@ class MiTapSoundBoxViewModel : ViewModel() {
     private val _instantMsg = MutableSharedFlow<InstantMsg>()
     val instantMsg: SharedFlow<InstantMsg> = _instantMsg.asSharedFlow()
 
-    private suspend fun validateMacAddress(macAddress: String, allowEmpty: Boolean): Boolean {
+    private suspend fun validateMacAddress(macAddress: String, isWifiMac: Boolean): Boolean {
         if (macAddress.isBlank()) {
-            if (allowEmpty) {
+            if (isWifiMac) {
                 return true
             } else {
-                _instantMsg.emit(InstantMsg.EMPTY_MAC_ADDRESS)
+                _instantMsg.emit(InstantMsg.BLUETOOTH_EMPTY_MAC_ADDRESS)
             }
         } else if (!macAddress.isValidMacAddress()) {
-            _instantMsg.emit(InstantMsg.INVALID_MAC_ADDRESS)
+            _instantMsg.emit(if (isWifiMac) InstantMsg.WIFI_INVALID_MAC_ADDRESS else InstantMsg.BLUETOOTH_INVALID_MAC_ADDRESS)
         } else {
             return true
         }
@@ -69,10 +70,8 @@ class MiTapSoundBoxViewModel : ViewModel() {
 
     fun requestWriteNfc(nfcTagData: NFCTag, ndefWriteHandler: (NdefWriteData) -> Unit) {
         viewModelScope.launch {
-            if (validateMacAddress(
-                    nfcTagData.wifiMac,
-                    true
-                ) && validateMacAddress(nfcTagData.bluetoothMac, false)
+            if (validateMacAddress(nfcTagData.wifiMac, isWifiMac = true) &&
+                validateMacAddress(nfcTagData.bluetoothMac, isWifiMac = false)
             ) {
                 val writeTime = (System.currentTimeMillis() / 1000).toInt()
                 val ndefMsg = XiaomiNfc.MiTapSoundBox.newNdefMessage(
