@@ -356,4 +356,22 @@ object XiaomiNfc {
                     byteArrayOf(FLAG_ABILITY_LYRA)
             }
     }
+
+    @Suppress("unused")
+    object TVCast : HandoffNfcAction<TVCast.Config>() {
+        private const val ACTION_SUFFIX_TV_CAST = "TVCAST"
+
+        class Config(
+            override val deviceType: HandoffAppData.DeviceType,
+            val wifiMac: String,
+            val bluetoothMac: String
+        ) : HandoffNfcAction.Config
+
+        override fun onBuildPayloadsMap(config: Config): Map<HandoffAppData.PayloadKey, ByteArray> =
+            mapOf(
+                HandoffAppData.PayloadKey.ACTION_SUFFIX to ACTION_SUFFIX_TV_CAST.toByteArray(Charsets.UTF_8),
+                HandoffAppData.PayloadKey.WIFI_MAC to config.wifiMac.toByteArray(Charsets.UTF_8),
+                HandoffAppData.PayloadKey.BLUETOOTH_MAC to config.bluetoothMac.toByteArray(Charsets.UTF_8),
+            )
+    }
 }
