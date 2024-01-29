@@ -14,11 +14,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Nfc
-import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -95,7 +95,7 @@ fun MiTapSoundBox(
                 navigationIcon = {
                     IconButton(onClick = onNavBack) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = stringResource(id = R.string.nav_back)
                         )
                     }
@@ -242,7 +242,7 @@ private fun WriteNfcFunctionCard(
             ) {
                 IconTextButton(
                     text = stringResource(id = R.string.open_iot_spec),
-                    icon = Icons.Default.OpenInNew,
+                    icon = Icons.AutoMirrored.Default.OpenInNew,
                     onClick = {
                         focusManager.clearFocus()
                         uriHandler.openUri(context.getString(R.string.mi_iot_spec_url))

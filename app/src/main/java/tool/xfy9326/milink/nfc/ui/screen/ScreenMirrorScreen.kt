@@ -12,16 +12,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material.icons.automirrored.outlined.ScreenShare
 import androidx.compose.material.icons.filled.AppShortcut
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Cast
 import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Nfc
-import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Transform
-import androidx.compose.material.icons.outlined.ScreenShare
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -106,7 +106,7 @@ fun ScreenMirrorScreen(
                 navigationIcon = {
                     IconButton(onClick = onNavBack) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = stringResource(id = R.string.nav_back)
                         )
                     }
@@ -114,7 +114,7 @@ fun ScreenMirrorScreen(
                 actions = {
                     IconButton(onClick = { viewModel.openMiLinkVersionDialog(context) }) {
                         Icon(
-                            imageVector = Icons.Default.HelpOutline,
+                            imageVector = Icons.AutoMirrored.Default.HelpOutline,
                             contentDescription = stringResource(id = R.string.local_app_versions)
                         )
                     }
@@ -197,7 +197,7 @@ private fun TestScreenMirrorFunctionCard(
 
     FunctionCard(
         modifier = modifier.fillMaxWidth(),
-        icon = Icons.Outlined.ScreenShare,
+        icon = Icons.AutoMirrored.Outlined.ScreenShare,
         title = stringResource(id = R.string.test_screen_mirror),
         description = stringResource(id = R.string.test_screen_mirror_desc)
     ) {
@@ -355,7 +355,7 @@ private fun TilesScreenMirrorFunctionCard(
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     IconTextButton(
                         text = stringResource(id = R.string.add_tiles),
-                        icon = Icons.Default.OpenInNew,
+                        icon = Icons.AutoMirrored.Default.OpenInNew,
                         onClick = {
                             focusManager.clearFocus()
                             onRequestAddTiles()
@@ -397,12 +397,12 @@ private fun HuaweiRedirectFunctionCard(
         ) {
             IconTextButton(
                 text = stringResource(id = R.string.open_notification_service_settings),
-                icon = Icons.Default.OpenInNew,
+                icon = Icons.AutoMirrored.Default.OpenInNew,
                 onClick = { context.openNotificationServiceSettings(NfcNotificationListenerService::class.java.name) }
             )
             IconTextButton(
                 text = stringResource(id = R.string.open_app_settings_for_autostart),
-                icon = Icons.Default.OpenInNew,
+                icon = Icons.AutoMirrored.Default.OpenInNew,
                 onClick = { context.openAppSettings() }
             )
             Divider(

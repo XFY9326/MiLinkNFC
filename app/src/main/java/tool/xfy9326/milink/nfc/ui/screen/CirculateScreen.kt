@@ -13,11 +13,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Devices
 import androidx.compose.material.icons.filled.Nfc
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -95,7 +95,7 @@ fun CirculateScreen(
                 navigationIcon = {
                     IconButton(onClick = onNavBack) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = stringResource(id = R.string.nav_back)
                         )
                     }
@@ -220,7 +220,7 @@ private fun TestCirculateFunctionCard(
             IconTextButton(
                 modifier = Modifier.align(Alignment.End),
                 text = stringResource(id = R.string.send),
-                icon = Icons.Default.Send,
+                icon = Icons.AutoMirrored.Default.Send,
                 onClick = {
                     focusManager.clearFocus()
                     onSendCirculate(editCirculate.copy())

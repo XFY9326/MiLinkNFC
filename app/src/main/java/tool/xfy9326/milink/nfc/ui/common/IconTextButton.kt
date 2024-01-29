@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.OpenInNew
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -27,7 +27,7 @@ import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 @Composable
 private fun Preview() {
     AppTheme {
-        IconTextButton(text = "Button", icon = Icons.Default.OpenInNew, onClick = {})
+        IconTextButton(text = "Button", icon = Icons.AutoMirrored.Default.OpenInNew, onClick = {})
     }
 }
 

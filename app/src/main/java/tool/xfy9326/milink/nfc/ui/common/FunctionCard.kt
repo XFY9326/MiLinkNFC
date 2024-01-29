@@ -14,8 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.Android
-import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,7 +39,10 @@ private fun Preview() {
             title = "Function",
             extraIconContent = {
                 IconButton(onClick = {}) {
-                    Icon(imageVector = Icons.Default.HelpOutline, contentDescription = null)
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Default.HelpOutline,
+                        contentDescription = null
+                    )
                 }
             },
             description = "Description line 1\n\nDescription line 2\n\nDescription line 3"

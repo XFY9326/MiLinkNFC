@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ScreenShare
 import androidx.compose.material.icons.filled.BluetoothAudio
 import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material.icons.filled.DataObject
@@ -20,7 +21,6 @@ import androidx.compose.material.icons.filled.Update
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.FileCopy
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.ScreenShare
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -239,7 +239,7 @@ private fun Content(
                 onClick = onNavToCirculate
             )
             EntryCard(
-                icon = Icons.Outlined.ScreenShare,
+                icon = Icons.AutoMirrored.Outlined.ScreenShare,
                 title = stringResource(id = R.string.xiaomi_screen_mirror_nfc),
                 summary = stringResource(id = R.string.xiaomi_screen_mirror_nfc_summary),
                 onClick = onNavToScreenMirror

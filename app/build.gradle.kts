@@ -99,15 +99,16 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.8.2")
 
     // Compose BOM
-    val composeBom = platform("androidx.compose:compose-bom:2023.10.01")
+    val composeBom = platform("androidx.compose:compose-bom:2024.01.00")
     implementation(composeBom)
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.animation:animation")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
 
     // Compose Accompanist
-    val accompanist = "0.32.0"
+    val accompanist = "0.34.0"
     implementation("com.google.accompanist:accompanist-drawablepainter:$accompanist")
 
     // AndroidX Compose Lifecycle

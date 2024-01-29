@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.outlined.FileOpen
 import androidx.compose.material.icons.outlined.Save
@@ -146,7 +146,7 @@ private fun TopBar(
         navigationIcon = {
             IconButton(onClick = onNavBack) {
                 Icon(
-                    imageVector = Icons.Default.ArrowBack,
+                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
                     contentDescription = stringResource(id = R.string.nav_back)
                 )
             }

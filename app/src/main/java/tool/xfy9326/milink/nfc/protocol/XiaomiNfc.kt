@@ -369,7 +369,9 @@ object XiaomiNfc {
 
         override fun onBuildPayloadsMap(config: Config): Map<HandoffAppData.PayloadKey, ByteArray> =
             mapOf(
-                HandoffAppData.PayloadKey.ACTION_SUFFIX to ACTION_SUFFIX_TV_CAST.toByteArray(Charsets.UTF_8),
+                HandoffAppData.PayloadKey.ACTION_SUFFIX to ACTION_SUFFIX_TV_CAST.toByteArray(
+                    Charsets.UTF_8
+                ),
                 HandoffAppData.PayloadKey.WIFI_MAC to config.wifiMac.toByteArray(Charsets.UTF_8),
                 HandoffAppData.PayloadKey.BLUETOOTH_MAC to config.bluetoothMac.toByteArray(Charsets.UTF_8),
             )
