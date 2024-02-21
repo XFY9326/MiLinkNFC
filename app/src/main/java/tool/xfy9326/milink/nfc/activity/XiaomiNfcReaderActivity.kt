@@ -9,9 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -56,15 +54,13 @@ class XiaomiNfcReaderActivity : ComponentActivity() {
                 )
             }
         }
-        observeViewModel()
     }
 
-    private fun observeViewModel() {
+    override fun onStart() {
+        super.onStart()
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.exportNdefBin.collect {
-                    exportNdefBin.launch(it)
-                }
+            viewModel.exportNdefBin.collect {
+                exportNdefBin.launch(it)
             }
         }
     }
@@ -73,8 +69,7 @@ class XiaomiNfcReaderActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        val nfcAdapter = NfcAdapter.getDefaultAdapter(this)
-        nfcAdapter?.let { adapter ->
+        NfcAdapter.getDefaultAdapter(this)?.let { adapter ->
             adapter.enableNdefReaderMode(this) {
                 val ndef = Ndef.get(it)
                 if (ndef != null) {

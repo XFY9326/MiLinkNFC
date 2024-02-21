@@ -11,9 +11,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -29,7 +27,6 @@ import tool.xfy9326.milink.nfc.utils.ignoreTagUntilRemoved
 import tool.xfy9326.milink.nfc.utils.showToast
 import tool.xfy9326.milink.nfc.utils.startActivity
 import tool.xfy9326.milink.nfc.utils.tryConnect
-import tool.xfy9326.milink.nfc.utils.useCatching
 
 class MainActivity : ComponentActivity() {
     private val viewModel by viewModels<MainViewModel>()
@@ -52,18 +49,6 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
-        observeViewModel()
-        setupNfcReaderListener()
-    }
-
-    private fun observeViewModel() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.instantMsg.collect {
-                    showToast(getString(it.resId))
-                }
-            }
-        }
     }
 
     private fun startReaderActivity() {
@@ -77,22 +62,27 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun setupNfcReaderListener() {
-        val nfcAdapter = NfcAdapter.getDefaultAdapter(this)
-        if (nfcAdapter != null) {
-            lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                    viewModel.nfcWriteData.collect { data ->
-                        data?.let {
-                            nfcAdapter.enableNdefReaderMode(this@MainActivity) {
-                                handleNfcTag(nfcAdapter, it, data)
-                            }
-                        } ?: nfcAdapter.disableReaderMode(this@MainActivity)
-                    }
+    override fun onStart() {
+        super.onStart()
+        lifecycleScope.launch {
+            viewModel.instantMsg.collect {
+                showToast(getString(it.resId))
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        lifecycleScope.launch {
+            viewModel.nfcWriteData.collect { data ->
+                NfcAdapter.getDefaultAdapter(this@MainActivity)?.apply {
+                    data?.let {
+                        enableNdefReaderMode(this@MainActivity) {
+                            handleNfcTag(this, it, data)
+                        }
+                    } ?: disableReaderMode(this@MainActivity)
                 }
             }
-        } else {
-            showToast(getString(R.string.not_support_nfc))
         }
     }
 
@@ -118,13 +108,10 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private suspend fun formatNdefTag(
-        nfcAdapter: NfcAdapter,
-        ndefFormatable: NdefFormatable
-    ): Unit = withContext(Dispatchers.IO) {
+    private suspend fun formatNdefTag(nfcAdapter: NfcAdapter, ndefFormatable: NdefFormatable): Unit = withContext(Dispatchers.IO) {
         ndefFormatable.tryConnect().onSuccess {
-            it.useCatching {
-                format(null)
+            it.runCatching {
+                use { format(null) }
             }.onSuccess {
                 nfcAdapter.ignoreTagUntilRemoved(ndefFormatable.tag)
                 makeToast(getString(R.string.nfc_ndef_format_success))
@@ -136,50 +123,14 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private suspend fun writeNdefTag(
-        nfcAdapter: NfcAdapter,
-        ndef: Ndef,
-        writeData: NdefWriteData
-    ): Unit = withContext(Dispatchers.IO) {
+    private suspend fun writeNdefTag(nfcAdapter: NfcAdapter, ndef: Ndef, writeData: NdefWriteData): Unit = withContext(Dispatchers.IO) {
         ndef.tryConnect().onSuccess {
-            it.useCatching {
-                if (!it.isWritable) {
-                    makeToast(getString(R.string.nfc_write_error_not_writeable))
-                    return@onSuccess
-                }
-                if (writeData.readOnly && !it.canMakeReadOnly()) {
-                    makeToast(getString(R.string.nfc_write_error_no_read_only))
-                    return@onSuccess
-                }
-
-                val ndefMsg = writeData.msg?.let { msg ->
-                    if (msg.byteArrayLength > it.maxSize) {
-                        makeToast(getString(R.string.nfc_write_error_max_size))
-                        return@onSuccess
-                    }
-                    msg
-                } ?: EmptyNdefMessage
-
-                try {
-                    it.writeNdefMessage(ndefMsg)
-                } catch (e: Exception) {
-                    makeToast(getString(R.string.nfc_write_error))
-                    return@onSuccess
-                }
-                if (writeData.readOnly) {
-                    try {
-                        if (!it.makeReadOnly()) {
-                            makeToast(getString(R.string.nfc_write_error_read_only))
-                            return@onSuccess
-                        }
-                    } catch (e: Exception) {
-                        makeToast(getString(R.string.nfc_write_error_read_only))
-                        return@onSuccess
-                    }
+            it.runCatching {
+                use {
+                    safeWriteNdefData(writeData) { resId -> makeToast(getString(resId)) }
                 }
             }.onSuccess {
                 makeToast(getString(R.string.nfc_write_success))
-                nfcAdapter.ignoreTagUntilRemoved(ndef.tag)
                 if (writeData.readOnly) viewModel.closeNfcWriter()
             }.onFailure { throwable ->
                 makeToast(
@@ -192,8 +143,46 @@ class MainActivity : ComponentActivity() {
                     }
                 )
             }
+            nfcAdapter.ignoreTagUntilRemoved(ndef.tag)
         }.onFailure {
             makeToast(getString(R.string.nfc_connect_failed))
+        }
+    }
+
+    private fun Ndef.safeWriteNdefData(writeData: NdefWriteData, onErrorResMsg: (Int) -> Unit) {
+        if (!isWritable) {
+            onErrorResMsg(R.string.nfc_write_error_not_writeable)
+            return
+        }
+        if (writeData.readOnly && !canMakeReadOnly()) {
+            onErrorResMsg(R.string.nfc_write_error_no_read_only)
+            return
+        }
+
+        val ndefMsg = writeData.msg?.let { msg ->
+            if (msg.byteArrayLength > maxSize) {
+                onErrorResMsg(R.string.nfc_write_error_max_size)
+                return
+            }
+            msg
+        } ?: EmptyNdefMessage
+
+        try {
+            writeNdefMessage(ndefMsg)
+        } catch (e: Exception) {
+            onErrorResMsg(R.string.nfc_write_error)
+            return
+        }
+        if (writeData.readOnly) {
+            try {
+                if (!makeReadOnly()) {
+                    onErrorResMsg(R.string.nfc_write_error_read_only)
+                    return
+                }
+            } catch (e: Exception) {
+                onErrorResMsg(R.string.nfc_write_error_read_only)
+                return
+            }
         }
     }
 }

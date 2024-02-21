@@ -9,6 +9,7 @@ import android.nfc.tech.TagTechnology
 import androidx.core.os.bundleOf
 
 private const val NFC_TAG_IGNORE_MILLS = 1000
+private const val NFC_TAG_CHECK_DELAY_MILLS = 250
 
 val EmptyNdefMessage = NdefMessage(NdefRecord(NdefRecord.TNF_EMPTY, null, null, null))
 
@@ -18,7 +19,7 @@ fun NfcAdapter.enableNdefReaderMode(activity: Activity, callBack: (Tag) -> Unit)
             NfcAdapter.FLAG_READER_NFC_F or
             NfcAdapter.FLAG_READER_NFC_V
     val options = bundleOf(
-        NfcAdapter.EXTRA_READER_PRESENCE_CHECK_DELAY to 250
+        NfcAdapter.EXTRA_READER_PRESENCE_CHECK_DELAY to NFC_TAG_CHECK_DELAY_MILLS
     )
     enableReaderMode(activity, callBack, flags, options)
 }
