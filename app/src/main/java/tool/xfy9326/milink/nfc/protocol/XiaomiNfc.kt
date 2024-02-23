@@ -11,6 +11,7 @@ import android.util.Base64
 import androidx.core.net.toUri
 import lib.xfy9326.xiaomi.nfc.AppsData
 import lib.xfy9326.xiaomi.nfc.HandoffAppData
+import lib.xfy9326.xiaomi.nfc.MiConnectData
 import lib.xfy9326.xiaomi.nfc.NfcTagActionRecord
 import lib.xfy9326.xiaomi.nfc.NfcTagAppData
 import lib.xfy9326.xiaomi.nfc.NfcTagDeviceRecord
@@ -71,9 +72,9 @@ object XiaomiNfc {
         protected fun newNdefRecord(config: T): NdefRecord =
             NdefRecord(
                 NdefRecord.TNF_EXTERNAL_TYPE,
-                ndefRecordType.bytes.takeIf { it.isNotEmpty() },
+                ndefRecordType.bytes,
                 null,
-                encode(config).encode()
+                MiConnectData.from(build(config)).toByteArray()
             )
 
         fun newNdefDiscoveredIntent(tag: Tag?, id: ByteArray?, config: T): Intent {
@@ -87,7 +88,7 @@ object XiaomiNfc {
             }
         }
 
-        fun encode(config: T): XiaomiNfcPayload<A> =
+        fun build(config: T): XiaomiNfcPayload<A> =
             XiaomiNfcPayload(
                 majorVersion = majorVersion,
                 minorVersion = minorVersion,
@@ -250,7 +251,7 @@ object XiaomiNfc {
 
         @SuppressLint("WrongConstant")
         fun sendBroadcast(context: Context, config: Config) {
-            val appData = encode(config).appsData
+            val appData = build(config).appsData
             Intent(ACTION).apply {
                 addFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP)
                 addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)

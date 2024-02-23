@@ -58,18 +58,21 @@ data class HandoffAppData(
     val enumPayloadsMap
         get() = payloadsMap.mapKeys { PayloadKey.parse(it.key) }
 
+    override fun size(): Int {
+        val actionBytes = action.toByteArray(Charsets.UTF_8)
+        return Byte.SIZE_BYTES + // major version
+                Byte.SIZE_BYTES + // minor version
+                Int.SIZE_BYTES + // deviceType
+                Byte.SIZE_BYTES + // attributeMap size
+                attributesMap.bytesMapTotalBytes() + // attributeMap
+                Byte.SIZE_BYTES + // action size
+                actionBytes.size + // action
+                payloadsMap.bytesMapTotalBytes() // payloadData
+    }
+
     override fun encode(): ByteArray {
         val actionBytes = action.toByteArray(Charsets.UTF_8)
-        return ByteBuffer.allocate(
-            Byte.SIZE_BYTES + // major version
-                    Byte.SIZE_BYTES + // minor version
-                    Int.SIZE_BYTES + // deviceType
-                    Byte.SIZE_BYTES + // attributeMap size
-                    attributesMap.bytesMapTotalBytes() + // attributeMap
-                    Byte.SIZE_BYTES + // action size
-                    actionBytes.size + // action
-                    payloadsMap.bytesMapTotalBytes() // payloadData
-        )
+        return ByteBuffer.allocate(size())
             .put(majorVersion)
             .put(minorVersion)
             .putInt(deviceType)

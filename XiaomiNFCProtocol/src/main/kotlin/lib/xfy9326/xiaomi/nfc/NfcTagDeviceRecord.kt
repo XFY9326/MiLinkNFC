@@ -99,13 +99,15 @@ data class NfcTagDeviceRecord(
             else -> emptyMap()
         }.tryExtractAppDataValueMap(action, ndefType)
 
+    override fun contentSize(): Int {
+        return Short.SIZE_BYTES + // deviceType
+                Byte.SIZE_BYTES + // flags
+                Byte.SIZE_BYTES + // deviceNumber
+                attributesMap.shortMapTotalBytes() // attributeMap
+    }
+
     override fun encodeContent(): ByteArray {
-        return ByteBuffer.allocate(
-            Short.SIZE_BYTES + // deviceType
-                    Byte.SIZE_BYTES + // flags
-                    Byte.SIZE_BYTES + // deviceNumber
-                    attributesMap.shortMapTotalBytes() // attributeMap
-        )
+        return ByteBuffer.allocate(contentSize())
             .putShort(deviceType)
             .put(flags)
             .put(deviceNumber)

@@ -29,14 +29,16 @@ data class NfcTagActionRecord(
     val enumAction by lazy { Action.parse(action) }
     val enumCondition by lazy { Condition.parse(condition) }
 
+    override fun contentSize(): Int {
+        return Short.SIZE_BYTES + // action
+                Byte.SIZE_BYTES + // condition
+                Byte.SIZE_BYTES + // deviceNumber
+                Byte.SIZE_BYTES + // flags
+                (conditionParameters?.size ?: 0) // conditionParameters
+    }
+
     override fun encodeContent(): ByteArray {
-        return ByteBuffer.allocate(
-            Short.SIZE_BYTES + // action
-                    Byte.SIZE_BYTES + // condition
-                    Byte.SIZE_BYTES + // deviceNumber
-                    Byte.SIZE_BYTES + // flags
-                    (conditionParameters?.size ?: 0) // conditionParameters
-        )
+        return ByteBuffer.allocate(contentSize())
             .putShort(action)
             .put(condition)
             .put(deviceNumber)

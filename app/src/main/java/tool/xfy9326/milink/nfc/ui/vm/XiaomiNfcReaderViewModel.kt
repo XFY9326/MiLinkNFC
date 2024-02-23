@@ -15,12 +15,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import lib.xfy9326.xiaomi.nfc.HandoffAppData
+import lib.xfy9326.xiaomi.nfc.MiConnectData
 import lib.xfy9326.xiaomi.nfc.NfcTagAppData
 import lib.xfy9326.xiaomi.nfc.XiaomiNdefPayloadType
-import lib.xfy9326.xiaomi.nfc.decodeAsMiConnectPayload
-import lib.xfy9326.xiaomi.nfc.getNfcProtocol
-import lib.xfy9326.xiaomi.nfc.isValidNfcPayload
-import lib.xfy9326.xiaomi.nfc.toXiaomiNfcPayload
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.data.NdefReadData
 import tool.xfy9326.milink.nfc.data.ui.AppDataUI
@@ -171,21 +168,21 @@ class XiaomiNfcReaderViewModel : ViewModel() {
             _instantMsg.emit(InstantMsg.NDEF_RECORD_NOT_FOUND)
             return false
         }
-        val miConnectPayload = runCatching { ndefBytes.decodeAsMiConnectPayload() }.getOrNull()
-        if (miConnectPayload == null) {
+        val miConnectData = runCatching { MiConnectData.from(ndefBytes) }.getOrNull()
+        if (miConnectData == null) {
             _instantMsg.emit(InstantMsg.PARSE_ERROR)
             return false
         }
-        if (!miConnectPayload.isValidNfcPayload()) {
+        if (!miConnectData.isValidNfcPayload) {
             _instantMsg.emit(InstantMsg.NOT_XIAOMI_NFC)
             return false
         }
-        val protocol = runCatching { miConnectPayload.getNfcProtocol() }.getOrNull()
+        val protocol = runCatching { miConnectData.getNfcProtocol() }.getOrNull()
         if (protocol == null) {
             _instantMsg.emit(InstantMsg.VERSION_ERROR)
             return false
         }
-        val payload = runCatching { miConnectPayload.toXiaomiNfcPayload(protocol) }.getOrNull()
+        val payload = runCatching { miConnectData.toXiaomiNfcPayload(protocol) }.getOrNull()
         if (payload == null) {
             _instantMsg.emit(InstantMsg.CONTENT_PARSE_ERROR)
             return false

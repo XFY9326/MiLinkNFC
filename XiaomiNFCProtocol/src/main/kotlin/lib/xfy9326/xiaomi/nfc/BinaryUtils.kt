@@ -10,9 +10,6 @@ internal fun ByteArray.startsWith(byteArray: ByteArray): Boolean {
     return true
 }
 
-internal fun List<ByteArray>.totalBytes(): Int =
-    fold(0) { acc, bytes -> acc + bytes.size }
-
 internal fun Map<Byte, ByteArray>.bytesMapTotalBytes(): Int =
     entries.fold(0) { acc, entry -> acc + Byte.SIZE_BYTES * 2 + entry.value.size }
 

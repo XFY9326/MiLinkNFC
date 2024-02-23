@@ -27,25 +27,9 @@ class ProtocolTest {
                     flags = 0,
                     deviceNumber = 0,
                     attributesMap = mapOf(
-                        NfcTagDeviceRecord.DeviceAttribute.WIFI_MAC_ADDRESS to byteArrayOf(
-                            0,
-                            0,
-                            0,
-                            0,
-                            0,
-                            0
-                        ),
-                        NfcTagDeviceRecord.DeviceAttribute.BLUETOOTH_MAC_ADDRESS to byteArrayOf(
-                            0,
-                            0,
-                            0,
-                            0,
-                            0,
-                            0
-                        ),
-                        NfcTagDeviceRecord.DeviceAttribute.MODEL to "xiaomi.wifispeaker.x08c".toByteArray(
-                            Charsets.UTF_8
-                        )
+                        NfcTagDeviceRecord.DeviceAttribute.WIFI_MAC_ADDRESS to ByteArray(6) { 0 },
+                        NfcTagDeviceRecord.DeviceAttribute.BLUETOOTH_MAC_ADDRESS to ByteArray(6) { 0 },
+                        NfcTagDeviceRecord.DeviceAttribute.MODEL to "xiaomi.wifispeaker.x08c".toByteArray(Charsets.UTF_8)
                     )
                 ),
                 NfcTagActionRecord.newInstance(
@@ -108,9 +92,9 @@ class ProtocolTest {
         )
 
         private inline fun <reified T : AppsData> XiaomiNfcProtocol<T>.testProtocol(bytes: ByteArray): XiaomiNfcPayload<T> {
-            val payload = bytes.decodeAsMiConnectPayload()
+            val payload = MiConnectData.from(bytes)
 
-            assertTrue(payload.isValidNfcPayload())
+            assertTrue(payload.isValidNfcPayload)
 
             val protocol = payload.getNfcProtocol()
             assertEquals(this, protocol)
@@ -127,7 +111,7 @@ class ProtocolTest {
     fun testV1Protocol() {
         val bytes = TEST_HEX_PAYLOAD_V1.hexToByteArray()
         val payload = XiaomiNfcProtocol.V1.testProtocol(bytes)
-        assertContentEquals(bytes, payload.encode())
+        assertContentEquals(bytes, MiConnectData.from(payload).toByteArray())
         assertContentEquals(payload.appsData.encode(), TEST_PAYLOAD_V1.encode())
     }
 
@@ -135,7 +119,7 @@ class ProtocolTest {
     fun testV2Protocol() {
         val bytes = TEST_HEX_PAYLOAD_V2.hexToByteArray()
         val payload = XiaomiNfcProtocol.V2.testProtocol(bytes)
-        assertContentEquals(bytes, payload.encode())
+        assertContentEquals(bytes, MiConnectData.from(payload).toByteArray())
         assertContentEquals(payload.appsData.encode(), TEST_PAYLOAD_V2.encode())
     }
 
@@ -143,7 +127,7 @@ class ProtocolTest {
     fun testHandoffProtocol() {
         val bytes = TEST_HEX_PAYLOAD_HANDOFF.hexToByteArray()
         val payload = XiaomiNfcProtocol.HandOff.testProtocol(bytes)
-        assertContentEquals(bytes, payload.encode())
+        assertContentEquals(bytes, MiConnectData.from(payload).toByteArray())
         assertContentEquals(payload.appsData.encode(), TEST_PAYLOAD_HANDOFF.encode())
     }
 }

@@ -42,22 +42,23 @@ data class NfcTagAppData(
     fun getFirstDeviceAttributesMap(ndefType: XiaomiNdefPayloadType): Map<NfcTagDeviceRecord.DeviceAttribute, ByteArray> =
         firstOrNullDeviceRecord()?.getAllAttributesMap(firstAction(), ndefType) ?: emptyMap()
 
+    override fun size(): Int {
+        return Byte.SIZE_BYTES + // majorVersion
+                Byte.SIZE_BYTES + // minorVersion
+                Int.SIZE_BYTES + // writeTime
+                Byte.SIZE_BYTES + // flags
+                Byte.SIZE_BYTES + // records size
+                records.sumOf { it.size() } // records
+    }
+
     override fun encode(): ByteArray {
-        val recordByteArrays = records.map { it.encode() }
-        return ByteBuffer.allocate(
-            Byte.SIZE_BYTES + // majorVersion
-                    Byte.SIZE_BYTES + // minorVersion
-                    Int.SIZE_BYTES + // writeTime
-                    Byte.SIZE_BYTES + // flags
-                    Byte.SIZE_BYTES + // records size
-                    recordByteArrays.totalBytes() // records
-        )
+        return ByteBuffer.allocate(size())
             .put(majorVersion)
             .put(minorVersion)
             .putInt(writeTime)
             .put(flags)
             .put(records.size.toByte())
-            .putByteArrays(recordByteArrays)
+            .putByteArrays(records.map { it.encode() })
             .array()
     }
 }

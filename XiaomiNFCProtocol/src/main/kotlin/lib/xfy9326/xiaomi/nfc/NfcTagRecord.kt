@@ -44,17 +44,22 @@ sealed class NfcTagRecord(private val type: Byte) : BinaryData {
         }
     }
 
+    protected abstract fun contentSize(): Int
+
     protected abstract fun encodeContent(): ByteArray
 
-    final override fun encode(): ByteArray {
-        val content = encodeContent()
-        val totalSize = Byte.SIZE_BYTES + // type
+    final override fun size(): Int {
+        return Byte.SIZE_BYTES + // type
                 Short.SIZE_BYTES + // content size
-                content.size // content
+                contentSize() // content
+    }
+
+    final override fun encode(): ByteArray {
+        val totalSize = size()
         return ByteBuffer.allocate(totalSize)
             .put(type)
             .putShort(totalSize.toShort())
-            .put(content)
+            .put(encodeContent())
             .array()
     }
 }
