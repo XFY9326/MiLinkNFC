@@ -91,8 +91,8 @@ class ProtocolTest {
             )
         )
 
-        private inline fun <reified T : AppsData> XiaomiNfcProtocol<T>.testProtocol(bytes: ByteArray): XiaomiNfcPayload<T> {
-            val payload = MiConnectData.from(bytes)
+        private inline fun <reified T : AppData> XiaomiNfcProtocol<T>.testProtocol(bytes: ByteArray): XiaomiNfcPayload<T> {
+            val payload = MiConnectData.parse(bytes)
 
             assertTrue(payload.isValidNfcPayload)
 
@@ -100,7 +100,7 @@ class ProtocolTest {
             assertEquals(this, protocol)
 
             val xiaomiNfcPayload = payload.toXiaomiNfcPayload(this)
-            assertIs<T>(xiaomiNfcPayload.appsData)
+            assertIs<T>(xiaomiNfcPayload.appData)
 
             return xiaomiNfcPayload
         }
@@ -112,7 +112,7 @@ class ProtocolTest {
         val bytes = TEST_HEX_PAYLOAD_V1.hexToByteArray()
         val payload = XiaomiNfcProtocol.V1.testProtocol(bytes)
         assertContentEquals(bytes, MiConnectData.from(payload).toByteArray())
-        assertContentEquals(payload.appsData.encode(), TEST_PAYLOAD_V1.encode())
+        assertContentEquals(TEST_PAYLOAD_V1.encode(), payload.appData.encode())
     }
 
     @Test
@@ -120,7 +120,7 @@ class ProtocolTest {
         val bytes = TEST_HEX_PAYLOAD_V2.hexToByteArray()
         val payload = XiaomiNfcProtocol.V2.testProtocol(bytes)
         assertContentEquals(bytes, MiConnectData.from(payload).toByteArray())
-        assertContentEquals(payload.appsData.encode(), TEST_PAYLOAD_V2.encode())
+        assertContentEquals(TEST_PAYLOAD_V2.encode(), payload.appData.encode())
     }
 
     @Test
@@ -128,6 +128,6 @@ class ProtocolTest {
         val bytes = TEST_HEX_PAYLOAD_HANDOFF.hexToByteArray()
         val payload = XiaomiNfcProtocol.HandOff.testProtocol(bytes)
         assertContentEquals(bytes, MiConnectData.from(payload).toByteArray())
-        assertContentEquals(payload.appsData.encode(), TEST_PAYLOAD_HANDOFF.encode())
+        assertContentEquals(TEST_PAYLOAD_HANDOFF.encode(), payload.appData.encode())
     }
 }

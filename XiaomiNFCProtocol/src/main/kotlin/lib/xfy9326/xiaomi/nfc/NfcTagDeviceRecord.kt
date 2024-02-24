@@ -58,21 +58,6 @@ data class NfcTagDeviceRecord(
             require(bytes.startsWith(PREFIX_APP_DATA_MAP)) { "Not an valid DeviceAttribute.APP_DATA map byte array" }
             return buffer.getShortKeyBytesMap().mapKeys { DeviceAttribute.parse(it.key) }
         }
-
-        private fun Map<DeviceAttribute, ByteArray>.tryExtractAppDataValueMap(
-            action: NfcTagActionRecord.Action,
-            ndefType: XiaomiNdefPayloadType
-        ) =
-            takeIf {
-                DeviceAttribute.APP_DATA in it
-            }?.let { map ->
-                val appDataBytes = map.getValue(DeviceAttribute.APP_DATA)
-                val extMap = when (getAppDataValueType(appDataBytes, action, ndefType)) {
-                    AppDataValueType.ATTRIBUTES_MAP -> decodeAppDataValueMap(appDataBytes)
-                    else -> mapOf(DeviceAttribute.APP_DATA to appDataBytes)
-                }
-                map.filterNot { it.key == DeviceAttribute.APP_DATA } + extMap
-            } ?: this
     }
 
     val enumDeviceType by lazy { DeviceType.parse(deviceType) }
@@ -90,14 +75,24 @@ data class NfcTagDeviceRecord(
                 }
             }
 
-            XiaomiNdefPayloadType.MI_CONNECT_SERVICE -> attributesMap.mapKeys {
-                DeviceAttribute.parse(
-                    it.key
-                )
+            else -> attributesMap.mapKeys {
+                DeviceAttribute.parse(it.key)
             }
-
-            else -> emptyMap()
-        }.tryExtractAppDataValueMap(action, ndefType)
+        }.let {
+            if (DeviceAttribute.APP_DATA in it) {
+                val appDataBytes = it.getValue(DeviceAttribute.APP_DATA)
+                val type = getAppDataValueType(appDataBytes, action, ndefType)
+                if (type == AppDataValueType.ATTRIBUTES_MAP) {
+                    it.toMutableMap().apply {
+                        putAll(decodeAppDataValueMap(appDataBytes))
+                    }
+                } else {
+                    it
+                }
+            } else {
+                it
+            }
+        }
 
     override fun contentSize(): Int {
         return Short.SIZE_BYTES + // deviceType
@@ -106,13 +101,11 @@ data class NfcTagDeviceRecord(
                 attributesMap.shortMapTotalBytes() // attributeMap
     }
 
-    override fun encodeContent(): ByteArray {
-        return ByteBuffer.allocate(contentSize())
-            .putShort(deviceType)
+    override fun encodeContentInto(buffer: ByteBuffer) {
+        buffer.putShort(deviceType)
             .put(flags)
             .put(deviceNumber)
             .putShortKeyBytesMap(attributesMap)
-            .array()
     }
 
     enum class DeviceType(val value: Short) {

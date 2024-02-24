@@ -9,7 +9,7 @@ data class HandoffAppData(
     val attributesMap: Map<Byte, ByteArray>,
     val action: String,
     val payloadsMap: Map<Byte, ByteArray>
-) : AppsData {
+) : AppData() {
     @Suppress("unused")
     companion object {
         fun newInstance(
@@ -59,21 +59,19 @@ data class HandoffAppData(
         get() = payloadsMap.mapKeys { PayloadKey.parse(it.key) }
 
     override fun size(): Int {
-        val actionBytes = action.toByteArray(Charsets.UTF_8)
-        return Byte.SIZE_BYTES + // major version
-                Byte.SIZE_BYTES + // minor version
+        return Byte.SIZE_BYTES + // majorVersion
+                Byte.SIZE_BYTES + // minorVersion
                 Int.SIZE_BYTES + // deviceType
                 Byte.SIZE_BYTES + // attributeMap size
                 attributesMap.bytesMapTotalBytes() + // attributeMap
                 Byte.SIZE_BYTES + // action size
-                actionBytes.size + // action
-                payloadsMap.bytesMapTotalBytes() // payloadData
+                action.toByteArray(Charsets.UTF_8).size + // action
+                payloadsMap.bytesMapTotalBytes() // payloadMap
     }
 
-    override fun encode(): ByteArray {
+    override fun encodeInto(buffer: ByteBuffer) {
         val actionBytes = action.toByteArray(Charsets.UTF_8)
-        return ByteBuffer.allocate(size())
-            .put(majorVersion)
+        buffer.put(majorVersion)
             .put(minorVersion)
             .putInt(deviceType)
             .put(attributesMap.size.toByte())
@@ -81,7 +79,6 @@ data class HandoffAppData(
             .put(actionBytes.size.toByte())
             .put(actionBytes)
             .putByteKeyBytesMap(payloadsMap)
-            .array()
     }
 
     enum class DeviceType(val value: Int) {

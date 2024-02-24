@@ -1,7 +1,14 @@
 package lib.xfy9326.xiaomi.nfc
 
-interface BinaryData {
-    fun size(): Int
+import java.nio.ByteBuffer
 
-    fun encode(): ByteArray
+abstract class BinaryData {
+    abstract fun size(): Int
+
+    abstract fun encodeInto(buffer: ByteBuffer)
+
+    fun encode(): ByteArray =
+        ByteBuffer.allocate(size()).apply {
+            encodeInto(this)
+        }.array()
 }

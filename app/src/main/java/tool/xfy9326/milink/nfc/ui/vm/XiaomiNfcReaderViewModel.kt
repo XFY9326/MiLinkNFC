@@ -168,7 +168,7 @@ class XiaomiNfcReaderViewModel : ViewModel() {
             _instantMsg.emit(InstantMsg.NDEF_RECORD_NOT_FOUND)
             return false
         }
-        val miConnectData = runCatching { MiConnectData.from(ndefBytes) }.getOrNull()
+        val miConnectData = runCatching { MiConnectData.parse(ndefBytes) }.getOrNull()
         if (miConnectData == null) {
             _instantMsg.emit(InstantMsg.PARSE_ERROR)
             return false
@@ -193,7 +193,7 @@ class XiaomiNfcReaderViewModel : ViewModel() {
                 tag = tagInfo,
                 ndefType = ndefType,
                 payload = XiaomiNfcPayloadUI(payload),
-                appData = when (val appData = payload.appsData) {
+                appData = when (val appData = payload.appData) {
                     is HandoffAppData -> HandoffAppDataUI(appData)
                     is NfcTagAppData -> NfcTagAppDataUI(appData, ndefType)
                 }

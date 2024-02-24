@@ -49,6 +49,6 @@ class NfcTagAppDataUI(
         flags = nfcTagAppData.flags.toHexString(true),
         actionRecord = nfcTagAppData.firstOrNullActionRecord()?.let { NfcTagActionRecordUI(it) },
         deviceRecord = nfcTagAppData.firstOrNullDeviceRecord()
-            ?.let { NfcTagDeviceRecordUI(it, nfcTagAppData.firstAction(), ndefPayloadType) }
+            ?.let { NfcTagDeviceRecordUI(it, nfcTagAppData.firstEnumAction(), ndefPayloadType) }
     )
 }

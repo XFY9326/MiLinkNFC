@@ -37,15 +37,14 @@ data class NfcTagActionRecord(
                 (conditionParameters?.size ?: 0) // conditionParameters
     }
 
-    override fun encodeContent(): ByteArray {
-        return ByteBuffer.allocate(contentSize())
-            .putShort(action)
+    override fun encodeContentInto(buffer: ByteBuffer) {
+        buffer.putShort(action)
             .put(condition)
             .put(deviceNumber)
             .put(flags)
             .apply {
                 conditionParameters?.let { put(it) }
-            }.array()
+            }
     }
 
     enum class Action(val value: Short) {

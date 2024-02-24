@@ -9,7 +9,7 @@ data class NfcTagAppData(
     val writeTime: Int,
     val flags: Byte,
     val records: List<NfcTagRecord>
-) : AppsData {
+) : AppData() {
     companion object {
         fun decode(bytes: ByteArray): NfcTagAppData {
             val buffer = ByteBuffer.wrap(bytes)
@@ -33,14 +33,14 @@ data class NfcTagAppData(
     fun firstOrNullActionRecord(): NfcTagActionRecord? =
         records.asSequence().filterIsInstance<NfcTagActionRecord>().firstOrNull()
 
-    fun firstAction(): NfcTagActionRecord.Action =
+    fun firstEnumAction(): NfcTagActionRecord.Action =
         firstOrNullActionRecord()?.enumAction ?: NfcTagActionRecord.Action.UNKNOWN
 
     fun firstOrNullActionValue(): Short? =
         firstOrNullActionRecord()?.action
 
-    fun getFirstDeviceAttributesMap(ndefType: XiaomiNdefPayloadType): Map<NfcTagDeviceRecord.DeviceAttribute, ByteArray> =
-        firstOrNullDeviceRecord()?.getAllAttributesMap(firstAction(), ndefType) ?: emptyMap()
+    fun getFirstDeviceEnumAttributesMap(ndefType: XiaomiNdefPayloadType): Map<NfcTagDeviceRecord.DeviceAttribute, ByteArray> =
+        firstOrNullDeviceRecord()?.getAllAttributesMap(firstEnumAction(), ndefType) ?: emptyMap()
 
     override fun size(): Int {
         return Byte.SIZE_BYTES + // majorVersion
@@ -51,14 +51,14 @@ data class NfcTagAppData(
                 records.sumOf { it.size() } // records
     }
 
-    override fun encode(): ByteArray {
-        return ByteBuffer.allocate(size())
-            .put(majorVersion)
+    override fun encodeInto(buffer: ByteBuffer) {
+        buffer.put(majorVersion)
             .put(minorVersion)
             .putInt(writeTime)
             .put(flags)
             .put(records.size.toByte())
-            .putByteArrays(records.map { it.encode() })
-            .array()
+        for (record in records) {
+            record.encodeInto(buffer)
+        }
     }
 }

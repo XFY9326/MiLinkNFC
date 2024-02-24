@@ -2,7 +2,7 @@ package lib.xfy9326.xiaomi.nfc
 
 import java.nio.ByteBuffer
 
-sealed class NfcTagRecord(private val type: Byte) : BinaryData {
+sealed class NfcTagRecord(private val type: Byte) : BinaryData() {
     companion object {
         internal const val TYPE_DEVICE = 0x01.toByte()
         internal const val TYPE_ACTION = 0x02.toByte()
@@ -36,9 +36,7 @@ sealed class NfcTagRecord(private val type: Byte) : BinaryData {
                 deviceNumber = buffer.get(),
                 flags = buffer.get(),
                 conditionParameters = if (buffer.hasRemaining()) ByteArray(buffer.remaining()).also {
-                    buffer.get(
-                        it
-                    )
+                    buffer.get(it)
                 } else null
             )
         }
@@ -46,7 +44,7 @@ sealed class NfcTagRecord(private val type: Byte) : BinaryData {
 
     protected abstract fun contentSize(): Int
 
-    protected abstract fun encodeContent(): ByteArray
+    protected abstract fun encodeContentInto(buffer: ByteBuffer)
 
     final override fun size(): Int {
         return Byte.SIZE_BYTES + // type
@@ -54,12 +52,9 @@ sealed class NfcTagRecord(private val type: Byte) : BinaryData {
                 contentSize() // content
     }
 
-    final override fun encode(): ByteArray {
-        val totalSize = size()
-        return ByteBuffer.allocate(totalSize)
-            .put(type)
-            .putShort(totalSize.toShort())
-            .put(encodeContent())
-            .array()
+    override fun encodeInto(buffer: ByteBuffer) {
+        buffer.put(type)
+            .putShort(size().toShort())
+        encodeContentInto(buffer)
     }
 }

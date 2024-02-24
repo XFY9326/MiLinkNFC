@@ -9,7 +9,7 @@ import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.util.Base64
 import androidx.core.net.toUri
-import lib.xfy9326.xiaomi.nfc.AppsData
+import lib.xfy9326.xiaomi.nfc.AppData
 import lib.xfy9326.xiaomi.nfc.HandoffAppData
 import lib.xfy9326.xiaomi.nfc.MiConnectData
 import lib.xfy9326.xiaomi.nfc.NfcTagActionRecord
@@ -57,7 +57,7 @@ object XiaomiNfc {
             NdefRecord.createUri(URI_MI_HOME.toUri())
         )
 
-    abstract class NfcAction<T, A : AppsData>(
+    abstract class NfcAction<T, A : AppData>(
         private val majorVersion: Int,
         private val minorVersion: Int,
         private val idHash: Byte? = null,
@@ -94,7 +94,7 @@ object XiaomiNfc {
                 minorVersion = minorVersion,
                 idHash = idHash,
                 protocol = protocol,
-                appsData = encodeAppsData(config)
+                appData = encodeAppsData(config)
             )
     }
 
@@ -251,13 +251,13 @@ object XiaomiNfc {
 
         @SuppressLint("WrongConstant")
         fun sendBroadcast(context: Context, config: Config) {
-            val appData = build(config).appsData
+            val appData = build(config).appData
             Intent(ACTION).apply {
                 addFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP)
                 addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
                 addFlags(FLAG_BIND_TREAT_LIKE_VISIBLE_FOREGROUND_SERVICE)
                 putExtra(EXTRA_ACTION, NfcTagActionRecord.Action.CUSTOM.value.toInt())
-                appData.getFirstDeviceAttributesMap(ndefRecordType).let { map ->
+                appData.getFirstDeviceEnumAttributesMap(ndefRecordType).let { map ->
                     val idHash = map[NfcTagDeviceRecord.DeviceAttribute.ID_HASH]?.let {
                         Base64.encodeToString(
                             it,

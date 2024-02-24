@@ -16,11 +16,6 @@ internal fun Map<Byte, ByteArray>.bytesMapTotalBytes(): Int =
 internal fun Map<Short, ByteArray>.shortMapTotalBytes(): Int =
     entries.fold(0) { acc, entry -> acc + Short.SIZE_BYTES * 2 + entry.value.size }
 
-internal fun ByteBuffer.putByteArrays(array: Iterable<ByteArray>): ByteBuffer {
-    for (bytes in array) put(bytes)
-    return this
-}
-
 internal fun ByteBuffer.putByteKeyBytesMap(map: Map<Byte, ByteArray>): ByteBuffer {
     for ((key, value) in map) {
         put(key)
