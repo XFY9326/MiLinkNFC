@@ -1,6 +1,6 @@
 package lib.xfy9326.xiaomi.nfc
 
-enum class XiaomiNdefPayloadType(val value: String) {
+enum class XiaomiNdefTNF(val value: String) {
     UNKNOWN(""),
     SMART_HOME("com.xiaomi.smarthome:externaltype"),
     MI_CONNECT_SERVICE("com.xiaomi.mi_connect_service:externaltype");

@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import lib.xfy9326.xiaomi.nfc.HandoffAppData
 import lib.xfy9326.xiaomi.nfc.MiConnectData
 import lib.xfy9326.xiaomi.nfc.NfcTagAppData
-import lib.xfy9326.xiaomi.nfc.XiaomiNdefPayloadType
+import lib.xfy9326.xiaomi.nfc.XiaomiNdefTNF
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.data.NdefReadData
 import tool.xfy9326.milink.nfc.data.ui.AppDataUI
@@ -52,7 +52,7 @@ class XiaomiNfcReaderViewModel : ViewModel() {
     ) {
         data class NfcInfo(
             val tag: NfcTagInfoUI?,
-            val ndefType: XiaomiNdefPayloadType,
+            val ndefType: XiaomiNdefTNF,
             val payload: XiaomiNfcPayloadUI,
             val appData: AppDataUI,
         )
@@ -158,12 +158,12 @@ class XiaomiNfcReaderViewModel : ViewModel() {
         tagInfo: NfcTagInfoUI?,
         ndefMessage: NdefMessage
     ): Boolean {
-        val ndefType = XiaomiNfc.getXiaomiNfcPayloadType(ndefMessage)
+        val ndefType = XiaomiNfc.getXiaomiNdefPayloadType(ndefMessage)
         if (ndefType == null) {
             _instantMsg.emit(InstantMsg.NDEF_RECORD_NOT_FOUND)
             return false
         }
-        val ndefBytes = XiaomiNfc.getXiaomiNfcPayloadBytes(ndefMessage, ndefType)
+        val ndefBytes = XiaomiNfc.getXiaomiNdefPayloadBytes(ndefMessage, ndefType)
         if (ndefBytes == null) {
             _instantMsg.emit(InstantMsg.NDEF_RECORD_NOT_FOUND)
             return false

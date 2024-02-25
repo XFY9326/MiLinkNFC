@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.collectLatest
-import lib.xfy9326.xiaomi.nfc.XiaomiNdefPayloadType
+import lib.xfy9326.xiaomi.nfc.XiaomiNdefTNF
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.data.ui.HandoffAppDataUI
 import tool.xfy9326.milink.nfc.data.ui.NfcTagAppDataUI
@@ -231,7 +231,7 @@ private fun NfcTagInfoCard(modifier: Modifier = Modifier, data: NfcTagInfoUI) {
 }
 
 @Composable
-private fun NdefCard(modifier: Modifier = Modifier, ndefType: XiaomiNdefPayloadType) {
+private fun NdefCard(modifier: Modifier = Modifier, ndefType: XiaomiNdefTNF) {
     OutlinedCard(modifier = modifier) {
         InfoContent(
             modifier = Modifier
@@ -241,9 +241,9 @@ private fun NdefCard(modifier: Modifier = Modifier, ndefType: XiaomiNdefPayloadT
             data = mapOf(
                 stringResource(id = R.string.nfc_field_type) to stringResource(
                     id = when (ndefType) {
-                        XiaomiNdefPayloadType.UNKNOWN -> R.string.unknown
-                        XiaomiNdefPayloadType.SMART_HOME -> R.string.ndef_payload_type_smart_home
-                        XiaomiNdefPayloadType.MI_CONNECT_SERVICE -> R.string.ndef_payload_type_mi_connect_service
+                        XiaomiNdefTNF.UNKNOWN -> R.string.unknown
+                        XiaomiNdefTNF.SMART_HOME -> R.string.ndef_payload_type_smart_home
+                        XiaomiNdefTNF.MI_CONNECT_SERVICE -> R.string.ndef_payload_type_mi_connect_service
                     }
                 )
             )
