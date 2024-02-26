@@ -43,6 +43,11 @@ NFC写入界面有写入字节大小的提示，请测试后根据自己的需�
 | 米家       | `com.xiaomi.smarthome`          | 9.1.501                  |
 | NFC服务    | `com.android.nfc`               | 14                       |
 
+## 相关项目
+
+- [XiaomiNDEF](https://github.com/XFY9326/XiaomiNDEF)  
+  使用Python自定义小米NDEF信息
+
 ## 开源协议
 
 ```text
