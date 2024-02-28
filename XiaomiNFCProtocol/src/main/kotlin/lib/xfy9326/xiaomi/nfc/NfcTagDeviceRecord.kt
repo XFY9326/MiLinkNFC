@@ -2,7 +2,7 @@ package lib.xfy9326.xiaomi.nfc
 
 import java.nio.ByteBuffer
 
-@Suppress("unused", "MemberVisibilityCanBePrivate")
+@Suppress("unused")
 data class NfcTagDeviceRecord(
     val deviceType: Short,
     val flags: Byte,

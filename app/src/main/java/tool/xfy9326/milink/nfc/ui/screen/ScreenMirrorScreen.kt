@@ -23,7 +23,7 @@ import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Transform
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
@@ -405,7 +405,7 @@ private fun HuaweiRedirectFunctionCard(
                 icon = Icons.AutoMirrored.Default.OpenInNew,
                 onClick = { context.openAppSettings() }
             )
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier.padding(top = 8.dp, bottom = 2.dp),
                 color = colorScheme.onSurfaceVariant
             )

@@ -22,7 +22,7 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.FileCopy
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
@@ -244,7 +244,7 @@ private fun Content(
                 summary = stringResource(id = R.string.xiaomi_screen_mirror_nfc_summary),
                 onClick = onNavToScreenMirror
             )
-            Divider(modifier = Modifier.fillMaxWidth())
+            HorizontalDivider(modifier = Modifier.fillMaxWidth())
             EntryCard(
                 icon = Icons.Default.DataObject,
                 title = stringResource(id = R.string.nfc_read_xiaomi_ndef),
@@ -269,7 +269,7 @@ private fun Content(
                 summary = stringResource(id = R.string.nfc_clear_ndef_summary),
                 onClick = onRequestClearNfc
             )
-            Divider(modifier = Modifier.fillMaxWidth())
+            HorizontalDivider(modifier = Modifier.fillMaxWidth())
             EntryCard(
                 icon = Icons.Default.GroupAdd,
                 title = stringResource(id = R.string.add_qq_group),
