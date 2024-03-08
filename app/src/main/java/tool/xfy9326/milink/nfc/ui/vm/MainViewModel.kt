@@ -27,10 +27,6 @@ import tool.xfy9326.milink.nfc.utils.isXiaomiHyperOS
 import tool.xfy9326.milink.nfc.utils.readBinary
 
 class MainViewModel : ViewModel() {
-    companion object {
-        private const val PERMITS_NFC_USING = 1
-    }
-
     enum class InstantMsg(@StringRes val resId: Int) {
         IMPORT_FAILED(R.string.import_failed),
         NDEF_PARSE_FAILED(R.string.ndef_parse_failed),
