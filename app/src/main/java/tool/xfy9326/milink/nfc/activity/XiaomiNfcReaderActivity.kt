@@ -118,8 +118,8 @@ class XiaomiNfcReaderActivity : ComponentActivity() {
                 showToast(R.string.nfc_connect_failed)
                 viewModel.clearNfcReadData()
             }
+            safeClose()
+            adapter.ignoreTagUntilRemoved(tag)
         }
-        safeClose()
-        adapter.ignoreTagUntilRemoved(tag)
     }
 }
