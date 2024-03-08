@@ -36,16 +36,27 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
-            manifestPlaceholders["ApplicationId"] =
-                defaultConfig.applicationId + applicationIdSuffix
+            manifestPlaceholders["ApplicationId"] = defaultConfig.applicationId + applicationIdSuffix
+
+            versionNameSuffix = "-debug"
+        }
+        register("beta") {
+            initWith(getByName("release"))
+            matchingFallbacks += "release"
+
+            applicationIdSuffix = ".beta"
+            manifestPlaceholders["ApplicationId"] = defaultConfig.applicationId + applicationIdSuffix
+
+            versionNameSuffix = "-beta"
+
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
 
             packaging {
                 resources.excludes += "DebugProbesKt.bin"
