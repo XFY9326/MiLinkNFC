@@ -31,7 +31,6 @@
     <string name="tap_and_write_nfc_tag_read_only">靠近NFC标签以写入只读数据</string>
     <string name="tap_and_read_nfc_tag">靠近NFC标签以读取数据</string>
     <string name="nfc_write_bytes">%1$d字节</string>
-    <string name="nfc_using_conflict">设备正在使用中</string>
     <string name="nfc_write_success">写入成功</string>
     <string name="nfc_connect_failed">连接失败</string>
     <string name="nfc_read_failed">读取失败</string>
@@ -128,7 +127,7 @@
     <string name="nfc_field_tech">技术</string>
     <string name="nfc_field_type">类型</string>
     <string name="nfc_field_size">容量</string>
-    <string name="nfc_field_writeable">可写</string>
+    <string name="nfc_field_writeable">可写入</string>
     <string name="nfc_field_can_make_read_only">可设置只读</string>
     <string name="nfc_field_version">版本</string>
     <string name="nfc_field_id_hash">ID</string>

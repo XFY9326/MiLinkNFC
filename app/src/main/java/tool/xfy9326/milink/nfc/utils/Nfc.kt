@@ -26,6 +26,14 @@ fun NfcAdapter.enableNdefReaderMode(activity: Activity, callBack: (Tag) -> Unit)
     enableReaderMode(activity, callBack, flags, options)
 }
 
+fun <T : TagTechnology> T.safeClose(): Boolean =
+    try {
+        close()
+        true
+    } catch (e: Exception) {
+        false
+    }
+
 fun NfcAdapter.ignoreTagUntilRemoved(tag: Tag) =
     runCatching {
         ignore(tag, NFC_TAG_IGNORE_MILLS, null, null)
@@ -36,7 +44,7 @@ val Tag.techNameList: List<String>
 
 suspend fun <T : TagTechnology> T.tryConnect(): Result<T> = runCatching {
     if (!isConnected) withContext(Dispatchers.IO) { connect() }
-    require(isConnected) { "Connect failed!" }
+    require(isConnected)
     this
 }
 

@@ -22,6 +22,7 @@ import tool.xfy9326.milink.nfc.utils.MIME_ALL
 import tool.xfy9326.milink.nfc.utils.enableNdefReaderMode
 import tool.xfy9326.milink.nfc.utils.ignoreTagUntilRemoved
 import tool.xfy9326.milink.nfc.utils.isNullOrEmpty
+import tool.xfy9326.milink.nfc.utils.safeClose
 import tool.xfy9326.milink.nfc.utils.showToast
 import tool.xfy9326.milink.nfc.utils.techNameList
 import tool.xfy9326.milink.nfc.utils.tryConnect
@@ -64,18 +65,22 @@ class XiaomiNfcReaderActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         NfcAdapter.getDefaultAdapter(this)?.let { adapter ->
-            adapter.enableNdefReaderMode(this) {
-                val ndef = Ndef.get(it)
-                if (ndef != null) {
-                    lifecycleScope.launch { ndef.readNdef() }
-                } else {
-                    if (NdefFormatable.get(it) != null) {
-                        showToast(R.string.nfc_ndef_formatable)
+            if (adapter.isEnabled) {
+                adapter.enableNdefReaderMode(this) {
+                    val ndef = Ndef.get(it)
+                    if (ndef != null) {
+                        lifecycleScope.launch { ndef.readNdef(adapter) }
                     } else {
-                        showToast(R.string.nfc_not_ndef)
+                        if (NdefFormatable.get(it) != null) {
+                            showToast(R.string.nfc_ndef_formatable)
+                        } else {
+                            showToast(R.string.nfc_not_ndef)
+                        }
+                        viewModel.clearNfcReadData()
                     }
-                    viewModel.clearNfcReadData()
                 }
+            } else {
+                showToast(R.string.nfc_disabled)
             }
         }
     }
@@ -85,7 +90,7 @@ class XiaomiNfcReaderActivity : ComponentActivity() {
         super.onPause()
     }
 
-    private suspend fun Ndef.readNdef() {
+    private suspend fun Ndef.readNdef(adapter: NfcAdapter) {
         lifecycleScope.launch(Dispatchers.Main.immediate) {
             tryConnect().onSuccess {
                 try {
@@ -109,11 +114,12 @@ class XiaomiNfcReaderActivity : ComponentActivity() {
                     showToast(R.string.nfc_read_failed)
                     viewModel.clearNfcReadData()
                 }
-                NfcAdapter.getDefaultAdapter(this@XiaomiNfcReaderActivity)?.ignoreTagUntilRemoved(tag)
             }.onFailure {
                 showToast(R.string.nfc_connect_failed)
                 viewModel.clearNfcReadData()
             }
         }
+        safeClose()
+        adapter.ignoreTagUntilRemoved(tag)
     }
 }
