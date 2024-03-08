@@ -162,7 +162,7 @@ private fun TopBar(
                 IconButton(onClick = onRequestExportNdefBin) {
                     Icon(
                         imageVector = Icons.Outlined.Save,
-                        contentDescription = stringResource(id = R.string.export)
+                        contentDescription = stringResource(id = R.string.save)
                     )
                 }
             }
@@ -176,7 +176,7 @@ private fun EventHandler(viewModel: XiaomiNfcReaderViewModel) {
 
     LaunchedEffect(Unit) {
         viewModel.instantMsg.collectLatest {
-            context.showToast(text = context.getString(it.resId))
+            context.showToast(it.resId)
         }
     }
 }

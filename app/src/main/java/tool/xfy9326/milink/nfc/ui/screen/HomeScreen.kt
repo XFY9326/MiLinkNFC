@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -15,9 +14,9 @@ import androidx.compose.material.icons.filled.BluetoothAudio
 import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material.icons.filled.DataObject
 import androidx.compose.material.icons.filled.Devices
+import androidx.compose.material.icons.filled.GetApp
 import androidx.compose.material.icons.filled.GroupAdd
 import androidx.compose.material.icons.filled.Nfc
-import androidx.compose.material.icons.filled.Update
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.FileCopy
 import androidx.compose.material.icons.outlined.Info
@@ -56,10 +55,8 @@ import tool.xfy9326.milink.nfc.ui.common.EntryCard
 import tool.xfy9326.milink.nfc.ui.common.SlideAnimationNavHost
 import tool.xfy9326.milink.nfc.ui.dialog.AboutDialog
 import tool.xfy9326.milink.nfc.ui.dialog.MessageAlertDialog
-import tool.xfy9326.milink.nfc.ui.dialog.NdefWriterDialog
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.vm.MainViewModel
-import tool.xfy9326.milink.nfc.utils.showToast
 
 const val HomeRoute = "home"
 
@@ -82,8 +79,6 @@ fun HomeScreen(
     onRequestWriteNdefBin: () -> Unit,
     onExit: () -> Unit
 ) {
-    val context = LocalContext.current
-
     val navController = rememberNavController()
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -174,16 +169,6 @@ fun HomeScreen(
             onDismissRequest = onExit
         )
     }
-
-    uiState.value.ndefWriteDialogData?.let {
-        NdefWriterDialog(
-            ndefWriteData = it,
-            onOpenReader = viewModel::openNFCWriter,
-            onCloseReader = viewModel::closeNfcWriter,
-            onNfcDeviceUsing = { context.showToast(context.getString(R.string.nfc_using_conflict)) },
-            onDismissRequest = viewModel::cancelNdefWriteDialog
-        )
-    }
 }
 
 @Composable
@@ -244,7 +229,7 @@ private fun Content(
                 summary = stringResource(id = R.string.xiaomi_screen_mirror_nfc_summary),
                 onClick = onNavToScreenMirror
             )
-            HorizontalDivider(modifier = Modifier.fillMaxWidth())
+            HorizontalDivider()
             EntryCard(
                 icon = Icons.Default.DataObject,
                 title = stringResource(id = R.string.nfc_read_xiaomi_ndef),
@@ -269,7 +254,7 @@ private fun Content(
                 summary = stringResource(id = R.string.nfc_clear_ndef_summary),
                 onClick = onRequestClearNfc
             )
-            HorizontalDivider(modifier = Modifier.fillMaxWidth())
+            HorizontalDivider()
             EntryCard(
                 icon = Icons.Default.GroupAdd,
                 title = stringResource(id = R.string.add_qq_group),
@@ -299,7 +284,7 @@ private fun TopBar(
                 uriHandler.openUri(context.getString(R.string.app_releases_url))
             }) {
                 Icon(
-                    imageVector = Icons.Default.Update,
+                    imageVector = Icons.Default.GetApp,
                     contentDescription = stringResource(id = R.string.check_update)
                 )
             }

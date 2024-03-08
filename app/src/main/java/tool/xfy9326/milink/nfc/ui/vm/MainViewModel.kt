@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Semaphore
 import tool.xfy9326.milink.nfc.AppContext
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.data.NdefWriteData
@@ -22,6 +21,7 @@ import tool.xfy9326.milink.nfc.datastore.AppDataStore
 import tool.xfy9326.milink.nfc.datastore.base.key.readValue
 import tool.xfy9326.milink.nfc.datastore.base.key.writeValue
 import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
+import tool.xfy9326.milink.nfc.utils.EmptyNdefMessage
 import tool.xfy9326.milink.nfc.utils.NdefIO
 import tool.xfy9326.milink.nfc.utils.isXiaomiHyperOS
 import tool.xfy9326.milink.nfc.utils.readBinary
@@ -39,20 +39,17 @@ class MainViewModel : ViewModel() {
     }
 
     data class UiState(
-        val showNotSupportedOSDialog: Boolean = false,
-        val ndefWriteDialogData: NdefWriteData? = null,
+        val showNotSupportedOSDialog: Boolean = false
     )
-
-    private val nfcUsing = Semaphore(PERMITS_NFC_USING)
-
-    private val _nfcWriteData = MutableStateFlow<NdefWriteData?>(null)
-    val nfcWriteData: StateFlow<NdefWriteData?> = _nfcWriteData.asStateFlow()
 
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     private val _instantMsg = MutableSharedFlow<InstantMsg>()
     val instantMsg: SharedFlow<InstantMsg> = _instantMsg.asSharedFlow()
+
+    private val _nfcWriteData = MutableSharedFlow<NdefWriteData>()
+    val nfcWriteData: SharedFlow<NdefWriteData> = _nfcWriteData.asSharedFlow()
 
     init {
         checkNotSupportedOS()
@@ -96,11 +93,11 @@ class MainViewModel : ViewModel() {
     }
 
     fun requestClearNdefWriteDialog() {
-        requestNdefWriteDialog(NdefWriteData(msg = null, readOnly = false))
+        requestNdefWriteDialog(NdefWriteData(msg = EmptyNdefMessage, readOnly = false))
     }
 
     fun requestFormatXiaomiTapNdefWriteDialog() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val ndefMsg = XiaomiNfc.EmptyMiTap.newNdefMessage(
                 (System.currentTimeMillis() / 1000).toInt(),
                 AppDataStore.shrinkNdefMsg.getValue()
@@ -117,36 +114,8 @@ class MainViewModel : ViewModel() {
             } else if (!nfcAdapter.isEnabled) {
                 _instantMsg.emit(InstantMsg.NFC_DISABLED)
             } else {
-                _uiState.update {
-                    it.copy(ndefWriteDialogData = ndefWriteData)
-                }
+                _nfcWriteData.emit(ndefWriteData)
             }
-        }
-    }
-
-    fun cancelNdefWriteDialog() {
-        _uiState.update {
-            it.copy(ndefWriteDialogData = null)
-        }
-    }
-
-    fun openNFCWriter(ndefWriteData: NdefWriteData): Boolean {
-        return if (nfcUsing.tryAcquire()) {
-            _nfcWriteData.update { ndefWriteData }
-            true
-        } else {
-            false
-        }
-    }
-
-    fun closeNfcWriter() {
-        _nfcWriteData.update { null }
-        try {
-            if (nfcUsing.availablePermits < PERMITS_NFC_USING) {
-                nfcUsing.release()
-            }
-        } catch (e: Exception) {
-            // Ignore
         }
     }
 }

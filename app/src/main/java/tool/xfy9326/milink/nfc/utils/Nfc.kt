@@ -7,6 +7,8 @@ import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.nfc.tech.TagTechnology
 import androidx.core.os.bundleOf
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 private const val NFC_TAG_IGNORE_MILLS = 1000
 private const val NFC_TAG_CHECK_DELAY_MILLS = 250
@@ -29,9 +31,12 @@ fun NfcAdapter.ignoreTagUntilRemoved(tag: Tag) =
         ignore(tag, NFC_TAG_IGNORE_MILLS, null, null)
     }.getOrDefault(false)
 
-fun <T : TagTechnology> T.tryConnect(): Result<T> = runCatching {
-    if (!isConnected) connect()
-    require(isConnected)
+val Tag.techNameList: List<String>
+    get() = techList.map { str -> str.substringAfterLast(".") }
+
+suspend fun <T : TagTechnology> T.tryConnect(): Result<T> = runCatching {
+    if (!isConnected) withContext(Dispatchers.IO) { connect() }
+    require(isConnected) { "Connect failed!" }
     this
 }
 

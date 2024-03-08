@@ -43,6 +43,11 @@
         </activity>
 
         <activity
+            android:name=".activity.NdefWriterActivity"
+            android:exported="false"
+            android:launchMode="singleTop" />
+
+        <activity
             android:name=".activity.XiaomiNfcReaderActivity"
             android:exported="false"
             android:launchMode="singleTop" />

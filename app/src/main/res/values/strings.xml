@@ -20,6 +20,7 @@
     <string name="nfc_write_bin_ndef">复制NDEF到NFC标签</string>
     <string name="nfc_write_bin_ndef_summary">选择导出的NDEF文件以写入NFC标签</string>
     <string name="nfc_writer">NFC写入</string>
+    <string name="nfc_write_ndef">写入NFC标签</string>
     <string name="write_mi_tap_sound_box_nfc">音频接力NFC标签</string>
     <string name="write_mi_tap_sound_box_nfc_desc">向NFC标签中覆盖写入音频接力的数据，仅支持NDEF格式的NFC标签。\n\n如果写入失败，可能是因为写入NFC标签时连接断开，请多尝试几次。\n\n使用NFC标签前请确保手机曾经配对连接过这个蓝牙设备，WIFI MAC地址和IOT设备名称可以不填写（或许填写后有特殊作用）。\n\n这个NFC标签的功能原理是自动连接蓝牙设备，所以理论上可以支持任何蓝牙音箱。\n\n如果希望填写但不知道IOT设备名称，可以在第三方收集整理的米家产品库搜索。</string>
     <string name="write_circulate_nfc">内容流转NFC标签</string>
@@ -27,7 +28,6 @@
     <string name="write_screen_mirror_nfc">一碰妙享NFC标签</string>
     <string name="write_screen_mirror_nfc_desc">向NFC标签中覆盖写入小米一碰妙享的数据，仅支持NDEF格式的NFC标签。\n\n如果写入失败，可能是因为写入NFC标签时连接断开，请多尝试几次。\n\n如果投屏时多次出现连接失败，可以使用“测试屏幕镜像”功能并尝试重启小米电脑管家。</string>
     <string name="tap_and_write_nfc_tag">靠近NFC标签以写入数据</string>
-    <string name="tap_and_clear_nfc_tag">靠近NFC标签以写入空数据</string>
     <string name="tap_and_write_nfc_tag_read_only">靠近NFC标签以写入只读数据</string>
     <string name="tap_and_read_nfc_tag">靠近NFC标签以读取数据</string>
     <string name="nfc_write_bytes">%1$d字节</string>

@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 
@@ -19,6 +20,9 @@ val Context.packageUri: Uri
 inline fun <reified A : Activity> Context.startActivity(intentBlock: Intent.() -> Unit = {}) {
     startActivity(Intent(this, A::class.java).apply(intentBlock))
 }
+
+fun Context.showToast(@StringRes resId: Int, vararg formatArgs: Any, longDuration: Boolean = false): Unit =
+    showToast(getString(resId, *formatArgs), longDuration)
 
 fun Context.showToast(text: String, longDuration: Boolean = false): Unit =
     Toast.makeText(this, text, if (longDuration) Toast.LENGTH_LONG else Toast.LENGTH_SHORT).show()

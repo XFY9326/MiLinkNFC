@@ -23,16 +23,16 @@ import tool.xfy9326.milink.nfc.utils.enableNdefReaderMode
 import tool.xfy9326.milink.nfc.utils.ignoreTagUntilRemoved
 import tool.xfy9326.milink.nfc.utils.isNullOrEmpty
 import tool.xfy9326.milink.nfc.utils.showToast
+import tool.xfy9326.milink.nfc.utils.techNameList
 import tool.xfy9326.milink.nfc.utils.tryConnect
 
 class XiaomiNfcReaderActivity : ComponentActivity() {
     private val viewModel by viewModels<XiaomiNfcReaderViewModel>()
-    private val exportNdefBin =
-        registerForActivityResult(ActivityResultContracts.CreateDocument(MIME_ALL)) {
-            if (it != null) {
-                viewModel.exportNdefBin(it)
-            }
+    private val exportNdefBin = registerForActivityResult(ActivityResultContracts.CreateDocument(MIME_ALL)) {
+        if (it != null) {
+            viewModel.exportNdefBin(it)
         }
+    }
     private val importNdefBin = registerForActivityResult(ActivityResultContracts.GetContent()) {
         if (it != null) {
             viewModel.updateNfcReadData(it)
@@ -54,10 +54,6 @@ class XiaomiNfcReaderActivity : ComponentActivity() {
                 )
             }
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
         lifecycleScope.launch {
             viewModel.exportNdefBin.collect {
                 exportNdefBin.launch(it)
@@ -65,22 +61,18 @@ class XiaomiNfcReaderActivity : ComponentActivity() {
         }
     }
 
-    private fun makeToast(msg: String): Unit = runOnUiThread { showToast(msg) }
-
     override fun onResume() {
         super.onResume()
         NfcAdapter.getDefaultAdapter(this)?.let { adapter ->
             adapter.enableNdefReaderMode(this) {
                 val ndef = Ndef.get(it)
                 if (ndef != null) {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        readNdef(adapter, ndef)
-                    }
+                    lifecycleScope.launch { ndef.readNdef() }
                 } else {
                     if (NdefFormatable.get(it) != null) {
-                        makeToast(getString(R.string.nfc_ndef_formatable))
+                        showToast(R.string.nfc_ndef_formatable)
                     } else {
-                        makeToast(getString(R.string.nfc_not_ndef))
+                        showToast(R.string.nfc_not_ndef)
                     }
                     viewModel.clearNfcReadData()
                 }
@@ -93,33 +85,35 @@ class XiaomiNfcReaderActivity : ComponentActivity() {
         super.onPause()
     }
 
-    private suspend fun readNdef(nfcAdapter: NfcAdapter, ndef: Ndef) = withContext(Dispatchers.IO) {
-        ndef.tryConnect().onSuccess {
-            try {
-                val msg = it.ndefMessage
-                if (msg.isNullOrEmpty()) {
-                    makeToast(getString(R.string.nfc_empty))
-                } else {
-                    NdefReadData(
-                        scanTime = System.currentTimeMillis(),
-                        techList = it.tag.techList.map { str -> str.substringAfterLast(".") },
-                        type = it.type,
-                        msg = msg,
-                        maxSize = it.maxSize,
-                        writeable = it.isWritable,
-                        canMakeReadOnly = it.canMakeReadOnly()
-                    ).also { data ->
-                        viewModel.updateNfcReadData(data)
+    private suspend fun Ndef.readNdef() {
+        lifecycleScope.launch(Dispatchers.Main.immediate) {
+            tryConnect().onSuccess {
+                try {
+                    val msg = withContext(Dispatchers.IO) { it.ndefMessage }
+                    if (msg.isNullOrEmpty()) {
+                        showToast(R.string.nfc_empty)
+                    } else {
+                        NdefReadData(
+                            scanTime = System.currentTimeMillis(),
+                            techList = it.tag.techNameList,
+                            type = it.type,
+                            msg = msg,
+                            maxSize = it.maxSize,
+                            writeable = it.isWritable,
+                            canMakeReadOnly = it.canMakeReadOnly()
+                        ).also { data ->
+                            viewModel.updateNfcReadData(data)
+                        }
                     }
+                } catch (e: Exception) {
+                    showToast(R.string.nfc_read_failed)
+                    viewModel.clearNfcReadData()
                 }
-            } catch (e: Exception) {
-                makeToast(getString(R.string.nfc_read_failed))
+                NfcAdapter.getDefaultAdapter(this@XiaomiNfcReaderActivity)?.ignoreTagUntilRemoved(tag)
+            }.onFailure {
+                showToast(R.string.nfc_connect_failed)
                 viewModel.clearNfcReadData()
             }
-            nfcAdapter.ignoreTagUntilRemoved(ndef.tag)
-        }.onFailure {
-            makeToast(getString(R.string.nfc_connect_failed))
-            viewModel.clearNfcReadData()
         }
     }
 }

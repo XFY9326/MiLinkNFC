@@ -12,8 +12,8 @@ android {
         applicationId = "tool.xfy9326.milink.nfc"
         minSdk = 29
         targetSdk = 34
-        versionCode = 13
-        versionName = "1.8.4"
+        versionCode = 14
+        versionName = "1.9"
 
         resourceConfigurations += "zh"
 
