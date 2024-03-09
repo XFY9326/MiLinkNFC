@@ -39,7 +39,7 @@
     <string name="nfc_ndef_not_supported">不支持NDEF格式\n%1$s</string>
     <string name="nfc_not_ndef">非NDEF格式的标签</string>
     <string name="nfc_ndef_formatable">未格式化为NDEF的标签</string>
-    <string name="nfc_write_error">写入失败</string>
+    <string name="nfc_write_error">写入错误\n请保持NFC连接稳定</string>
     <string name="nfc_write_failed">写入失败</string>
     <string name="nfc_write_error_read_only">设置只读失败</string>
     <string name="nfc_ndef_format_success">格式化为NDEF成功\n请再次触碰NFC标签以写入数据</string>
@@ -47,7 +47,7 @@
     <string name="nfc_write_error_max_size">写入空间不足</string>
     <string name="nfc_write_error_no_read_only">不可设为只读</string>
     <string name="nfc_write_error_not_writeable">不可写入</string>
-    <string name="nfc_new_tag_found">检测到NFC标签</string>
+    <string name="nfc_new_tag_found">发现NFC标签</string>
     <string name="test_circulate">测试内容流转</string>
     <string name="test_circulate_desc">模拟NFC内容流转，向指定WLAN和蓝牙MAC地址的设备进行内容流转。\n\n触发方式：\n“虚拟NFC标签”：可能使投屏服务出错，但不受系统版本限制。\n“互联通信服务”：直接控制投屏服务，但可能因为系统版本不符无法触发。\n\n建议在后台播放音乐时测试，不支持的设备可能会导致互联互通功能一段时间无响应（可以尝试在设置中重启）。</string>
     <string name="test_screen_mirror">测试屏幕镜像</string>

@@ -1,6 +1,8 @@
 package tool.xfy9326.milink.nfc.activity
 
+import android.content.Intent
 import android.nfc.NfcAdapter
+import android.nfc.Tag
 import android.nfc.tech.Ndef
 import android.nfc.tech.NdefFormatable
 import android.os.Bundle
@@ -19,7 +21,7 @@ import tool.xfy9326.milink.nfc.ui.screen.XiaomiNfcReaderScreen
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.vm.XiaomiNfcReaderViewModel
 import tool.xfy9326.milink.nfc.utils.MIME_ALL
-import tool.xfy9326.milink.nfc.utils.enableNdefReaderMode
+import tool.xfy9326.milink.nfc.utils.enableNdefForegroundDispatch
 import tool.xfy9326.milink.nfc.utils.ignoreTagUntilRemoved
 import tool.xfy9326.milink.nfc.utils.isNullOrEmpty
 import tool.xfy9326.milink.nfc.utils.requireConnect
@@ -28,6 +30,7 @@ import tool.xfy9326.milink.nfc.utils.safeClose
 import tool.xfy9326.milink.nfc.utils.showToast
 import tool.xfy9326.milink.nfc.utils.showToastInMain
 import tool.xfy9326.milink.nfc.utils.techNameList
+import tool.xfy9326.milink.nfc.utils.tryGetNfcTag
 
 class XiaomiNfcReaderActivity : ComponentActivity() {
     private val viewModel by viewModels<XiaomiNfcReaderViewModel>()
@@ -66,21 +69,9 @@ class XiaomiNfcReaderActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        NfcAdapter.getDefaultAdapter(this)?.let { adapter ->
+        NfcAdapter.getDefaultAdapter(this)?.also { adapter ->
             if (adapter.requireEnabled()) {
-                adapter.enableNdefReaderMode(this) {
-                    val ndef = Ndef.get(it)
-                    if (ndef != null) {
-                        lifecycleScope.launch { ndef.readNdef(adapter) }
-                    } else {
-                        if (NdefFormatable.get(it) != null) {
-                            showToast(R.string.nfc_ndef_formatable)
-                        } else {
-                            showToast(R.string.nfc_not_ndef)
-                        }
-                        viewModel.clearNfcReadData()
-                    }
-                }
+                adapter.enableNdefForegroundDispatch(this)
             } else {
                 showToast(R.string.nfc_disabled)
             }
@@ -88,11 +79,33 @@ class XiaomiNfcReaderActivity : ComponentActivity() {
     }
 
     override fun onPause() {
-        NfcAdapter.getDefaultAdapter(this)?.disableReaderMode(this)
+        NfcAdapter.getDefaultAdapter(this)?.disableForegroundDispatch(this)
         super.onPause()
     }
 
-    private suspend fun Ndef.readNdef(adapter: NfcAdapter): Unit = withContext(Dispatchers.IO) {
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        intent?.tryGetNfcTag()?.also(::onNfcTagDiscovered)
+    }
+
+    private fun onNfcTagDiscovered(tag: Tag) {
+        val ndef = Ndef.get(tag)
+        if (ndef != null) {
+            lifecycleScope.launch {
+                ndef.readNdef()
+                ignoreTagUntilRemoved(tag)
+            }
+        } else {
+            if (NdefFormatable.get(tag) != null) {
+                showToast(R.string.nfc_ndef_formatable)
+            } else {
+                showToast(R.string.nfc_not_ndef)
+            }
+            viewModel.clearNfcReadData()
+        }
+    }
+
+    private suspend fun Ndef.readNdef(): Unit = withContext(Dispatchers.IO) {
         if (requireConnect()) {
             try {
                 val msg = ndefMessage
@@ -111,17 +124,14 @@ class XiaomiNfcReaderActivity : ComponentActivity() {
                         viewModel.updateNfcReadData(data)
                     }
                 }
+                safeClose()
             } catch (e: Exception) {
                 showToastInMain(R.string.nfc_read_failed)
                 viewModel.clearNfcReadData()
-            }
-            if (!safeClose()) {
-                showToastInMain(R.string.nfc_close_failed)
             }
         } else {
             showToastInMain(R.string.nfc_connect_failed)
             viewModel.clearNfcReadData()
         }
-        adapter.ignoreTagUntilRemoved(tag)
     }
 }

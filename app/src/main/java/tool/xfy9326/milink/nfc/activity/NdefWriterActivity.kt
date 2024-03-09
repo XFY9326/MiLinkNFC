@@ -1,7 +1,9 @@
 package tool.xfy9326.milink.nfc.activity
 
 import android.content.Context
+import android.content.Intent
 import android.nfc.NfcAdapter
+import android.nfc.Tag
 import android.nfc.tech.Ndef
 import android.nfc.tech.NdefFormatable
 import android.os.Bundle
@@ -21,7 +23,7 @@ import tool.xfy9326.milink.nfc.ui.screen.NdefWriterScreen
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.vm.NfcWriterViewModel
 import tool.xfy9326.milink.nfc.utils.MIME_ALL
-import tool.xfy9326.milink.nfc.utils.enableNdefReaderMode
+import tool.xfy9326.milink.nfc.utils.enableNdefForegroundDispatch
 import tool.xfy9326.milink.nfc.utils.ignoreTagUntilRemoved
 import tool.xfy9326.milink.nfc.utils.requireConnect
 import tool.xfy9326.milink.nfc.utils.requireEnabled
@@ -30,6 +32,7 @@ import tool.xfy9326.milink.nfc.utils.showToast
 import tool.xfy9326.milink.nfc.utils.showToastInMain
 import tool.xfy9326.milink.nfc.utils.startActivity
 import tool.xfy9326.milink.nfc.utils.techNameList
+import tool.xfy9326.milink.nfc.utils.tryGetNfcTag
 
 class NdefWriterActivity : ComponentActivity() {
     companion object {
@@ -71,23 +74,9 @@ class NdefWriterActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        NfcAdapter.getDefaultAdapter(this)?.let { adapter ->
+        NfcAdapter.getDefaultAdapter(this)?.also { adapter ->
             if (adapter.requireEnabled()) {
-                adapter.enableNdefReaderMode(this) {
-                    lifecycleScope.launch {
-                        val ndef = Ndef.get(it)
-                        if (ndef != null) {
-                            ndef.writeTag(adapter)
-                            return@launch
-                        }
-                        val ndefFormatable = NdefFormatable.get(it)
-                        if (ndefFormatable != null) {
-                            ndefFormatable.formatTag(adapter)
-                            return@launch
-                        }
-                        showToast(R.string.nfc_ndef_not_supported, it.techNameList.joinToString())
-                    }
-                }
+                adapter.enableNdefForegroundDispatch(this, true)
             } else {
                 showToast(R.string.nfc_disabled)
             }
@@ -95,76 +84,96 @@ class NdefWriterActivity : ComponentActivity() {
     }
 
     override fun onPause() {
-        NfcAdapter.getDefaultAdapter(this)?.disableReaderMode(this)
+        NfcAdapter.getDefaultAdapter(this)?.disableForegroundDispatch(this)
         super.onPause()
     }
 
-    private suspend fun NdefFormatable.formatTag(adapter: NfcAdapter): Unit = withContext(Dispatchers.IO) {
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        intent?.tryGetNfcTag()?.also(::onNfcTagDiscovered)
+    }
+
+    private fun onNfcTagDiscovered(tag: Tag) {
+        lifecycleScope.launch {
+            val ndef = Ndef.get(tag)
+            if (ndef != null) {
+                ndef.writeTag()
+                ignoreTagUntilRemoved(tag)
+                return@launch
+            }
+            val ndefFormatable = NdefFormatable.get(tag)
+            if (ndefFormatable != null) {
+                ndefFormatable.formatTag()
+                ignoreTagUntilRemoved(tag)
+                return@launch
+            }
+            showToast(R.string.nfc_ndef_not_supported, tag.techNameList.joinToString())
+        }
+    }
+
+    private suspend fun NdefFormatable.formatTag(): Unit = withContext(Dispatchers.IO) {
         if (requireConnect()) {
             try {
                 format(null)
+                showToastInMain(R.string.nfc_ndef_format_success)
             } catch (e: Exception) {
                 showToastInMain(R.string.nfc_ndef_format_failed)
             }
-            if (safeClose()) {
-                showToastInMain(R.string.nfc_ndef_format_success)
-            } else {
+            if (!safeClose()) {
                 showToastInMain(R.string.nfc_close_failed)
             }
         } else {
             showToastInMain(R.string.nfc_connect_failed)
         }
-        adapter.ignoreTagUntilRemoved(tag)
     }
 
-    private suspend fun Ndef.writeTag(adapter: NfcAdapter): Unit = withContext(Dispatchers.IO) {
+    private suspend fun Ndef.writeTag(): Unit = withContext(Dispatchers.IO) {
         if (requireConnect()) {
             try {
-                writeNdefData()
+                if (writeNdefData()) {
+                    showToastInMain(R.string.nfc_write_success)
+                }
             } catch (e: Exception) {
                 showToastInMain(R.string.nfc_write_failed)
             }
-            if (safeClose()) {
-                showToastInMain(R.string.nfc_write_success)
-                if (ndefWriteData.readOnly) onBackPressedDispatcher.onBackPressed()
-            } else {
+            if (!safeClose()) {
                 showToastInMain(R.string.nfc_close_failed)
             }
         } else {
             showToastInMain(R.string.nfc_connect_failed)
         }
-        adapter.ignoreTagUntilRemoved(tag)
     }
 
-    private suspend fun Ndef.writeNdefData() {
+    private suspend fun Ndef.writeNdefData(): Boolean {
         if (!isWritable) {
             showToastInMain(R.string.nfc_write_error_not_writeable)
-            return
+            return false
         }
         if (ndefWriteData.readOnly && !canMakeReadOnly()) {
             showToastInMain(R.string.nfc_write_error_no_read_only)
-            return
+            return false
         }
         if (ndefWriteData.msg.byteArrayLength > maxSize) {
             showToastInMain(R.string.nfc_write_error_max_size)
-            return
+            return false
         }
         try {
             writeNdefMessage(ndefWriteData.msg)
         } catch (e: Exception) {
             showToastInMain(R.string.nfc_write_error)
-            return
+            return false
         }
         if (ndefWriteData.readOnly) {
             try {
                 if (!makeReadOnly()) {
                     showToastInMain(R.string.nfc_write_error_read_only)
-                    return
+                    return false
                 }
             } catch (e: Exception) {
                 showToastInMain(R.string.nfc_write_error_read_only)
-                return
+                return false
             }
         }
+        return true
     }
 }

@@ -114,14 +114,14 @@ fun HomeScreen(
                         navOptions { launchSingleTop = true }
                     )
                 },
-                onRequestClearNfc = viewModel::requestClearNdefWriteDialog,
+                onRequestClearNfc = viewModel::requestClearNdefWriteActivity,
                 onRequestWriteNdefBin = onRequestWriteNdefBin,
-                onRequestFormatXiaomiTap = viewModel::requestFormatXiaomiTapNdefWriteDialog
+                onRequestFormatXiaomiTap = viewModel::requestFormatXiaomiTapNdefActivity
             )
         }
         composable(MiTapSoundBoxRoute) {
             MiTapSoundBox(
-                onRequestWriteNfc = viewModel::requestNdefWriteDialog,
+                onRequestWriteNfc = viewModel::requestNdefWriteActivity,
                 onNavBack = {
                     navController.popBackStack(HomeRoute, false)
                 }
@@ -129,7 +129,7 @@ fun HomeScreen(
         }
         composable(CirculateRoute) {
             CirculateScreen(
-                onRequestWriteNfc = viewModel::requestNdefWriteDialog,
+                onRequestWriteNfc = viewModel::requestNdefWriteActivity,
                 onNavBack = {
                     navController.popBackStack(HomeRoute, false)
                 }
@@ -137,7 +137,7 @@ fun HomeScreen(
         }
         composable(ScreenMirrorRoute) {
             ScreenMirrorScreen(
-                onRequestWriteNfc = viewModel::requestNdefWriteDialog,
+                onRequestWriteNfc = viewModel::requestNdefWriteActivity,
                 onNavBack = {
                     navController.popBackStack(HomeRoute, false)
                 }

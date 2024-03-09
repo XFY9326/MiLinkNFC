@@ -25,6 +25,7 @@ import tool.xfy9326.milink.nfc.utils.EmptyNdefMessage
 import tool.xfy9326.milink.nfc.utils.NdefIO
 import tool.xfy9326.milink.nfc.utils.isXiaomiHyperOS
 import tool.xfy9326.milink.nfc.utils.readBinary
+import tool.xfy9326.milink.nfc.utils.requireEnabled
 
 class MainViewModel : ViewModel() {
     enum class InstantMsg(@StringRes val resId: Int) {
@@ -70,7 +71,7 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun requestNdefBinWriteDialog(uri: Uri) {
+    fun requestNdefBinWriteActivity(uri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
             val bytes = uri.readBinary()
             if (bytes == null) {
@@ -84,30 +85,30 @@ class MainViewModel : ViewModel() {
                 return@launch
             }
 
-            requestNdefWriteDialog(NdefWriteData(msg = ndefMsg, readOnly = false))
+            requestNdefWriteActivity(NdefWriteData(msg = ndefMsg, readOnly = false))
         }
     }
 
-    fun requestClearNdefWriteDialog() {
-        requestNdefWriteDialog(NdefWriteData(msg = EmptyNdefMessage, readOnly = false))
+    fun requestClearNdefWriteActivity() {
+        requestNdefWriteActivity(NdefWriteData(msg = EmptyNdefMessage, readOnly = false))
     }
 
-    fun requestFormatXiaomiTapNdefWriteDialog() {
+    fun requestFormatXiaomiTapNdefActivity() {
         viewModelScope.launch {
             val ndefMsg = XiaomiNfc.EmptyMiTap.newNdefMessage(
                 (System.currentTimeMillis() / 1000).toInt(),
                 AppDataStore.shrinkNdefMsg.getValue()
             )
-            requestNdefWriteDialog(NdefWriteData(ndefMsg, false))
+            requestNdefWriteActivity(NdefWriteData(ndefMsg, false))
         }
     }
 
-    fun requestNdefWriteDialog(ndefWriteData: NdefWriteData) {
+    fun requestNdefWriteActivity(ndefWriteData: NdefWriteData) {
         viewModelScope.launch {
             val nfcAdapter = NfcAdapter.getDefaultAdapter(AppContext)
             if (nfcAdapter == null) {
                 _instantMsg.emit(InstantMsg.NOT_SUPPORT_NFC)
-            } else if (!nfcAdapter.isEnabled) {
+            } else if (!nfcAdapter.requireEnabled()) {
                 _instantMsg.emit(InstantMsg.NFC_DISABLED)
             } else {
                 _nfcWriteData.emit(ndefWriteData)

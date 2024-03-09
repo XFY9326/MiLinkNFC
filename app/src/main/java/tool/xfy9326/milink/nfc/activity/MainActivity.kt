@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
     private val viewModel by viewModels<MainViewModel>()
     private val readNdefBin = registerForActivityResult(ActivityResultContracts.GetContent()) {
         if (it != null) {
-            viewModel.requestNdefBinWriteDialog(it)
+            viewModel.requestNdefBinWriteActivity(it)
         }
     }
 
