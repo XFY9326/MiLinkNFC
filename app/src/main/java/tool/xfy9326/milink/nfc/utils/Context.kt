@@ -12,6 +12,8 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 
 val Context.packageUri: Uri
@@ -26,6 +28,12 @@ fun Context.showToast(@StringRes resId: Int, vararg formatArgs: Any, longDuratio
 
 fun Context.showToast(text: String, longDuration: Boolean = false): Unit =
     Toast.makeText(this, text, if (longDuration) Toast.LENGTH_LONG else Toast.LENGTH_SHORT).show()
+
+suspend fun Context.showToastInMain(@StringRes resId: Int, vararg formatArgs: Any, longDuration: Boolean = false): Unit =
+    showToastInMain(getString(resId, *formatArgs), longDuration)
+
+suspend fun Context.showToastInMain(text: String, longDuration: Boolean = false): Unit =
+    withContext(Dispatchers.Main.immediate) { showToast(text, longDuration) }
 
 fun Context.isUsingNotificationService(): Boolean {
     return NotificationManagerCompat.getEnabledListenerPackages(this).contains(packageName)

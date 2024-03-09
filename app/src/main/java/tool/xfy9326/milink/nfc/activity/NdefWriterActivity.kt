@@ -23,11 +23,13 @@ import tool.xfy9326.milink.nfc.ui.vm.NfcWriterViewModel
 import tool.xfy9326.milink.nfc.utils.MIME_ALL
 import tool.xfy9326.milink.nfc.utils.enableNdefReaderMode
 import tool.xfy9326.milink.nfc.utils.ignoreTagUntilRemoved
+import tool.xfy9326.milink.nfc.utils.requireConnect
+import tool.xfy9326.milink.nfc.utils.requireEnabled
 import tool.xfy9326.milink.nfc.utils.safeClose
 import tool.xfy9326.milink.nfc.utils.showToast
+import tool.xfy9326.milink.nfc.utils.showToastInMain
 import tool.xfy9326.milink.nfc.utils.startActivity
 import tool.xfy9326.milink.nfc.utils.techNameList
-import tool.xfy9326.milink.nfc.utils.tryConnect
 
 class NdefWriterActivity : ComponentActivity() {
     companion object {
@@ -70,9 +72,9 @@ class NdefWriterActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         NfcAdapter.getDefaultAdapter(this)?.let { adapter ->
-            if (adapter.isEnabled) {
+            if (adapter.requireEnabled()) {
                 adapter.enableNdefReaderMode(this) {
-                    lifecycleScope.launch(Dispatchers.Main.immediate) {
+                    lifecycleScope.launch {
                         val ndef = Ndef.get(it)
                         if (ndef != null) {
                             ndef.writeTag(adapter)
@@ -97,76 +99,70 @@ class NdefWriterActivity : ComponentActivity() {
         super.onPause()
     }
 
-    private suspend fun NdefFormatable.formatTag(adapter: NfcAdapter) {
-        tryConnect().onSuccess {
-            it.runCatching {
+    private suspend fun NdefFormatable.formatTag(adapter: NfcAdapter): Unit = withContext(Dispatchers.IO) {
+        if (requireConnect()) {
+            try {
                 format(null)
-            }.onSuccess {
-                showToast(R.string.nfc_ndef_format_success)
-            }.onFailure {
-                showToast(R.string.nfc_ndef_format_failed)
+            } catch (e: Exception) {
+                showToastInMain(R.string.nfc_ndef_format_failed)
             }
-        }.onFailure {
-            showToast(R.string.nfc_connect_failed)
+            if (safeClose()) {
+                showToastInMain(R.string.nfc_ndef_format_success)
+            } else {
+                showToastInMain(R.string.nfc_close_failed)
+            }
+        } else {
+            showToastInMain(R.string.nfc_connect_failed)
         }
-        safeClose()
         adapter.ignoreTagUntilRemoved(tag)
     }
 
-    private suspend fun Ndef.writeTag(adapter: NfcAdapter) {
-        tryConnect().onSuccess {
-            it.runCatching {
+    private suspend fun Ndef.writeTag(adapter: NfcAdapter): Unit = withContext(Dispatchers.IO) {
+        if (requireConnect()) {
+            try {
                 writeNdefData()
-            }.onSuccess {
-                showToast(R.string.nfc_write_success)
-                if (ndefWriteData.readOnly) onBackPressedDispatcher.onBackPressed()
-            }.onFailure { throwable ->
-                showToast(
-                    buildString {
-                        append(getString(R.string.nfc_write_error_unknown))
-                        throwable.message.takeUnless { m -> m.isNullOrBlank() }?.let { m ->
-                            appendLine()
-                            append(m)
-                        }
-                    }
-                )
+            } catch (e: Exception) {
+                showToastInMain(R.string.nfc_write_failed)
             }
-        }.onFailure {
-            showToast(R.string.nfc_connect_failed)
+            if (safeClose()) {
+                showToastInMain(R.string.nfc_write_success)
+                if (ndefWriteData.readOnly) onBackPressedDispatcher.onBackPressed()
+            } else {
+                showToastInMain(R.string.nfc_close_failed)
+            }
+        } else {
+            showToastInMain(R.string.nfc_connect_failed)
         }
-        safeClose()
         adapter.ignoreTagUntilRemoved(tag)
     }
 
     private suspend fun Ndef.writeNdefData() {
         if (!isWritable) {
-            showToast(R.string.nfc_write_error_not_writeable)
+            showToastInMain(R.string.nfc_write_error_not_writeable)
             return
         }
         if (ndefWriteData.readOnly && !canMakeReadOnly()) {
-            showToast(R.string.nfc_write_error_no_read_only)
+            showToastInMain(R.string.nfc_write_error_no_read_only)
             return
         }
         if (ndefWriteData.msg.byteArrayLength > maxSize) {
-            showToast(R.string.nfc_write_error_max_size)
+            showToastInMain(R.string.nfc_write_error_max_size)
             return
         }
         try {
-            withContext(Dispatchers.IO) {
-                writeNdefMessage(ndefWriteData.msg)
-            }
+            writeNdefMessage(ndefWriteData.msg)
         } catch (e: Exception) {
-            showToast(R.string.nfc_write_error)
+            showToastInMain(R.string.nfc_write_error)
             return
         }
         if (ndefWriteData.readOnly) {
             try {
-                if (!withContext(Dispatchers.IO) { makeReadOnly() }) {
-                    showToast(R.string.nfc_write_error_read_only)
+                if (!makeReadOnly()) {
+                    showToastInMain(R.string.nfc_write_error_read_only)
                     return
                 }
             } catch (e: Exception) {
-                showToast(R.string.nfc_write_error_read_only)
+                showToastInMain(R.string.nfc_write_error_read_only)
                 return
             }
         }

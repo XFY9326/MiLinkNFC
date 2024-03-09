@@ -33,13 +33,14 @@
     <string name="nfc_write_bytes">%1$d字节</string>
     <string name="nfc_write_success">写入成功</string>
     <string name="nfc_connect_failed">连接失败</string>
+    <string name="nfc_close_failed">连接关闭失败</string>
     <string name="nfc_read_failed">读取失败</string>
     <string name="nfc_empty">空标签</string>
     <string name="nfc_ndef_not_supported">不支持NDEF格式\n%1$s</string>
     <string name="nfc_not_ndef">非NDEF格式的标签</string>
     <string name="nfc_ndef_formatable">未格式化为NDEF的标签</string>
     <string name="nfc_write_error">写入失败</string>
-    <string name="nfc_write_error_unknown">未知错误</string>
+    <string name="nfc_write_failed">写入失败</string>
     <string name="nfc_write_error_read_only">设置只读失败</string>
     <string name="nfc_ndef_format_success">格式化为NDEF成功\n请再次触碰NFC标签以写入数据</string>
     <string name="nfc_ndef_format_failed">格式化为NDEF失败</string>
