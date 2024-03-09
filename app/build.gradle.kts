@@ -12,8 +12,8 @@ android {
         applicationId = "tool.xfy9326.milink.nfc"
         minSdk = 29
         targetSdk = 34
-        versionCode = 15
-        versionName = "1.9.1"
+        versionCode = 16
+        versionName = "1.9.2"
 
         resourceConfigurations += "zh"
 
@@ -37,6 +37,7 @@ android {
         debug {
             applicationIdSuffix = ".debug"
             manifestPlaceholders["ApplicationId"] = defaultConfig.applicationId + applicationIdSuffix
+            resValue("string", "app_name", "MiLink NFC Debug")
 
             versionNameSuffix = "-debug"
         }
@@ -46,6 +47,7 @@ android {
 
             applicationIdSuffix = ".beta"
             manifestPlaceholders["ApplicationId"] = defaultConfig.applicationId + applicationIdSuffix
+            resValue("string", "app_name", "MiLink NFC Beta")
 
             versionNameSuffix = "-beta"
 
