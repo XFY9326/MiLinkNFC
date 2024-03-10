@@ -13,6 +13,8 @@
         android:name="android.hardware.nfc"
         android:required="true" />
 
+    <uses-feature android:name="android.software.companion_device_setup" />
+
     <queries>
         <package android:name="com.xiaomi.mi_connect_service" />
         <package android:name="com.milink.service" />

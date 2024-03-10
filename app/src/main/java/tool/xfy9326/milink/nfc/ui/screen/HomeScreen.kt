@@ -9,13 +9,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.BluetoothSearching
 import androidx.compose.material.icons.automirrored.outlined.ScreenShare
-import androidx.compose.material.icons.filled.BluetoothAudio
 import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material.icons.filled.DataObject
 import androidx.compose.material.icons.filled.Devices
 import androidx.compose.material.icons.filled.GetApp
 import androidx.compose.material.icons.filled.GroupAdd
+import androidx.compose.material.icons.filled.MediaBluetoothOn
 import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.FileCopy
@@ -65,8 +66,10 @@ const val HomeRoute = "home"
 private fun Preview() {
     AppTheme {
         HomeScreen(
+            supportScanBluetoothMac = true,
             onNavToXiaomiNfcReader = {},
             onRequestWriteNdefBin = {},
+            onRequestScanBluetoothMac = {},
             onExit = {}
         )
     }
@@ -75,8 +78,10 @@ private fun Preview() {
 @Composable
 fun HomeScreen(
     viewModel: MainViewModel = viewModel(),
+    supportScanBluetoothMac: Boolean,
     onNavToXiaomiNfcReader: () -> Unit,
     onRequestWriteNdefBin: () -> Unit,
+    onRequestScanBluetoothMac: () -> Unit,
     onExit: () -> Unit
 ) {
     val navController = rememberNavController()
@@ -89,6 +94,7 @@ fun HomeScreen(
     ) {
         composable(HomeRoute) {
             Content(
+                supportScanBluetoothMac = supportScanBluetoothMac,
                 onNavToMiTapSoundBox = {
                     navController.navigate(
                         MiTapSoundBoxRoute,
@@ -116,7 +122,8 @@ fun HomeScreen(
                 },
                 onRequestClearNfc = viewModel::requestClearNdefWriteActivity,
                 onRequestWriteNdefBin = onRequestWriteNdefBin,
-                onRequestFormatXiaomiTap = viewModel::requestFormatXiaomiTapNdefActivity
+                onRequestFormatXiaomiTap = viewModel::requestFormatXiaomiTapNdefActivity,
+                onRequestScanBluetoothMac = onRequestScanBluetoothMac
             )
         }
         composable(MiTapSoundBoxRoute) {
@@ -173,6 +180,7 @@ fun HomeScreen(
 
 @Composable
 private fun Content(
+    supportScanBluetoothMac: Boolean,
     onNavToMiTapSoundBox: () -> Unit,
     onNavToCirculate: () -> Unit,
     onNavToScreenMirror: () -> Unit,
@@ -181,6 +189,7 @@ private fun Content(
     onRequestClearNfc: () -> Unit,
     onRequestWriteNdefBin: () -> Unit,
     onRequestFormatXiaomiTap: () -> Unit,
+    onRequestScanBluetoothMac: () -> Unit
 ) {
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
@@ -212,7 +221,7 @@ private fun Content(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             EntryCard(
-                icon = Icons.Default.BluetoothAudio,
+                icon = Icons.Default.MediaBluetoothOn,
                 title = stringResource(id = R.string.mi_tap_sound_box_nfc),
                 summary = stringResource(id = R.string.mi_tap_sound_box_nfc_summary),
                 onClick = onNavToMiTapSoundBox
@@ -254,6 +263,15 @@ private fun Content(
                 summary = stringResource(id = R.string.nfc_clear_ndef_summary),
                 onClick = onRequestClearNfc
             )
+            if (supportScanBluetoothMac) {
+                HorizontalDivider()
+                EntryCard(
+                    icon = Icons.AutoMirrored.Default.BluetoothSearching,
+                    title = stringResource(id = R.string.bluetooth_mac_scan),
+                    summary = stringResource(id = R.string.bluetooth_mac_scan_summary),
+                    onClick = onRequestScanBluetoothMac
+                )
+            }
             HorizontalDivider()
             EntryCard(
                 icon = Icons.Default.GroupAdd,
