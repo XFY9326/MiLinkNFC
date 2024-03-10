@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
             viewModel.requestNdefBinWriteActivity(it)
         }
     }
-    private val bluetoothScanner by lazy { BluetoothMacAddressScanner(this) }
+    private val bluetoothScanner = BluetoothMacAddressScanner(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()

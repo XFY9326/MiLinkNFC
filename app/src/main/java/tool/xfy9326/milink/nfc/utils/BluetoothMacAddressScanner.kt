@@ -26,7 +26,7 @@ import java.lang.ref.WeakReference
 class BluetoothMacAddressScanner(activity: ComponentActivity) {
     private val weakActivity = WeakReference(activity)
     private val nonEmptyStringPattern = "^(?!\\s*\$).+".toPattern()
-    private val deviceManager by lazy { AppContext.getSystemService<CompanionDeviceManager>() }
+    private val deviceManager by lazy { weakActivity.get()?.getSystemService<CompanionDeviceManager>() }
 
     private var scannerCallback: WeakReference<(String?) -> Unit>? = null
 
@@ -61,7 +61,7 @@ class BluetoothMacAddressScanner(activity: ComponentActivity) {
                 deviceManager != null
 
     val isEnabled: Boolean
-        get() = AppContext.getSystemService<BluetoothManager>()?.adapter?.isEnabled ?: false
+        get() = weakActivity.get()?.getSystemService<BluetoothManager>()?.adapter?.isEnabled ?: false
 
     private fun newParingRequest(): AssociationRequest =
         AssociationRequest.Builder().apply {
