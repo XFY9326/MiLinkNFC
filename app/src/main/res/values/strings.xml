@@ -26,7 +26,7 @@
     <string name="write_circulate_nfc">内容流转NFC标签</string>
     <string name="write_circulate_nfc_desc">向NFC标签中覆盖写入内容流转的数据，仅支持NDEF格式的NFC标签。\n\n小米音箱设备可以在小爱音箱App中查看设备WIFI MAC地址，其WIFI MAC地址+1即为蓝牙 MAC地址，例如：…:0F+1=…:10</string>
     <string name="write_screen_mirror_nfc">一碰妙享NFC标签</string>
-    <string name="write_screen_mirror_nfc_desc">向NFC标签中覆盖写入小米一碰妙享的数据，仅支持NDEF格式的NFC标签。\n\n如果投屏时多次出现连接失败，可以使用“测试屏幕镜像”功能并尝试重启小米电脑管家。\n\n使用MIUI而非HyperOS的设备如果遇到连接失败的问题，请尝试关闭Lyra连接并使用旧版小米妙享。</string>
+    <string name="write_screen_mirror_nfc_desc">向NFC标签中覆盖写入小米一碰妙享的数据，仅支持NDEF格式的NFC标签。\n\n如果投屏时多次出现连接失败，可以使用“测试屏幕镜像”功能并尝试重启小米电脑管家。\n\n使用MIUI而非HyperOS的设备如果遇到连接失败的问题，请尝试关闭Lyra连接并使用旧版小米妙享中心。</string>
     <string name="tap_and_write_nfc_tag">靠近NFC标签以写入数据</string>
     <string name="tap_and_write_nfc_tag_read_only">靠近NFC标签以写入只读数据</string>
     <string name="tap_and_read_nfc_tag">靠近NFC标签以读取数据</string>
