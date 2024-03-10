@@ -21,7 +21,7 @@ import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.data.NdefWriteData
 import tool.xfy9326.milink.nfc.ui.screen.NdefWriterScreen
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
-import tool.xfy9326.milink.nfc.ui.vm.NfcWriterViewModel
+import tool.xfy9326.milink.nfc.ui.vm.NdefWriterViewModel
 import tool.xfy9326.milink.nfc.utils.MIME_ALL
 import tool.xfy9326.milink.nfc.utils.enableNdefForegroundDispatch
 import tool.xfy9326.milink.nfc.utils.ignoreTagUntilRemoved
@@ -46,7 +46,7 @@ class NdefWriterActivity : ComponentActivity() {
     }
 
     private lateinit var ndefWriteData: NdefWriteData
-    private val viewModel by viewModels<NfcWriterViewModel>()
+    private val viewModel by viewModels<NdefWriterViewModel>()
     private val exportNdefBin = registerForActivityResult(ActivityResultContracts.CreateDocument(MIME_ALL)) {
         if (it != null) {
             viewModel.exportNdefBin(it, ndefWriteData.msg.toByteArray())
@@ -85,6 +85,7 @@ class NdefWriterActivity : ComponentActivity() {
 
     override fun onPause() {
         NfcAdapter.getDefaultAdapter(this)?.disableForegroundDispatch(this)
+        viewModel.setWritingStatus(false)
         super.onPause()
     }
 
@@ -94,20 +95,24 @@ class NdefWriterActivity : ComponentActivity() {
     }
 
     private fun onNfcTagDiscovered(tag: Tag) {
+        viewModel.setWritingStatus(true)
         lifecycleScope.launch {
-            val ndef = Ndef.get(tag)
-            if (ndef != null) {
-                ndef.writeTag()
+            try {
+                val ndef = Ndef.get(tag)
+                if (ndef != null) {
+                    ndef.writeTag()
+                    return@launch
+                }
+                val ndefFormatable = NdefFormatable.get(tag)
+                if (ndefFormatable != null) {
+                    ndefFormatable.formatTag()
+                    return@launch
+                }
+                showToast(R.string.nfc_ndef_not_supported, tag.techNameList.joinToString())
+            } finally {
                 ignoreTagUntilRemoved(tag)
-                return@launch
+                viewModel.setWritingStatus(false)
             }
-            val ndefFormatable = NdefFormatable.get(tag)
-            if (ndefFormatable != null) {
-                ndefFormatable.formatTag()
-                ignoreTagUntilRemoved(tag)
-                return@launch
-            }
-            showToast(R.string.nfc_ndef_not_supported, tag.techNameList.joinToString())
         }
     }
 

@@ -6,24 +6,39 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.datastore.AppDataStore
 import tool.xfy9326.milink.nfc.utils.NdefIO
 
-class NfcWriterViewModel : ViewModel() {
+class NdefWriterViewModel : ViewModel() {
     enum class InstantMsg(@StringRes val resId: Int) {
         EXPORT_SUCCESS(R.string.export_success),
         EXPORT_FAILED(R.string.export_failed),
     }
+
+    data class UiState(
+        val isWriting: Boolean = false
+    )
+
+    private val _uiState = MutableStateFlow(UiState())
+    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     private val _exportNdefBin = MutableSharedFlow<String>()
     val exportNdefBin: SharedFlow<String> = _exportNdefBin.asSharedFlow()
 
     private val _instantMsg = MutableSharedFlow<InstantMsg>()
     val instantMsg: SharedFlow<InstantMsg> = _instantMsg.asSharedFlow()
+
+    fun setWritingStatus(isWriting: Boolean) {
+        _uiState.update { it.copy(isWriting = isWriting) }
+    }
 
     fun requestExportNdefBin() {
         viewModelScope.launch {

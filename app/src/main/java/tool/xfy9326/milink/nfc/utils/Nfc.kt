@@ -14,7 +14,7 @@ import android.nfc.tech.NdefFormatable
 import android.nfc.tech.TagTechnology
 import androidx.core.content.IntentCompat
 
-private const val NFC_TAG_IGNORE_MILLS = 1000
+private const val NFC_TAG_IGNORE_MILLS = 2000
 
 val EmptyNdefMessage = NdefMessage(NdefRecord(NdefRecord.TNF_EMPTY, null, null, null))
 
