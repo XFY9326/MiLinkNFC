@@ -7,7 +7,6 @@ import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.Parcelable
 import androidx.annotation.StringRes
-import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -37,6 +36,7 @@ import tool.xfy9326.milink.nfc.ui.dialog.MiLinkVersionDialogData
 import tool.xfy9326.milink.nfc.utils.EMPTY
 import tool.xfy9326.milink.nfc.utils.MiContinuityUtils
 import tool.xfy9326.milink.nfc.utils.isValidMacAddress
+import tool.xfy9326.milink.nfc.utils.safeStartActivity
 
 class ScreenMirrorViewModel : ViewModel() {
     enum class InstantMsg(@StringRes val resId: Int) {
@@ -161,7 +161,7 @@ class ScreenMirrorViewModel : ViewModel() {
                         null,
                         config
                     ).also {
-                        ContextCompat.startActivity(context, it, null)
+                        context.safeStartActivity(it)
                     }
 
                     NfcActionIntentType.MI_CONNECT_SERVICE -> XiaomiNfc.ScreenMirror.sendBroadcast(

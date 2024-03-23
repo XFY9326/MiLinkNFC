@@ -161,10 +161,11 @@
     <string name="add_qq_group_desc">加入QQ群以获得更多信息\n群号：879055158</string>
     <string name="nfc_disabled">NFC功能未启用</string>
     <string name="bluetooth_disabled">蓝牙功能未启用</string>
-    <string name="bluetooth_mac_scan">扫描蓝牙设备的MAC地址</string>
-    <string name="bluetooth_mac_scan_summary">复制周围的蓝牙设备MAC地址到剪切板\n注：不显示无名称的蓝牙设备</string>
+    <string name="bluetooth_mac_scan">扫描周围蓝牙设备MAC地址</string>
+    <string name="bluetooth_mac_scan_summary">复制周围蓝牙设备的MAC地址到剪切板\n注：不显示无名称的蓝牙设备</string>
     <string name="bluetooth_mac_scan_failure">蓝牙设备扫描失败</string>
     <string name="bluetooth_mac_scan_success">%1$s\n已复制到剪切板</string>
+    <string name="activity_start_failed">未安装可处理此请求的应用</string>
 
     <string name="version" translatable="false">%1$s (%2$d)</string>
     <string name="author_name" translatable="false">XFY9326</string>

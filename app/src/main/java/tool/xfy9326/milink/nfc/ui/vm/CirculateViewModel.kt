@@ -3,7 +3,6 @@ package tool.xfy9326.milink.nfc.ui.vm
 import android.content.Context
 import android.os.Parcelable
 import androidx.annotation.StringRes
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -23,6 +22,7 @@ import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
 import tool.xfy9326.milink.nfc.utils.EMPTY
 import tool.xfy9326.milink.nfc.utils.hexToByteArray
 import tool.xfy9326.milink.nfc.utils.isValidMacAddress
+import tool.xfy9326.milink.nfc.utils.safeStartActivity
 
 class CirculateViewModel : ViewModel() {
     enum class InstantMsg(@StringRes val resId: Int) {
@@ -97,7 +97,7 @@ class CirculateViewModel : ViewModel() {
                         null,
                         config
                     ).also {
-                        ContextCompat.startActivity(context, it, null)
+                        context.safeStartActivity(it)
                     }
 
                     NfcActionIntentType.MI_CONNECT_SERVICE -> XiaomiNfc.Circulate.sendBroadcast(

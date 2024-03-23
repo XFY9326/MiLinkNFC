@@ -5,7 +5,6 @@ import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.os.Bundle
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
@@ -14,6 +13,7 @@ import tool.xfy9326.milink.nfc.data.NfcActionIntentType
 import tool.xfy9326.milink.nfc.datastore.AppDataStore
 import tool.xfy9326.milink.nfc.protocol.HuaweiHandoffNfc
 import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
+import tool.xfy9326.milink.nfc.utils.safeStartActivity
 
 class HuaweiShareNfcActivity : Activity() {
 
@@ -44,7 +44,7 @@ class HuaweiShareNfcActivity : Activity() {
                 id = nfcId,
                 config = config
             ).also {
-                ContextCompat.startActivity(this, it, null)
+                safeStartActivity(it)
             }
 
             NfcActionIntentType.MI_CONNECT_SERVICE -> XiaomiNfc.ScreenMirror.sendBroadcast(

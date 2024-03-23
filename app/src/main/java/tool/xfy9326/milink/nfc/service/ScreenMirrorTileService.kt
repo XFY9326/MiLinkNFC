@@ -7,10 +7,12 @@ import androidx.core.service.quicksettings.PendingIntentActivityWrapper
 import androidx.core.service.quicksettings.TileServiceCompat
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
+import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.activity.ScreenMirrorActionActivity
 import tool.xfy9326.milink.nfc.data.NfcActionIntentType
 import tool.xfy9326.milink.nfc.datastore.AppDataStore
 import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
+import tool.xfy9326.milink.nfc.utils.showToast
 
 class ScreenMirrorTileService : TileService() {
     override fun onClick() {
@@ -33,8 +35,10 @@ class ScreenMirrorTileService : TileService() {
                 PendingIntent.FLAG_ONE_SHOT,
                 false
             )
-        }.let {
-            TileServiceCompat.startActivityAndCollapse(this@ScreenMirrorTileService, it)
+        }.runCatching {
+            TileServiceCompat.startActivityAndCollapse(this@ScreenMirrorTileService, this)
+        }.onFailure {
+            showToast(R.string.activity_start_failed)
         }
     }
 }

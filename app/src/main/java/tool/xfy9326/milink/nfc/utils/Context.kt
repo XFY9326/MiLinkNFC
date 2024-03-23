@@ -11,9 +11,11 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import tool.xfy9326.milink.nfc.R
 
 
 val Context.packageUri: Uri
@@ -35,12 +37,25 @@ suspend fun Context.showToastInMain(@StringRes resId: Int, vararg formatArgs: An
 suspend fun Context.showToastInMain(text: String, longDuration: Boolean = false): Unit =
     withContext(Dispatchers.Main.immediate) { showToast(text, longDuration) }
 
+fun Context.safeStartActivity(intent: Intent, options: Bundle? = null) {
+    val queryActivity = intent.resolveActivity(packageManager) != null
+    val success = if (queryActivity) {
+        ContextCompat.startActivity(this, intent, options)
+        true
+    } else {
+        runCatching {
+            ContextCompat.startActivity(this, intent, options)
+        }.isSuccess
+    }
+    if (!success) applicationContext.showToast(R.string.activity_start_failed)
+}
+
 fun Context.isUsingNotificationService(): Boolean {
     return NotificationManagerCompat.getEnabledListenerPackages(this).contains(packageName)
 }
 
 fun Context.openAppSettings() {
-    startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageUri))
+    safeStartActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageUri))
 }
 
 fun Context.openNotificationServiceSettings(componentName: String) {
@@ -59,5 +74,5 @@ fun Context.openNotificationServiceSettings(componentName: String) {
             putExtra(":settings:show_fragment_args", Bundle().also { it.putString(key, value) })
         }
     }
-    startActivity(intent)
+    safeStartActivity(intent)
 }
