@@ -12,8 +12,8 @@ android {
         applicationId = "tool.xfy9326.milink.nfc"
         minSdk = 29
         targetSdk = 34
-        versionCode = 17
-        versionName = "1.9.3"
+        versionCode = 18
+        versionName = "1.9.4"
 
         resourceConfigurations += "zh"
 
@@ -30,7 +30,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.10"
+        kotlinCompilerExtensionVersion = "1.5.11"
     }
 
     buildTypes {
@@ -116,7 +116,7 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.8.2")
 
     // Compose BOM
-    val composeBom = platform("androidx.compose:compose-bom:2024.02.02")
+    val composeBom = platform("androidx.compose:compose-bom:2024.03.00")
     implementation(composeBom)
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling-preview")
