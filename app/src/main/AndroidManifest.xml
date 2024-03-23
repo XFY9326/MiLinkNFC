@@ -22,6 +22,10 @@
         <package android:name="com.xiaomi.mirror" />
         <package android:name="com.android.fileexplorer" />
         <package android:name="com.miui.gallery" />
+
+        <intent>
+            <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+        </intent>
     </queries>
 
     <application
