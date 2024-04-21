@@ -89,9 +89,9 @@ class NdefWriterActivity : ComponentActivity() {
         super.onPause()
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        intent?.tryGetNfcTag()?.also(::onNfcTagDiscovered)
+        intent.tryGetNfcTag()?.also(::onNfcTagDiscovered)
     }
 
     private fun onNfcTagDiscovered(tag: Tag) {

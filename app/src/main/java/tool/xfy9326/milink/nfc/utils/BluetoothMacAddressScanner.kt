@@ -34,7 +34,7 @@ class BluetoothMacAddressScanner(activity: ComponentActivity) {
         @Suppress("DEPRECATION")
         weakActivity.get()?.registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
             try {
-                if (it?.resultCode == Activity.RESULT_OK) {
+                if (it.resultCode == Activity.RESULT_OK) {
                     val device = it.data?.let { data ->
                         IntentCompat.getParcelableExtra(data, CompanionDeviceManager.EXTRA_DEVICE, Parcelable::class.java)
                     }

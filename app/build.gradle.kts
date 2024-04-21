@@ -30,7 +30,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.11"
+        kotlinCompilerExtensionVersion = "1.5.12"
     }
 
     buildTypes {
@@ -108,15 +108,15 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
 
     // AndroidX Core
-    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.core:core-ktx:1.13.0")
     implementation("androidx.core:core-splashscreen:1.0.1")
 
     // AndroidX
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
-    implementation("androidx.activity:activity-compose:1.8.2")
+    implementation("androidx.datastore:datastore-preferences:1.1.0")
+    implementation("androidx.activity:activity-compose:1.9.0")
 
     // Compose BOM
-    val composeBom = platform("androidx.compose:compose-bom:2024.03.00")
+    val composeBom = platform("androidx.compose:compose-bom:2024.04.01")
     implementation(composeBom)
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling-preview")
