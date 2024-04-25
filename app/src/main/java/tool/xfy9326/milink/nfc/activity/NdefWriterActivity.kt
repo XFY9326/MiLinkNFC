@@ -47,14 +47,17 @@ class NdefWriterActivity : ComponentActivity() {
 
     private lateinit var ndefWriteData: NdefWriteData
     private val viewModel by viewModels<NdefWriterViewModel>()
-    private val exportNdefBin = registerForActivityResult(ActivityResultContracts.CreateDocument(MIME_ALL)) {
-        if (it != null) {
-            viewModel.exportNdefBin(it, ndefWriteData.msg.toByteArray())
+    private val exportNdefBin =
+        registerForActivityResult(ActivityResultContracts.CreateDocument(MIME_ALL)) {
+            if (it != null) {
+                viewModel.exportNdefBin(it, ndefWriteData.msg.toByteArray())
+            }
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        ndefWriteData = IntentCompat.getParcelableExtra(intent, EXTRA_NDEF_DATA, NdefWriteData::class.java) ?: error("Unknown intent")
+        ndefWriteData =
+            IntentCompat.getParcelableExtra(intent, EXTRA_NDEF_DATA, NdefWriteData::class.java)
+                ?: error("Unknown intent")
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent {

@@ -42,14 +42,18 @@ class NdefWriterViewModel : ViewModel() {
 
     fun requestExportNdefBin() {
         viewModelScope.launch {
-            val fileName = NdefIO.getExportFileName(System.currentTimeMillis(), AppDataStore.exportNxpNdefFormat.getValue())
+            val fileName = NdefIO.getExportFileName(
+                System.currentTimeMillis(),
+                AppDataStore.exportNxpNdefFormat.getValue()
+            )
             _exportNdefBin.emit(fileName)
         }
     }
 
     fun exportNdefBin(uri: Uri, buffer: ByteArray) {
         viewModelScope.launch(Dispatchers.IO) {
-            val result = NdefIO.writeNdefMessage(uri, buffer, AppDataStore.exportNxpNdefFormat.getValue())
+            val result =
+                NdefIO.writeNdefMessage(uri, buffer, AppDataStore.exportNxpNdefFormat.getValue())
             _instantMsg.emit(if (result) InstantMsg.EXPORT_SUCCESS else InstantMsg.EXPORT_FAILED)
         }
     }

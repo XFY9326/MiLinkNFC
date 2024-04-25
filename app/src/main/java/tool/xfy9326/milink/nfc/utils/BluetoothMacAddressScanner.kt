@@ -26,33 +26,41 @@ import java.lang.ref.WeakReference
 class BluetoothMacAddressScanner(activity: ComponentActivity) {
     private val weakActivity = WeakReference(activity)
     private val nonEmptyStringPattern = "^(?!\\s*\$).+".toPattern()
-    private val deviceManager by lazy { weakActivity.get()?.getSystemService<CompanionDeviceManager>() }
+    private val deviceManager by lazy {
+        weakActivity.get()?.getSystemService<CompanionDeviceManager>()
+    }
 
     private var scannerCallback: WeakReference<(String?) -> Unit>? = null
 
-    private val intentSenderLauncher: ActivityResultLauncher<IntentSenderRequest>? = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-        @Suppress("DEPRECATION")
-        weakActivity.get()?.registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
-            try {
-                if (it.resultCode == Activity.RESULT_OK) {
-                    val device = it.data?.let { data ->
-                        IntentCompat.getParcelableExtra(data, CompanionDeviceManager.EXTRA_DEVICE, Parcelable::class.java)
-                    }
-                    val macAddress = when (device) {
-                        is BluetoothDevice -> device.address
-                        is android.bluetooth.le.ScanResult -> device.device.address
-                        else -> null
-                    }
-                    scannerCallback?.get()?.invoke(macAddress?.uppercase())
-                    if (macAddress != null) {
-                        deviceManager?.disassociate(macAddress)
+    private val intentSenderLauncher: ActivityResultLauncher<IntentSenderRequest>? =
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            @Suppress("DEPRECATION")
+            weakActivity.get()
+                ?.registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
+                    try {
+                        if (it.resultCode == Activity.RESULT_OK) {
+                            val device = it.data?.let { data ->
+                                IntentCompat.getParcelableExtra(
+                                    data,
+                                    CompanionDeviceManager.EXTRA_DEVICE,
+                                    Parcelable::class.java
+                                )
+                            }
+                            val macAddress = when (device) {
+                                is BluetoothDevice -> device.address
+                                is android.bluetooth.le.ScanResult -> device.device.address
+                                else -> null
+                            }
+                            scannerCallback?.get()?.invoke(macAddress?.uppercase())
+                            if (macAddress != null) {
+                                deviceManager?.disassociate(macAddress)
+                            }
+                        }
+                    } finally {
+                        scannerCallback = null
                     }
                 }
-            } finally {
-                scannerCallback = null
-            }
-        }
-    } else null
+        } else null
 
     val isSupported: Boolean
         get() = (AppContext.packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH) ||
@@ -61,7 +69,8 @@ class BluetoothMacAddressScanner(activity: ComponentActivity) {
                 deviceManager != null
 
     val isEnabled: Boolean
-        get() = weakActivity.get()?.getSystemService<BluetoothManager>()?.adapter?.isEnabled ?: false
+        get() = weakActivity.get()?.getSystemService<BluetoothManager>()?.adapter?.isEnabled
+            ?: false
 
     private fun newParingRequest(): AssociationRequest =
         AssociationRequest.Builder().apply {
@@ -87,7 +96,16 @@ class BluetoothMacAddressScanner(activity: ComponentActivity) {
             object : CompanionDeviceManager.Callback() {
                 override fun onAssociationPending(intentSender: IntentSender) {
                     weakActivity.get()?.let {
-                        ActivityCompat.startIntentSenderForResult(it, intentSender, 0, null, 0, 0, 0, null)
+                        ActivityCompat.startIntentSenderForResult(
+                            it,
+                            intentSender,
+                            0,
+                            null,
+                            0,
+                            0,
+                            0,
+                            null
+                        )
                     }
                 }
 

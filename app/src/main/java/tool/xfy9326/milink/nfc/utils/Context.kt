@@ -25,13 +25,21 @@ inline fun <reified A : Activity> Context.startActivity(intentBlock: Intent.() -
     startActivity(Intent(this, A::class.java).apply(intentBlock))
 }
 
-fun Context.showToast(@StringRes resId: Int, vararg formatArgs: Any, longDuration: Boolean = false): Unit =
+fun Context.showToast(
+    @StringRes resId: Int,
+    vararg formatArgs: Any,
+    longDuration: Boolean = false
+): Unit =
     showToast(getString(resId, *formatArgs), longDuration)
 
 fun Context.showToast(text: String, longDuration: Boolean = false): Unit =
     Toast.makeText(this, text, if (longDuration) Toast.LENGTH_LONG else Toast.LENGTH_SHORT).show()
 
-suspend fun Context.showToastInMain(@StringRes resId: Int, vararg formatArgs: Any, longDuration: Boolean = false): Unit =
+suspend fun Context.showToastInMain(
+    @StringRes resId: Int,
+    vararg formatArgs: Any,
+    longDuration: Boolean = false
+): Unit =
     showToastInMain(getString(resId, *formatArgs), longDuration)
 
 suspend fun Context.showToastInMain(text: String, longDuration: Boolean = false): Unit =

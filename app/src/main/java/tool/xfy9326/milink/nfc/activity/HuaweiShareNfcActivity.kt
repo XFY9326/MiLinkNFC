@@ -4,7 +4,6 @@ import android.app.Activity
 import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.os.Bundle
-import android.widget.Toast
 import androidx.core.content.IntentCompat
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
@@ -14,6 +13,7 @@ import tool.xfy9326.milink.nfc.datastore.AppDataStore
 import tool.xfy9326.milink.nfc.protocol.HuaweiHandoffNfc
 import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
 import tool.xfy9326.milink.nfc.utils.safeStartActivity
+import tool.xfy9326.milink.nfc.utils.showToast
 
 class HuaweiShareNfcActivity : Activity() {
 
@@ -22,7 +22,7 @@ class HuaweiShareNfcActivity : Activity() {
         if (NfcAdapter.ACTION_NDEF_DISCOVERED == intent.action) {
             val bluetoothMac = HuaweiHandoffNfc.parseBluetoothMac(intent)
             if (bluetoothMac == null) {
-                Toast.makeText(applicationContext, R.string.bluetooth_mac_not_found, Toast.LENGTH_SHORT).show()
+                applicationContext.showToast(R.string.bluetooth_mac_not_found)
             } else {
                 redirectHuaweiNdef(bluetoothMac)
             }

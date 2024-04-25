@@ -97,7 +97,11 @@ class XiaomiNfcReaderViewModel : ViewModel() {
     fun exportNdefBin(uri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
             prepareNdefReadCache()?.let {
-                val result = NdefIO.writeNdefMessage(uri, it.content, AppDataStore.exportNxpNdefFormat.getValue())
+                val result = NdefIO.writeNdefMessage(
+                    uri,
+                    it.content,
+                    AppDataStore.exportNxpNdefFormat.getValue()
+                )
                 _instantMsg.emit(if (result) InstantMsg.EXPORT_SUCCESS else InstantMsg.EXPORT_FAILED)
             }
         }

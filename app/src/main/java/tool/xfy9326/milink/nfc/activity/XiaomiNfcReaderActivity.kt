@@ -34,11 +34,12 @@ import tool.xfy9326.milink.nfc.utils.tryGetNfcTag
 
 class XiaomiNfcReaderActivity : ComponentActivity() {
     private val viewModel by viewModels<XiaomiNfcReaderViewModel>()
-    private val exportNdefBin = registerForActivityResult(ActivityResultContracts.CreateDocument(MIME_ALL)) {
-        if (it != null) {
-            viewModel.exportNdefBin(it)
+    private val exportNdefBin =
+        registerForActivityResult(ActivityResultContracts.CreateDocument(MIME_ALL)) {
+            if (it != null) {
+                viewModel.exportNdefBin(it)
+            }
         }
-    }
     private val importNdefBin = registerForActivityResult(ActivityResultContracts.GetContent()) {
         if (it != null) {
             viewModel.updateNfcReadData(it)

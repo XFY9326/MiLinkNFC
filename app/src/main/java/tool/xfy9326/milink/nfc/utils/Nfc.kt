@@ -18,7 +18,10 @@ private const val NFC_TAG_IGNORE_MILLS = 2000
 
 val EmptyNdefMessage = NdefMessage(NdefRecord(NdefRecord.TNF_EMPTY, null, null, null))
 
-fun NfcAdapter.enableNdefForegroundDispatch(activity: Activity, allowNdefFormatable: Boolean = false) {
+fun NfcAdapter.enableNdefForegroundDispatch(
+    activity: Activity,
+    allowNdefFormatable: Boolean = false
+) {
     val intent = Intent(activity, activity.javaClass).apply {
         addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
     }
