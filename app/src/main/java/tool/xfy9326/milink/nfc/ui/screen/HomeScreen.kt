@@ -15,7 +15,6 @@ import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material.icons.filled.DataObject
 import androidx.compose.material.icons.filled.Devices
 import androidx.compose.material.icons.filled.GetApp
-import androidx.compose.material.icons.filled.GroupAdd
 import androidx.compose.material.icons.filled.MediaBluetoothOn
 import androidx.compose.material.icons.filled.Nfc
 import androidx.compose.material.icons.filled.Warning
@@ -191,9 +190,6 @@ private fun Content(
     onRequestFormatXiaomiTap: () -> Unit,
     onRequestScanBluetoothMac: () -> Unit
 ) {
-    val context = LocalContext.current
-    val uriHandler = LocalUriHandler.current
-
     val scrollState = rememberScrollState()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val snackBarHostState = remember { SnackbarHostState() }
@@ -272,15 +268,6 @@ private fun Content(
                     onClick = onRequestScanBluetoothMac
                 )
             }
-            HorizontalDivider()
-            EntryCard(
-                icon = Icons.Default.GroupAdd,
-                title = stringResource(id = R.string.add_qq_group),
-                summary = stringResource(id = R.string.add_qq_group_desc),
-                onClick = {
-                    uriHandler.openUri(context.getString(R.string.qq_group_url))
-                }
-            )
         }
     }
 }

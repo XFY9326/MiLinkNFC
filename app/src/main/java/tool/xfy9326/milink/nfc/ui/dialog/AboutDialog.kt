@@ -95,7 +95,7 @@ fun AboutDialog(onDismissRequest: () -> Unit) {
                     contentDescription = stringResource(id = R.string.app_name),
                     tint = colorResource(id = R.color.ic_launcher_foreground),
                     modifier = Modifier
-                        .size(64.dp)
+                        .size(72.dp)
                         .padding(10.dp)
                 )
                 Column(modifier = Modifier.fillMaxWidth()) {

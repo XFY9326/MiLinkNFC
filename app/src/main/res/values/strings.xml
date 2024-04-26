@@ -158,7 +158,6 @@
     <string name="iot_model_name">IOT设备名称</string>
     <string name="open_iot_spec">搜索设备</string>
     <string name="add_qq_group">使用交流</string>
-    <string name="add_qq_group_desc">加入QQ群以获得更多信息\n群号：879055158</string>
     <string name="nfc_disabled">NFC功能未启用</string>
     <string name="bluetooth_disabled">蓝牙功能未启用</string>
     <string name="bluetooth_mac_scan">扫描周围蓝牙设备MAC地址</string>
@@ -177,7 +176,6 @@
     <string name="placeholder_mac_address" translatable="false">00:FF:00:FF:00:FF</string>
     <string name="placeholder_iot_model_name" translatable="false">xiaomi.wifispeaker.</string>
     <string name="mi_iot_spec_url" translatable="false">https://home.miot-spec.com/</string>
-    <string name="qq_group_url" translatable="false">https://qm.qq.com/q/QaVLSn9Rao</string>
     <string name="protocol_v1" translatable="false">V1</string>
     <string name="protocol_v2" translatable="false">V2</string>
     <string name="protocol_handoff" translatable="false">HandOff</string>
