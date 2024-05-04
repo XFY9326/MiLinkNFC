@@ -157,7 +157,6 @@
     <string name="settings_export_nxp_ndef_summary">导出文本文件格式而不是二进制格式</string>
     <string name="iot_model_name">IOT设备名称</string>
     <string name="open_iot_spec">搜索设备</string>
-    <string name="add_qq_group">使用交流</string>
     <string name="nfc_disabled">NFC功能未启用</string>
     <string name="bluetooth_disabled">蓝牙功能未启用</string>
     <string name="bluetooth_mac_scan">扫描周围蓝牙设备MAC地址</string>
