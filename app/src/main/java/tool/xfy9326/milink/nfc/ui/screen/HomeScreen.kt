@@ -237,8 +237,8 @@ private fun Content(
             HorizontalDivider()
             EntryCard(
                 icon = Icons.Default.DataObject,
-                title = stringResource(id = R.string.nfc_read_xiaomi_ndef),
-                summary = stringResource(id = R.string.nfc_read_xiaomi_ndef_summary),
+                title = stringResource(id = R.string.nfc_read_ndef),
+                summary = stringResource(id = R.string.nfc_read_ndef_summary),
                 onClick = onNavToXiaomiNfcReader
             )
             EntryCard(

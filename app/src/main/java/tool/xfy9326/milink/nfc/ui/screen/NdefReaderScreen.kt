@@ -6,6 +6,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.displayCutoutPadding
@@ -14,8 +15,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Nfc
@@ -42,20 +43,21 @@ import kotlinx.coroutines.flow.collectLatest
 import lib.xfy9326.xiaomi.nfc.XiaomiNdefTNF
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.data.ui.HandoffAppDataUI
+import tool.xfy9326.milink.nfc.data.ui.NdefRecordUI
 import tool.xfy9326.milink.nfc.data.ui.NfcTagAppDataUI
 import tool.xfy9326.milink.nfc.data.ui.NfcTagInfoUI
 import tool.xfy9326.milink.nfc.data.ui.XiaomiNfcPayloadUI
 import tool.xfy9326.milink.nfc.ui.common.InfoContent
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.theme.LocalAppThemeTypography
-import tool.xfy9326.milink.nfc.ui.vm.XiaomiNfcReaderViewModel
+import tool.xfy9326.milink.nfc.ui.vm.NdefReaderViewModel
 import tool.xfy9326.milink.nfc.utils.showToast
 
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
     AppTheme {
-        XiaomiNfcReaderScreen(
+        NdefReaderScreen(
             onNavBack = {},
             onRequestImportNdefBin = {}
         )
@@ -65,13 +67,11 @@ private fun Preview() {
 private const val ANIMATION_LABEL_CONTENT = "Content"
 
 @Composable
-fun XiaomiNfcReaderScreen(
-    viewModel: XiaomiNfcReaderViewModel = viewModel(),
+fun NdefReaderScreen(
+    viewModel: NdefReaderViewModel = viewModel(),
     onNavBack: () -> Unit,
     onRequestImportNdefBin: () -> Unit
 ) {
-    val scrollState = rememberScrollState()
-
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
@@ -85,47 +85,20 @@ fun XiaomiNfcReaderScreen(
             )
         }
     ) { innerPadding ->
-        Crossfade(targetState = uiState.value.nfcInfo, label = ANIMATION_LABEL_CONTENT) { nfcInfo ->
-            nfcInfo?.let {
-                Column(
+        Crossfade(targetState = uiState.value.hasData, label = ANIMATION_LABEL_CONTENT) {
+            if (it) {
+                NfcContent(innerPadding = innerPadding, uiState = uiState.value)
+            } else {
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .verticalScroll(scrollState)
                         .padding(innerPadding)
                         .consumeWindowInsets(innerPadding)
-                        .displayCutoutPadding()
-                        .padding(horizontal = 8.dp, vertical = 6.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                        .displayCutoutPadding(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    it.tag?.let { tag ->
-                        NfcTagInfoCard(modifier = Modifier.padding(horizontal = 8.dp), data = tag)
-                    }
-                    NdefCard(modifier = Modifier.padding(horizontal = 8.dp), ndefType = it.ndefType)
-                    XiaomiNfcPayloadCard(
-                        modifier = Modifier.padding(horizontal = 8.dp),
-                        data = it.payload
-                    )
-                    when (it.appData) {
-                        is HandoffAppDataUI -> HandoffAppDataCard(
-                            modifier = Modifier.padding(horizontal = 8.dp),
-                            data = it.appData
-                        )
-
-                        is NfcTagAppDataUI -> NfcTagAppDataCard(
-                            modifier = Modifier.padding(horizontal = 8.dp),
-                            data = it.appData
-                        )
-                    }
+                    NfcWaitScan()
                 }
-            } ?: Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding)
-                    .displayCutoutPadding(),
-                contentAlignment = Alignment.Center
-            ) {
-                NfcWaitScan()
             }
         }
     }
@@ -142,7 +115,7 @@ private fun TopBar(
     onRequestImportNdefBin: () -> Unit
 ) {
     TopAppBar(
-        title = { Text(text = stringResource(id = R.string.nfc_read_xiaomi_ndef)) },
+        title = { Text(text = stringResource(id = R.string.nfc_read_ndef)) },
         navigationIcon = {
             IconButton(onClick = onNavBack) {
                 Icon(
@@ -171,12 +144,40 @@ private fun TopBar(
 }
 
 @Composable
-private fun EventHandler(viewModel: XiaomiNfcReaderViewModel) {
+private fun EventHandler(viewModel: NdefReaderViewModel) {
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.instantMsg.collectLatest {
             context.showToast(it.resId)
+        }
+    }
+}
+
+@Composable
+private fun NfcContent(
+    innerPadding: PaddingValues,
+    uiState: NdefReaderViewModel.UiState,
+) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
+            .consumeWindowInsets(innerPadding)
+            .displayCutoutPadding()
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        uiState.nfcTag?.let { tag ->
+            item {
+                NfcTagInfoCard(modifier = Modifier.padding(horizontal = 8.dp), data = tag)
+            }
+        }
+        items(uiState.ndefRecords) {
+            when (it) {
+                is NdefRecordUI.Default -> DefaultNdefCard(defaultNdef = it)
+                is NdefRecordUI.XiaomiNfc -> XiaomiNdefCard(xiaomiNfc = it)
+            }
         }
     }
 }
@@ -215,7 +216,7 @@ private fun NfcTagInfoCard(modifier: Modifier = Modifier, data: NfcTagInfoUI) {
                 .fillMaxWidth()
                 .padding(16.dp),
             title = stringResource(id = R.string.info_nfc_tag),
-            data = mapOf(
+            data = listOf(
                 stringResource(id = R.string.nfc_field_tech) to data.techList.joinToString(),
                 stringResource(id = R.string.nfc_field_type) to data.type,
                 stringResource(id = R.string.nfc_field_size) to stringResource(
@@ -231,14 +232,64 @@ private fun NfcTagInfoCard(modifier: Modifier = Modifier, data: NfcTagInfoUI) {
 }
 
 @Composable
-private fun NdefCard(modifier: Modifier = Modifier, ndefType: XiaomiNdefTNF) {
+private fun DefaultNdefCard(modifier: Modifier = Modifier, defaultNdef: NdefRecordUI.Default) {
     OutlinedCard(modifier = modifier) {
         InfoContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
             title = stringResource(id = R.string.info_ndef),
-            data = mapOf(
+            data = buildList {
+                defaultNdef.id?.let {
+                    add(stringResource(id = R.string.ndef_field_id) to it)
+                }
+                add(stringResource(id = R.string.ndef_field_tnf) to defaultNdef.tnf.name)
+                defaultNdef.rtdHex?.let { hex ->
+                    val showRtd = defaultNdef.rtd?.let { text -> text + "\n" + hex } ?: hex
+                    add(stringResource(id = R.string.ndef_field_type) to showRtd)
+                }
+                defaultNdef.payloadText?.let {
+                    add(stringResource(id = R.string.ndef_field_payload) to it)
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun XiaomiNdefCard(modifier: Modifier = Modifier, xiaomiNfc: NdefRecordUI.XiaomiNfc) {
+    OutlinedCard(modifier = modifier) {
+        XiaomiNdefTNFCard(
+            modifier = Modifier.padding(horizontal = 8.dp),
+            ndefType = xiaomiNfc.ndefType
+        )
+        XiaomiNfcPayloadCard(
+            modifier = Modifier.padding(horizontal = 8.dp),
+            data = xiaomiNfc.payload
+        )
+        when (xiaomiNfc.appData) {
+            is HandoffAppDataUI -> HandoffAppDataCard(
+                modifier = Modifier.padding(horizontal = 8.dp),
+                data = xiaomiNfc.appData
+            )
+
+            is NfcTagAppDataUI -> NfcTagAppDataCard(
+                modifier = Modifier.padding(horizontal = 8.dp),
+                data = xiaomiNfc.appData
+            )
+        }
+    }
+}
+
+@Composable
+private fun XiaomiNdefTNFCard(modifier: Modifier = Modifier, ndefType: XiaomiNdefTNF) {
+    OutlinedCard(modifier = modifier) {
+        InfoContent(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            title = stringResource(id = R.string.info_xiaomi_ndef),
+            data = listOf(
                 stringResource(id = R.string.nfc_field_type) to stringResource(
                     id = when (ndefType) {
                         XiaomiNdefTNF.UNKNOWN -> R.string.unknown
@@ -259,12 +310,12 @@ private fun XiaomiNfcPayloadCard(modifier: Modifier = Modifier, data: XiaomiNfcP
                 .fillMaxWidth()
                 .padding(16.dp),
             title = stringResource(id = R.string.info_xiaomi_payload),
-            data = mutableMapOf(
-                stringResource(id = R.string.nfc_field_version) to "${data.majorVersion} ${data.minorVersion}",
-                stringResource(id = R.string.nfc_field_protocol) to stringResource(id = data.protocol.resId)
-            ).also {
-                if (data.idHash != null) it[stringResource(id = R.string.nfc_field_id_hash)] =
-                    data.idHash
+            data = buildList {
+                add(stringResource(id = R.string.nfc_field_version) to "${data.majorVersion} ${data.minorVersion}")
+                add(stringResource(id = R.string.nfc_field_protocol) to stringResource(id = data.protocol.resId))
+                data.idHash?.let {
+                    add(stringResource(id = R.string.nfc_field_id_hash) to it)
+                }
             }
         )
     }
@@ -278,22 +329,23 @@ private fun HandoffAppDataCard(modifier: Modifier = Modifier, data: HandoffAppDa
                 .fillMaxWidth()
                 .padding(16.dp),
             title = stringResource(id = R.string.info_app_data),
-            data = mutableMapOf(
-                stringResource(id = R.string.nfc_field_version) to "${data.majorVersion} ${data.minorVersion}",
-                stringResource(id = R.string.nfc_field_device_type) to data.deviceType,
-            ).also {
+            data = buildList {
+                add(stringResource(id = R.string.nfc_field_version) to "${data.majorVersion} ${data.minorVersion}")
+                add(stringResource(id = R.string.nfc_field_device_type) to data.deviceType)
                 if (data.attributesMap.isNotEmpty()) {
-                    it[stringResource(id = R.string.nfc_field_attributes)] =
-                        data.attributesMap.map { entry ->
+                    add(
+                        stringResource(id = R.string.nfc_field_attributes) to data.attributesMap.map { entry ->
                             "${entry.key}: ${entry.value}"
                         }.joinToString("\n")
+                    )
                 }
-                it[stringResource(id = R.string.nfc_field_action)] = data.action
+                add(stringResource(id = R.string.nfc_field_action) to data.action)
                 if (data.payloadsMap.isNotEmpty()) {
-                    it[stringResource(id = R.string.nfc_field_properties)] =
-                        data.payloadsMap.map { entry ->
+                    add(
+                        stringResource(id = R.string.nfc_field_properties) to data.payloadsMap.map { entry ->
                             "${entry.key}: ${entry.value}"
                         }.joinToString("\n")
+                    )
                 }
             }
         )
@@ -308,7 +360,7 @@ private fun NfcTagAppDataCard(modifier: Modifier = Modifier, data: NfcTagAppData
                 .fillMaxWidth()
                 .padding(16.dp),
             title = stringResource(id = R.string.info_app_data),
-            data = mapOf(
+            data = listOf(
                 stringResource(id = R.string.nfc_field_version) to "${data.majorVersion} ${data.minorVersion}",
                 stringResource(id = R.string.nfc_field_write_time) to data.writeTime,
                 stringResource(id = R.string.nfc_field_flags) to data.flags,
@@ -321,15 +373,13 @@ private fun NfcTagAppDataCard(modifier: Modifier = Modifier, data: NfcTagAppData
                         .fillMaxWidth()
                         .padding(16.dp),
                     title = stringResource(id = R.string.info_app_data_nfc_tag_action_record),
-                    data = mutableMapOf(
-                        stringResource(id = R.string.nfc_field_action) to record.action,
-                        stringResource(id = R.string.nfc_field_condition) to record.condition,
-                        stringResource(id = R.string.nfc_field_device_number) to record.deviceNumber,
-                        stringResource(id = R.string.nfc_field_flags) to record.flags
-                    ).also {
+                    data = buildList {
+                        add(stringResource(id = R.string.nfc_field_action) to record.action)
+                        add(stringResource(id = R.string.nfc_field_condition) to record.condition)
+                        add(stringResource(id = R.string.nfc_field_device_number) to record.deviceNumber)
+                        add(stringResource(id = R.string.nfc_field_flags) to record.flags)
                         if (!record.conditionParameters.isNullOrEmpty()) {
-                            it[stringResource(id = R.string.nfc_field_condition_parameters)] =
-                                record.conditionParameters
+                            add(stringResource(id = R.string.nfc_field_condition_parameters) to record.conditionParameters)
                         }
                     }
                 )
@@ -342,16 +392,16 @@ private fun NfcTagAppDataCard(modifier: Modifier = Modifier, data: NfcTagAppData
                         .fillMaxWidth()
                         .padding(16.dp),
                     title = stringResource(id = R.string.info_app_data_nfc_tag_device_record),
-                    data = mutableMapOf(
-                        stringResource(id = R.string.nfc_field_device_type) to record.deviceType,
-                        stringResource(id = R.string.nfc_field_flags) to record.flags,
-                        stringResource(id = R.string.nfc_field_device_number) to record.deviceNumber,
-                    ).also {
+                    data = buildList {
+                        add(stringResource(id = R.string.nfc_field_device_type) to record.deviceType)
+                        add(stringResource(id = R.string.nfc_field_flags) to record.flags)
+                        add(stringResource(id = R.string.nfc_field_device_number) to record.deviceNumber)
                         if (record.attributesMap.isNotEmpty()) {
-                            it[stringResource(id = R.string.nfc_field_attributes)] =
-                                record.attributesMap.map { entry ->
+                            add(
+                                stringResource(id = R.string.nfc_field_attributes) to record.attributesMap.map { entry ->
                                     "${entry.key}: ${entry.value}"
                                 }.joinToString("\n")
+                            )
                         }
                     }
                 )

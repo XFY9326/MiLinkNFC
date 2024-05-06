@@ -11,8 +11,8 @@
     <string name="mi_tap_sound_box_nfc_summary">基于小米碰碰贴2将音频接力到蓝牙音箱</string>
     <string name="circulate_nfc">内容流转</string>
     <string name="circulate_nfc_summary">使用NFC将当前内容流转到指定MAC的设备</string>
-    <string name="nfc_read_xiaomi_ndef">读取小米NFC标签</string>
-    <string name="nfc_read_xiaomi_ndef_summary">读取并解析小米NFC协议的NFC标签</string>
+    <string name="nfc_read_ndef">读取NDEF信息</string>
+    <string name="nfc_read_ndef_summary">读取并解析NDEF协议的NFC标签\n同样支持解析小米NFC协议</string>
     <string name="nfc_clear_ndef">清空NFC标签</string>
     <string name="nfc_clear_ndef_summary">使NFC标签失去功能（会残留部分旧数据）</string>
     <string name="nfc_format_xiaomi_tap">创建空小米碰碰贴</string>
@@ -105,7 +105,6 @@
     <string name="missing_package">缺少应用：%1$s</string>
     <string name="check_update">检查更新</string>
     <string name="not_support_nfc">当前设备不支持NFC！</string>
-    <string name="xiaomi_ndef_not_found">非小米NFC标签</string>
     <string name="xiaomi_ndef_not_nfc">非小米NFC数据</string>
     <string name="xiaomi_ndef_version_error">无法判断小米NFC协议版本</string>
     <string name="xiaomi_ndef_parse_error">NFC标签解析失败</string>
@@ -118,6 +117,7 @@
     <string name="unknown">未知</string>
     <string name="current_and_total_bytes">%1$d/%2$d 字节</string>
     <string name="info_ndef">NDEF信息</string>
+    <string name="info_xiaomi_ndef">小米NDEF信息</string>
     <string name="info_nfc_tag">NFC标签</string>
     <string name="info_xiaomi_payload">小米NFC协议</string>
     <string name="info_app_data">小米应用数据</string>
@@ -142,6 +142,10 @@
     <string name="nfc_field_condition">条件</string>
     <string name="nfc_field_condition_parameters">条件参数</string>
     <string name="nfc_field_attributes">属性</string>
+    <string name="ndef_field_id" translatable="false">ID</string>
+    <string name="ndef_field_tnf">NDEF类型</string>
+    <string name="ndef_field_type">数据类型</string>
+    <string name="ndef_field_payload">数据</string>
     <string name="import_text">导入</string>
     <string name="import_success">导入成功</string>
     <string name="import_failed">导出失败</string>

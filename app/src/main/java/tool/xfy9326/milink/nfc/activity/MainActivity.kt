@@ -56,7 +56,7 @@ class MainActivity : ComponentActivity() {
         } else if (!nfcAdapter.isEnabled) {
             showToast(R.string.nfc_disabled)
         } else {
-            startActivity<XiaomiNfcReaderActivity>()
+            startActivity<NdefReaderActivity>()
         }
     }
 

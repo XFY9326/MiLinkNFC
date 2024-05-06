@@ -32,22 +32,14 @@ object XiaomiNfc {
     private const val PKG_MI_CONNECT_SERVICE = "com.xiaomi.mi_connect_service"
     private const val PKG_SMART_HOME = "com.xiaomi.smarthome"
 
-    fun getXiaomiNdefPayloadType(ndefMessage: NdefMessage): XiaomiNdefTNF? =
-        ndefMessage.records.asSequence().filterNotNull().filter {
-            it.tnf == NdefRecord.TNF_EXTERNAL_TYPE
-        }.mapNotNull {
-            runCatching {
-                XiaomiNdefTNF.parse(it.type.toString(Charsets.US_ASCII))
+    fun getXiaomiNdefTNF(ndefRecord: NdefRecord): XiaomiNdefTNF? {
+        if (ndefRecord.tnf == NdefRecord.TNF_EXTERNAL_TYPE) {
+            return runCatching {
+                XiaomiNdefTNF.parse(ndefRecord.type.toString(Charsets.US_ASCII))
             }.getOrNull()
-        }.firstOrNull()
-
-    fun getXiaomiNdefPayloadBytes(
-        ndefMessage: NdefMessage,
-        type: XiaomiNdefTNF
-    ): ByteArray? =
-        ndefMessage.records.asSequence().filterNotNull().filter {
-            it.tnf == NdefRecord.TNF_EXTERNAL_TYPE && it.type.toString(Charsets.US_ASCII) == type.value
-        }.firstOrNull()?.payload
+        }
+        return null
+    }
 
     private fun newMiTapNdefMessage(ndefRecord: NdefRecord): NdefMessage =
         NdefMessage(

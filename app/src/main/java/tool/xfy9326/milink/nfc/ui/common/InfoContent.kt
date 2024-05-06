@@ -19,7 +19,7 @@ private fun Preview() {
     AppTheme {
         InfoContent(
             title = "TITLE",
-            data = mapOf(
+            data = listOf(
                 "Title 1" to "Content",
                 "Title 2" to "Content",
                 "Title 3" to "Content: Content\nContent: Content\nContent: Content",
@@ -34,7 +34,7 @@ private fun Preview() {
 fun InfoContent(
     modifier: Modifier = Modifier,
     title: String? = null,
-    data: Map<String, String>,
+    data: List<Pair<String, String>>,
 ) {
     val typography = LocalAppThemeTypography.current
     val colorScheme = LocalAppThemeColorScheme.current

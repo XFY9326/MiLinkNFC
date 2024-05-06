@@ -55,7 +55,7 @@
             android:launchMode="singleTop" />
 
         <activity
-            android:name=".activity.XiaomiNfcReaderActivity"
+            android:name=".activity.NdefReaderActivity"
             android:exported="false"
             android:launchMode="singleTop" />
 

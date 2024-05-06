@@ -17,9 +17,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.data.NdefReadData
-import tool.xfy9326.milink.nfc.ui.screen.XiaomiNfcReaderScreen
+import tool.xfy9326.milink.nfc.ui.screen.NdefReaderScreen
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
-import tool.xfy9326.milink.nfc.ui.vm.XiaomiNfcReaderViewModel
+import tool.xfy9326.milink.nfc.ui.vm.NdefReaderViewModel
 import tool.xfy9326.milink.nfc.utils.MIME_ALL
 import tool.xfy9326.milink.nfc.utils.enableNdefForegroundDispatch
 import tool.xfy9326.milink.nfc.utils.ignoreTagUntilRemoved
@@ -32,8 +32,8 @@ import tool.xfy9326.milink.nfc.utils.showToastInMain
 import tool.xfy9326.milink.nfc.utils.techNameList
 import tool.xfy9326.milink.nfc.utils.tryGetNfcTag
 
-class XiaomiNfcReaderActivity : ComponentActivity() {
-    private val viewModel by viewModels<XiaomiNfcReaderViewModel>()
+class NdefReaderActivity : ComponentActivity() {
+    private val viewModel by viewModels<NdefReaderViewModel>()
     private val exportNdefBin =
         registerForActivityResult(ActivityResultContracts.CreateDocument(MIME_ALL)) {
             if (it != null) {
@@ -51,7 +51,7 @@ class XiaomiNfcReaderActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AppTheme {
-                XiaomiNfcReaderScreen(
+                NdefReaderScreen(
                     onNavBack = {
                         onBackPressedDispatcher.onBackPressed()
                     },
