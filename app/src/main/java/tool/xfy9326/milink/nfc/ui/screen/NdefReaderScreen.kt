@@ -263,6 +263,9 @@ private fun DefaultNdefCard(
                 defaultNdef.payloadLanguage?.let {
                     add(stringResource(id = R.string.ndef_field_language) to it)
                 }
+                defaultNdef.smartPosterUri?.let {
+                    add(stringResource(id = R.string.ndef_field_uri) to it.toString())
+                }
                 defaultNdef.payload?.let {
                     add(stringResource(id = R.string.ndef_field_payload) to it)
                 }

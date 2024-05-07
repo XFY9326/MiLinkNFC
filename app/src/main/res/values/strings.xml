@@ -116,11 +116,11 @@
     <string name="clear">清空</string>
     <string name="unknown">未知</string>
     <string name="current_and_total_bytes">%1$d/%2$d 字节</string>
-    <string name="info_ndef">%1$d. NDEF信息</string>
-    <string name="info_xiaomi_ndef">%1$d. 小米NDEF信息</string>
+    <string name="info_ndef">%1$d. NDEF记录</string>
+    <string name="info_xiaomi_ndef">%1$d. 小米NDEF记录</string>
     <string name="info_nfc_tag">NFC标签</string>
     <string name="info_xiaomi_payload">小米NFC协议</string>
-    <string name="info_app_data">小米应用数据</string>
+    <string name="info_app_data">应用数据</string>
     <string name="info_app_data_nfc_tag_action_record">NFC行为</string>
     <string name="info_app_data_nfc_tag_device_record">NFC设备</string>
     <string name="ndef_payload_type_mi_connect_service">小米互联通信服务</string>

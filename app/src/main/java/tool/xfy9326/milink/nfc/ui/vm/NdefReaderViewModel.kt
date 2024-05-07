@@ -187,20 +187,26 @@ class NdefReaderViewModel : ViewModel() {
             id = record.id?.takeIf { it.isNotEmpty() }?.toHexText(),
             tnf = NdefTNF.getByValue(record.tnf.toByte()),
             rtd = NdefRTD.getByValue(record.type),
-            typeText = if (
-                record.tnf == NdefRecord.TNF_ABSOLUTE_URI ||
+            typeText = record.type.takeIf { it.isNotEmpty() }?.runCatching {
+                when (record.tnf) {
+                    NdefRecord.TNF_ABSOLUTE_URI ->
+                        Uri.parse(toString(Charsets.UTF_8)).normalizeScheme().toString()
+
+                    NdefRecord.TNF_MIME_MEDIA ->
+                        Intent.normalizeMimeType(toString(Charsets.US_ASCII))
+
+                    else -> null
+                }
+            }?.getOrNull(),
+            typeHex = record.type?.takeIf { it.isNotEmpty() }?.toHexText(),
+            smartPosterUri = if (
                 record.tnf == NdefRecord.TNF_WELL_KNOWN &&
                 record.type.contentEquals(NdefRecord.RTD_SMART_POSTER)
             ) {
-                record.toUri()?.toString()
-            } else if (record.tnf == NdefRecord.TNF_MIME_MEDIA) {
-                runCatching {
-                    Intent.normalizeMimeType(record.type.toString(Charsets.US_ASCII))
-                }.getOrNull()
+                record.toUri()
             } else null,
-            typeHex = record.type?.takeIf { it.isNotEmpty() }?.toHexText(),
             payloadLanguage = payloadText?.first,
-            payloadText = runCatching {
+            payloadText = record.payload?.takeIf { it.isNotEmpty() }?.runCatching {
                 if (
                     record.tnf == NdefRecord.TNF_EXTERNAL_TYPE &&
                     record.type.contentEquals(NdefRTD.ANDROID_APP.value)
@@ -217,7 +223,7 @@ class NdefReaderViewModel : ViewModel() {
                 ) {
                     record.payload.toString(Charsets.UTF_8)
                 } else record.getPayloadUri()
-            }.getOrNull(),
+            }?.getOrNull(),
             payloadHex = record.payload?.takeIf { it.isNotEmpty() }?.toHexText(),
         )
     }

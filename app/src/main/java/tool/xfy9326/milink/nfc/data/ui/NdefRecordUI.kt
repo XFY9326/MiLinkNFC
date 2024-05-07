@@ -1,5 +1,6 @@
 package tool.xfy9326.milink.nfc.data.ui
 
+import android.net.Uri
 import lib.xfy9326.xiaomi.nfc.XiaomiNdefTNF
 import tool.xfy9326.milink.nfc.data.NdefRTD
 import tool.xfy9326.milink.nfc.data.NdefTNF
@@ -11,6 +12,7 @@ sealed interface NdefRecordUI {
         val rtd: NdefRTD?,
         val typeText: String?,
         val typeHex: String?,
+        val smartPosterUri: Uri?,
         val payloadLanguage: String?,
         private val payloadText: String?,
         private val payloadHex: String?
