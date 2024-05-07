@@ -1,6 +1,5 @@
 package tool.xfy9326.milink.nfc.data.ui
 
-import android.net.Uri
 import lib.xfy9326.xiaomi.nfc.XiaomiNdefTNF
 import tool.xfy9326.milink.nfc.data.NdefRTD
 import tool.xfy9326.milink.nfc.data.NdefTNF
@@ -9,18 +8,24 @@ sealed interface NdefRecordUI {
     data class Default(
         val id: String?,
         val tnf: NdefTNF,
-        private val rtdType: NdefRTD?,
-        private val rtdText: String?,
-        val rtdHex: String?,
-        private val mimeType: String?,
-        private val uri: Uri?,
-        private val payload: String?
+        val rtd: NdefRTD?,
+        val typeText: String?,
+        val typeHex: String?,
+        val payloadLanguage: String?,
+        private val payloadText: String?,
+        private val payloadHex: String?
     ) : NdefRecordUI {
-        val payloadText: String?
-            get() = uri?.toString() ?: payload
+        val type: String?
+            get() = if (rtd == null) {
+                typeText ?: typeHex
+            } else if (typeText != null) {
+                rtd.name + "\n" + typeText
+            } else {
+                rtd.name
+            }
 
-        val rtd: String?
-            get() = mimeType ?: rtdType?.name ?: rtdText
+        val payload: String?
+            get() = payloadText ?: payloadHex
     }
 
     data class XiaomiNfc(

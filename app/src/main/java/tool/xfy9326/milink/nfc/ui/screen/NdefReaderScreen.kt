@@ -16,7 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Nfc
@@ -173,10 +173,19 @@ private fun NfcContent(
                 NfcTagInfoCard(modifier = Modifier.padding(horizontal = 8.dp), data = tag)
             }
         }
-        items(uiState.ndefRecords) {
-            when (it) {
-                is NdefRecordUI.Default -> DefaultNdefCard(defaultNdef = it)
-                is NdefRecordUI.XiaomiNfc -> XiaomiNdefCard(xiaomiNfc = it)
+        itemsIndexed(uiState.ndefRecords) { index, item ->
+            when (item) {
+                is NdefRecordUI.Default -> DefaultNdefCard(
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    index = index,
+                    defaultNdef = item
+                )
+
+                is NdefRecordUI.XiaomiNfc -> XiaomiNdefCard(
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    index = index,
+                    xiaomiNfc = item
+                )
             }
         }
     }
@@ -232,23 +241,29 @@ private fun NfcTagInfoCard(modifier: Modifier = Modifier, data: NfcTagInfoUI) {
 }
 
 @Composable
-private fun DefaultNdefCard(modifier: Modifier = Modifier, defaultNdef: NdefRecordUI.Default) {
+private fun DefaultNdefCard(
+    modifier: Modifier = Modifier,
+    index: Int,
+    defaultNdef: NdefRecordUI.Default
+) {
     OutlinedCard(modifier = modifier) {
         InfoContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            title = stringResource(id = R.string.info_ndef),
+            title = stringResource(id = R.string.info_ndef, index + 1),
             data = buildList {
                 defaultNdef.id?.let {
                     add(stringResource(id = R.string.ndef_field_id) to it)
                 }
                 add(stringResource(id = R.string.ndef_field_tnf) to defaultNdef.tnf.name)
-                defaultNdef.rtdHex?.let { hex ->
-                    val showRtd = defaultNdef.rtd?.let { text -> text + "\n" + hex } ?: hex
-                    add(stringResource(id = R.string.ndef_field_type) to showRtd)
+                defaultNdef.type?.let {
+                    add(stringResource(id = R.string.ndef_field_type) to it)
                 }
-                defaultNdef.payloadText?.let {
+                defaultNdef.payloadLanguage?.let {
+                    add(stringResource(id = R.string.ndef_field_language) to it)
+                }
+                defaultNdef.payload?.let {
                     add(stringResource(id = R.string.ndef_field_payload) to it)
                 }
             }
@@ -257,38 +272,48 @@ private fun DefaultNdefCard(modifier: Modifier = Modifier, defaultNdef: NdefReco
 }
 
 @Composable
-private fun XiaomiNdefCard(modifier: Modifier = Modifier, xiaomiNfc: NdefRecordUI.XiaomiNfc) {
+private fun XiaomiNdefCard(
+    modifier: Modifier = Modifier,
+    index: Int,
+    xiaomiNfc: NdefRecordUI.XiaomiNfc
+) {
     OutlinedCard(modifier = modifier) {
-        XiaomiNdefTNFCard(
-            modifier = Modifier.padding(horizontal = 8.dp),
-            ndefType = xiaomiNfc.ndefType
-        )
-        XiaomiNfcPayloadCard(
-            modifier = Modifier.padding(horizontal = 8.dp),
-            data = xiaomiNfc.payload
-        )
-        when (xiaomiNfc.appData) {
-            is HandoffAppDataUI -> HandoffAppDataCard(
+        Column(
+            modifier = Modifier.padding(vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            XiaomiNdefTNFCard(
                 modifier = Modifier.padding(horizontal = 8.dp),
-                data = xiaomiNfc.appData
+                index = index,
+                ndefType = xiaomiNfc.ndefType
             )
+            XiaomiNfcPayloadCard(
+                modifier = Modifier.padding(horizontal = 8.dp),
+                data = xiaomiNfc.payload
+            )
+            when (xiaomiNfc.appData) {
+                is HandoffAppDataUI -> HandoffAppDataCard(
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    data = xiaomiNfc.appData
+                )
 
-            is NfcTagAppDataUI -> NfcTagAppDataCard(
-                modifier = Modifier.padding(horizontal = 8.dp),
-                data = xiaomiNfc.appData
-            )
+                is NfcTagAppDataUI -> NfcTagAppDataCard(
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    data = xiaomiNfc.appData
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun XiaomiNdefTNFCard(modifier: Modifier = Modifier, ndefType: XiaomiNdefTNF) {
+private fun XiaomiNdefTNFCard(modifier: Modifier = Modifier, index: Int, ndefType: XiaomiNdefTNF) {
     OutlinedCard(modifier = modifier) {
         InfoContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            title = stringResource(id = R.string.info_xiaomi_ndef),
+            title = stringResource(id = R.string.info_xiaomi_ndef, index + 1),
             data = listOf(
                 stringResource(id = R.string.nfc_field_type) to stringResource(
                     id = when (ndefType) {

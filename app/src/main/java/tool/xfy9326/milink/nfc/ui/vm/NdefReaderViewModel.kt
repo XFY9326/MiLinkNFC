@@ -1,5 +1,6 @@
 package tool.xfy9326.milink.nfc.ui.vm
 
+import android.content.Intent
 import android.net.Uri
 import android.nfc.NdefMessage
 import android.nfc.NdefRecord
@@ -27,6 +28,8 @@ import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.data.NdefRTD
 import tool.xfy9326.milink.nfc.data.NdefReadData
 import tool.xfy9326.milink.nfc.data.NdefTNF
+import tool.xfy9326.milink.nfc.data.getPayloadUri
+import tool.xfy9326.milink.nfc.data.getText
 import tool.xfy9326.milink.nfc.data.ui.HandoffAppDataUI
 import tool.xfy9326.milink.nfc.data.ui.NdefRecordUI
 import tool.xfy9326.milink.nfc.data.ui.NfcTagAppDataUI
@@ -178,18 +181,44 @@ class NdefReaderViewModel : ViewModel() {
         }
     }
 
-    private fun decodeNdefRecords(ndefRecord: NdefRecord): NdefRecordUI.Default {
+    private fun decodeNdefRecords(record: NdefRecord): NdefRecordUI.Default {
+        val payloadText = record.getText()
         return NdefRecordUI.Default(
-            id = ndefRecord.id.takeIf { it.isNotEmpty() }?.toHexText(),
-            tnf = NdefTNF.getByValue(ndefRecord.tnf.toByte()),
-            rtdType = NdefRTD.getByValue(ndefRecord.type),
-            rtdText = ndefRecord.type.takeIf { it.isNotEmpty() }?.let {
-                runCatching { it.toString(Charsets.US_ASCII) }.getOrNull() ?: it.toHexText()
-            },
-            rtdHex = ndefRecord.type.takeIf { it.isNotEmpty() }?.toHexText(),
-            mimeType = ndefRecord.toMimeType().takeUnless { it.isNullOrBlank() },
-            uri = ndefRecord.toUri(),
-            payload = ndefRecord.payload.takeIf { it.isNotEmpty() }?.toHexText()
+            id = record.id?.takeIf { it.isNotEmpty() }?.toHexText(),
+            tnf = NdefTNF.getByValue(record.tnf.toByte()),
+            rtd = NdefRTD.getByValue(record.type),
+            typeText = if (
+                record.tnf == NdefRecord.TNF_ABSOLUTE_URI ||
+                record.tnf == NdefRecord.TNF_WELL_KNOWN &&
+                record.type.contentEquals(NdefRecord.RTD_SMART_POSTER)
+            ) {
+                record.toUri()?.toString()
+            } else if (record.tnf == NdefRecord.TNF_MIME_MEDIA) {
+                runCatching {
+                    Intent.normalizeMimeType(record.type.toString(Charsets.US_ASCII))
+                }.getOrNull()
+            } else null,
+            typeHex = record.type?.takeIf { it.isNotEmpty() }?.toHexText(),
+            payloadLanguage = payloadText?.first,
+            payloadText = runCatching {
+                if (
+                    record.tnf == NdefRecord.TNF_EXTERNAL_TYPE &&
+                    record.type.contentEquals(NdefRTD.ANDROID_APP.value)
+                ) {
+                    record.payload.toString(Charsets.UTF_8)
+                } else if (
+                    record.tnf == NdefRecord.TNF_WELL_KNOWN &&
+                    record.type.contentEquals(NdefRecord.RTD_TEXT)
+                ) {
+                    payloadText?.second
+                } else if (
+                    record.tnf == NdefRecord.TNF_MIME_MEDIA &&
+                    record.type.contentEquals("text/plain".toByteArray())
+                ) {
+                    record.payload.toString(Charsets.UTF_8)
+                } else record.getPayloadUri()
+            }.getOrNull(),
+            payloadHex = record.payload?.takeIf { it.isNotEmpty() }?.toHexText(),
         )
     }
 
