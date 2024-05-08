@@ -1,7 +1,7 @@
 package tool.xfy9326.milink.nfc.data
 
+import android.nfc.NdefMessage
 import android.nfc.NdefRecord
-import tool.xfy9326.milink.nfc.utils.EMPTY
 
 enum class NdefTNF(val value: Byte) {
     EMPTY(0x00),
@@ -34,69 +34,142 @@ enum class NdefRTD(val value: ByteArray) {
     }
 }
 
-@Suppress("SpellCheckingInspection")
-private val URI_PREFIX_MAP = arrayOf(
-    "",  // 0x00
-    "http://www.",  // 0x01
-    "https://www.",  // 0x02
-    "http://",  // 0x03
-    "https://",  // 0x04
-    "tel:",  // 0x05
-    "mailto:",  // 0x06
-    "ftp://anonymous:anonymous@",  // 0x07
-    "ftp://ftp.",  // 0x08
-    "ftps://",  // 0x09
-    "sftp://",  // 0x0A
-    "smb://",  // 0x0B
-    "nfs://",  // 0x0C
-    "ftp://",  // 0x0D
-    "dav://",  // 0x0E
-    "news:",  // 0x0F
-    "telnet://",  // 0x10
-    "imap:",  // 0x11
-    "rtsp://",  // 0x12
-    "urn:",  // 0x13
-    "pop:",  // 0x14
-    "sip:",  // 0x15
-    "sips:",  // 0x16
-    "tftp:",  // 0x17
-    "btspp://",  // 0x18
-    "btl2cap://",  // 0x19
-    "btgoep://",  // 0x1A
-    "tcpobex://",  // 0x1B
-    "irdaobex://",  // 0x1C
-    "file://",  // 0x1D
-    "urn:epc:id:",  // 0x1E
-    "urn:epc:tag:",  // 0x1F
-    "urn:epc:pat:",  // 0x20
-    "urn:epc:raw:",  // 0x21
-    "urn:epc:",  // 0x22
-    "urn:nfc:",  // 0x23
-)
+sealed interface NdefSmartPoster {
+    enum class ActionType(val value: Byte) {
+        DO_THE_ACTION(0x00),
+        SAVE_FOR_LATER(0x01),
+        OPEN_FOR_EDITING(0x02),
+        UNDEFINED(Byte.MIN_VALUE);
 
-fun NdefRecord.getPayloadUri() =
-    if (tnf == NdefRecord.TNF_WELL_KNOWN && type.contentEquals(NdefRecord.RTD_URI) && payload.isNotEmpty()) {
-        runCatching {
-            val prefix = URI_PREFIX_MAP[payload[0].toInt()]
-            val uri = if (payload.size > 1) {
-                payload.copyOfRange(1, payload.size).toString(Charsets.UTF_8)
-            } else EMPTY
-            prefix + uri
-        }.getOrNull()
+        companion object {
+            fun getByValue(value: Byte): ActionType =
+                entries.firstOrNull { it.value == value } ?: UNDEFINED
+        }
+    }
+
+    companion object {
+        private val ACTION_RECORD_TYPE = "act".toByteArray()
+        private val SIZE_RECORD_TYPE = "s".toByteArray()
+        private val TYPE_RECORD_TYPE = "t".toByteArray()
+
+        private fun ByteArray.startsWith(byteArray: ByteArray): Boolean {
+            if (this.size < byteArray.size) return false
+            for (i in indices) {
+                if (this[i] != byteArray[i]) return false
+            }
+            return true
+        }
+    }
+
+    data class Title(val language: String, val text: String) : NdefSmartPoster {
+        companion object {
+            fun checkType(record: NdefRecord): Boolean =
+                record.tnf == NdefRecord.TNF_WELL_KNOWN &&
+                        record.type.contentEquals(NdefRecord.RTD_TEXT)
+        }
+    }
+
+    data class Uri(val uri: android.net.Uri) : NdefSmartPoster {
+        companion object {
+            fun checkType(record: NdefRecord): Boolean =
+                record.tnf == NdefRecord.TNF_WELL_KNOWN &&
+                        record.type.contentEquals(NdefRecord.RTD_URI) ||
+                        record.tnf == NdefRecord.TNF_ABSOLUTE_URI
+        }
+    }
+
+    data class Action(val actionType: ActionType) : NdefSmartPoster {
+        companion object {
+            fun checkType(record: NdefRecord): Boolean =
+                record.type.contentEquals(ACTION_RECORD_TYPE)
+        }
+    }
+
+    data class Icon(val payload: ByteArray) : NdefSmartPoster {
+        companion object {
+            fun checkType(record: NdefRecord): Boolean =
+                record.tnf == NdefRecord.TNF_MIME_MEDIA &&
+                        (record.type.startsWith("image/".toByteArray()) ||
+                                record.type.startsWith("video/".toByteArray()))
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Icon
+
+            return payload.contentEquals(other.payload)
+        }
+
+        override fun hashCode(): Int {
+            return payload.contentHashCode()
+        }
+    }
+
+    data class Size(val value: Int) : NdefSmartPoster {
+        companion object {
+            fun checkType(record: NdefRecord): Boolean =
+                record.type.contentEquals(SIZE_RECORD_TYPE)
+        }
+    }
+
+    data class Type(val mimeType: String) : NdefSmartPoster {
+        companion object {
+            fun checkType(record: NdefRecord): Boolean =
+                record.type.contentEquals(TYPE_RECORD_TYPE)
+        }
+    }
+}
+
+private fun parseRTDText(bytes: ByteArray): Pair<String, String>? = runCatching {
+    val status = bytes[0].toInt()
+    if (bytes.size > 1 + status) {
+        val code = bytes.copyOfRange(1, 1 + status).toString(Charsets.US_ASCII)
+        val text = bytes.copyOfRange(1 + status, bytes.size)
+            .toString(Charsets.UTF_8)
+        code to text
+    } else null
+}.getOrNull()
+
+fun NdefRecord.getRTDText() =
+    if (
+        tnf == NdefRecord.TNF_WELL_KNOWN &&
+        type.contentEquals(NdefRecord.RTD_TEXT) &&
+        payload.size > 2
+    ) parseRTDText(payload) else null
+
+private fun ByteArray.getUIntAt(idx: Int) =
+    ((this[idx].toUInt() and 0xFFu) shl 24) or
+            ((this[idx + 1].toUInt() and 0xFFu) shl 16) or
+            ((this[idx + 2].toUInt() and 0xFFu) shl 8) or
+            (this[idx + 3].toUInt() and 0xFFu)
+
+private fun parseSubSmartPosterRecords(record: NdefRecord): NdefSmartPoster? =
+    if (NdefSmartPoster.Title.checkType(record)) {
+        val rtdText = parseRTDText(record.payload)!!
+        NdefSmartPoster.Title(rtdText.first, rtdText.second)
+    } else if (NdefSmartPoster.Uri.checkType(record)) {
+        NdefSmartPoster.Uri(record.toUri()!!)
+    } else if (NdefSmartPoster.Action.checkType(record)) {
+        NdefSmartPoster.Action(NdefSmartPoster.ActionType.getByValue(record.payload[0]))
+    } else if (NdefSmartPoster.Icon.checkType(record)) {
+        NdefSmartPoster.Icon(record.payload)
+    } else if (NdefSmartPoster.Size.checkType(record)) {
+        NdefSmartPoster.Size(record.payload.getUIntAt(0).toInt())
+    } else if (NdefSmartPoster.Type.checkType(record)) {
+        NdefSmartPoster.Type(record.payload.toString(Charsets.UTF_8))
     } else null
 
-fun NdefRecord.getText() = if (
-    tnf == NdefRecord.TNF_WELL_KNOWN &&
-    type.contentEquals(NdefRecord.RTD_TEXT) &&
-    payload.size > 2
-) {
-    runCatching {
-        val status = payload[0].toInt()
-        if (payload.size > 1 + status) {
-            val code = payload.copyOfRange(1, 1 + status).toString(Charsets.US_ASCII)
-            val text = payload.copyOfRange(1 + status, payload.size)
-                .toString(Charsets.UTF_8)
-            code to text
-        } else null
-    }.getOrNull()
-} else null
+fun NdefRecord.getRTDSmartPoster() =
+    if (
+        tnf == NdefRecord.TNF_WELL_KNOWN &&
+        type.contentEquals(NdefRecord.RTD_SMART_POSTER) &&
+        payload.isNotEmpty()
+    ) {
+        runCatching {
+            NdefMessage(payload).records.asSequence().filterNotNull().mapNotNull {
+                parseSubSmartPosterRecords(it)
+            }
+        }.getOrNull()
+    } else null

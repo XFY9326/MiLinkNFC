@@ -28,8 +28,7 @@ import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.data.NdefRTD
 import tool.xfy9326.milink.nfc.data.NdefReadData
 import tool.xfy9326.milink.nfc.data.NdefTNF
-import tool.xfy9326.milink.nfc.data.getPayloadUri
-import tool.xfy9326.milink.nfc.data.getText
+import tool.xfy9326.milink.nfc.data.getRTDText
 import tool.xfy9326.milink.nfc.data.ui.HandoffAppDataUI
 import tool.xfy9326.milink.nfc.data.ui.NdefRecordUI
 import tool.xfy9326.milink.nfc.data.ui.NfcTagAppDataUI
@@ -182,7 +181,7 @@ class NdefReaderViewModel : ViewModel() {
     }
 
     private fun decodeNdefRecords(record: NdefRecord): NdefRecordUI.Default {
-        val payloadText = record.getText()
+        val payloadRTDText = record.getRTDText()
         return NdefRecordUI.Default(
             id = record.id?.takeIf { it.isNotEmpty() }?.toHexText(),
             tnf = NdefTNF.getByValue(record.tnf.toByte()),
@@ -205,7 +204,7 @@ class NdefReaderViewModel : ViewModel() {
             ) {
                 record.toUri()
             } else null,
-            payloadLanguage = payloadText?.first,
+            payloadLanguage = payloadRTDText?.first,
             payloadText = record.payload?.takeIf { it.isNotEmpty() }?.runCatching {
                 if (
                     record.tnf == NdefRecord.TNF_EXTERNAL_TYPE &&
@@ -216,13 +215,18 @@ class NdefReaderViewModel : ViewModel() {
                     record.tnf == NdefRecord.TNF_WELL_KNOWN &&
                     record.type.contentEquals(NdefRecord.RTD_TEXT)
                 ) {
-                    payloadText?.second
+                    payloadRTDText?.second
                 } else if (
                     record.tnf == NdefRecord.TNF_MIME_MEDIA &&
                     record.type.contentEquals("text/plain".toByteArray())
                 ) {
                     record.payload.toString(Charsets.UTF_8)
-                } else record.getPayloadUri()
+                } else if (
+                    record.tnf == NdefRecord.TNF_WELL_KNOWN &&
+                    record.type.contentEquals(NdefRecord.RTD_URI)
+                ) {
+                    record.toUri()?.toString()
+                } else null
             }?.getOrNull(),
             payloadHex = record.payload?.takeIf { it.isNotEmpty() }?.toHexText(),
         )
