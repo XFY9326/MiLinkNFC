@@ -2,7 +2,7 @@ package tool.xfy9326.milink.nfc.data.ui
 
 import lib.xfy9326.xiaomi.nfc.NfcTagActionRecord
 import lib.xfy9326.xiaomi.nfc.NfcTagDeviceRecord
-import lib.xfy9326.xiaomi.nfc.XiaomiNdefTNF
+import lib.xfy9326.xiaomi.nfc.XiaomiNdefType
 import tool.xfy9326.milink.nfc.utils.toHexString
 import tool.xfy9326.milink.nfc.utils.toHexText
 
@@ -33,7 +33,7 @@ class NfcTagDeviceRecordUI(
     constructor(
         deviceRecord: NfcTagDeviceRecord,
         action: NfcTagActionRecord.Action,
-        ndefPayloadType: XiaomiNdefTNF
+        ndefPayloadType: XiaomiNdefType
     ) : this(
         deviceType = deviceRecord.enumDeviceType.name,
         flags = deviceRecord.flags.toHexString(true),

@@ -2,7 +2,7 @@ package tool.xfy9326.milink.nfc.data.ui
 
 import lib.xfy9326.xiaomi.nfc.HandoffAppData
 import lib.xfy9326.xiaomi.nfc.NfcTagAppData
-import lib.xfy9326.xiaomi.nfc.XiaomiNdefTNF
+import lib.xfy9326.xiaomi.nfc.XiaomiNdefType
 import tool.xfy9326.milink.nfc.utils.toHexString
 import tool.xfy9326.milink.nfc.utils.toHexText
 import java.text.SimpleDateFormat
@@ -42,7 +42,7 @@ class NfcTagAppDataUI(
     val actionRecord: NfcTagActionRecordUI?,
     val deviceRecord: NfcTagDeviceRecordUI?,
 ) : AppDataUI {
-    constructor(nfcTagAppData: NfcTagAppData, ndefPayloadType: XiaomiNdefTNF) : this(
+    constructor(nfcTagAppData: NfcTagAppData, ndefPayloadType: XiaomiNdefType) : this(
         majorVersion = nfcTagAppData.majorVersion.toHexString(true),
         minorVersion = nfcTagAppData.minorVersion.toHexString(true),
         writeTime = SimpleDateFormat.getDateTimeInstance().format(nfcTagAppData.writeTime * 1000L),

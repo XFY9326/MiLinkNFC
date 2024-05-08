@@ -39,7 +39,7 @@ data class NfcTagAppData(
     fun firstOrNullActionValue(): Short? =
         firstOrNullActionRecord()?.action
 
-    fun getFirstDeviceEnumAttributesMap(ndefType: XiaomiNdefTNF): Map<NfcTagDeviceRecord.DeviceAttribute, ByteArray> =
+    fun getFirstDeviceEnumAttributesMap(ndefType: XiaomiNdefType): Map<NfcTagDeviceRecord.DeviceAttribute, ByteArray> =
         firstOrNullDeviceRecord()?.getAllAttributesMap(firstEnumAction(), ndefType) ?: emptyMap()
 
     override fun size(): Int {

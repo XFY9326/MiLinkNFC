@@ -15,7 +15,7 @@ import lib.xfy9326.xiaomi.nfc.MiConnectData
 import lib.xfy9326.xiaomi.nfc.NfcTagActionRecord
 import lib.xfy9326.xiaomi.nfc.NfcTagAppData
 import lib.xfy9326.xiaomi.nfc.NfcTagDeviceRecord
-import lib.xfy9326.xiaomi.nfc.XiaomiNdefTNF
+import lib.xfy9326.xiaomi.nfc.XiaomiNdefType
 import lib.xfy9326.xiaomi.nfc.XiaomiNfcPayload
 import lib.xfy9326.xiaomi.nfc.XiaomiNfcProtocol
 import org.json.JSONObject
@@ -32,10 +32,10 @@ object XiaomiNfc {
     private const val PKG_MI_CONNECT_SERVICE = "com.xiaomi.mi_connect_service"
     private const val PKG_SMART_HOME = "com.xiaomi.smarthome"
 
-    fun getXiaomiNdefTNF(ndefRecord: NdefRecord): XiaomiNdefTNF? {
+    fun getXiaomiNdefType(ndefRecord: NdefRecord): XiaomiNdefType? {
         if (ndefRecord.tnf == NdefRecord.TNF_EXTERNAL_TYPE) {
             return runCatching {
-                XiaomiNdefTNF.parse(ndefRecord.type.toString(Charsets.US_ASCII))
+                XiaomiNdefType.parse(ndefRecord.type.toString(Charsets.US_ASCII))
             }.getOrNull()
         }
         return null
@@ -54,7 +54,7 @@ object XiaomiNfc {
         private val minorVersion: Int,
         private val idHash: Byte? = null,
         private val protocol: XiaomiNfcProtocol<A>,
-        protected val ndefRecordType: XiaomiNdefTNF
+        protected val ndefRecordType: XiaomiNdefType
     ) {
         protected abstract fun encodeAppsData(config: T): A
 
@@ -95,7 +95,7 @@ object XiaomiNfc {
         minorVersion = 2,
         idHash = 0,
         protocol = XiaomiNfcProtocol.V1,
-        ndefRecordType = XiaomiNdefTNF.SMART_HOME
+        ndefRecordType = XiaomiNdefType.SMART_HOME
     ) {
         private const val MAJOR_VERSION = 1.toByte()
         private const val MINOR_VERSION = 0.toByte()
@@ -137,7 +137,7 @@ object XiaomiNfc {
         minorVersion = 2,
         idHash = 0,
         protocol = XiaomiNfcProtocol.V1,
-        ndefRecordType = XiaomiNdefTNF.MI_CONNECT_SERVICE
+        ndefRecordType = XiaomiNdefType.MI_CONNECT_SERVICE
     ) {
         private const val MAJOR_VERSION = 1.toByte()
         private const val MINOR_VERSION = 0.toByte()
@@ -196,7 +196,7 @@ object XiaomiNfc {
         minorVersion = 11,
         idHash = 0,
         protocol = XiaomiNfcProtocol.V2,
-        ndefRecordType = XiaomiNdefTNF.MI_CONNECT_SERVICE
+        ndefRecordType = XiaomiNdefType.MI_CONNECT_SERVICE
     ) {
         private const val MAJOR_VERSION = 1.toByte()
         private const val MINOR_VERSION = 0.toByte()
@@ -278,7 +278,7 @@ object XiaomiNfc {
         minorVersion = 13,
         idHash = null,
         protocol = XiaomiNfcProtocol.HandOff,
-        ndefRecordType = XiaomiNdefTNF.MI_CONNECT_SERVICE
+        ndefRecordType = XiaomiNdefType.MI_CONNECT_SERVICE
     ) {
         companion object {
             private const val MAJOR_VERSION = 0x27.toByte()

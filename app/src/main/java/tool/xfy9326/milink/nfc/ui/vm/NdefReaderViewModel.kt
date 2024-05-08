@@ -1,9 +1,7 @@
 package tool.xfy9326.milink.nfc.ui.vm
 
-import android.content.Intent
 import android.net.Uri
 import android.nfc.NdefMessage
-import android.nfc.NdefRecord
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -20,25 +18,16 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import lib.xfy9326.xiaomi.nfc.HandoffAppData
 import lib.xfy9326.xiaomi.nfc.MiConnectData
-import lib.xfy9326.xiaomi.nfc.NfcTagAppData
-import lib.xfy9326.xiaomi.nfc.XiaomiNdefTNF
+import lib.xfy9326.xiaomi.nfc.XiaomiNdefType
 import tool.xfy9326.milink.nfc.R
-import tool.xfy9326.milink.nfc.data.NdefRTD
 import tool.xfy9326.milink.nfc.data.NdefReadData
-import tool.xfy9326.milink.nfc.data.NdefTNF
-import tool.xfy9326.milink.nfc.data.getRTDText
-import tool.xfy9326.milink.nfc.data.ui.HandoffAppDataUI
 import tool.xfy9326.milink.nfc.data.ui.NdefRecordUI
-import tool.xfy9326.milink.nfc.data.ui.NfcTagAppDataUI
 import tool.xfy9326.milink.nfc.data.ui.NfcTagInfoUI
-import tool.xfy9326.milink.nfc.data.ui.XiaomiNfcPayloadUI
 import tool.xfy9326.milink.nfc.datastore.AppDataStore
 import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
 import tool.xfy9326.milink.nfc.utils.NdefIO
 import tool.xfy9326.milink.nfc.utils.readBinary
-import tool.xfy9326.milink.nfc.utils.toHexText
 
 class NdefReaderViewModel : ViewModel() {
     enum class InstantMsg(@StringRes val resId: Int) {
@@ -157,12 +146,13 @@ class NdefReaderViewModel : ViewModel() {
 
     private suspend fun handleNdefMessage(ndefMessage: NdefMessage) {
         val records = ndefMessage.records.asFlow().filterNotNull().map {
-            val xiaomiTNF = XiaomiNfc.getXiaomiNdefTNF(it)
-            if (xiaomiTNF == null) {
-                decodeNdefRecords(it)
-            } else {
-                decodeXiaomiNfc(xiaomiTNF, it.payload) ?: decodeNdefRecords(it)
-            }
+            XiaomiNfc.getXiaomiNdefType(it)?.let { tnf ->
+                decodeXiaomiNfc(tnf, it.payload)
+            } ?: runCatching {
+                if (NdefRecordUI.SmartPoster.checkType(it)) {
+                    NdefRecordUI.SmartPoster.parse(it)
+                } else null
+            }.getOrNull() ?: NdefRecordUI.Simple.parse(it)
         }.toList()
         _uiState.update { it.copy(ndefRecords = records) }
     }
@@ -180,62 +170,10 @@ class NdefReaderViewModel : ViewModel() {
         }
     }
 
-    private fun decodeNdefRecords(record: NdefRecord): NdefRecordUI.Default {
-        val payloadRTDText = record.getRTDText()
-        return NdefRecordUI.Default(
-            id = record.id?.takeIf { it.isNotEmpty() }?.toHexText(),
-            tnf = NdefTNF.getByValue(record.tnf.toByte()),
-            rtd = NdefRTD.getByValue(record.type),
-            typeText = record.type.takeIf { it.isNotEmpty() }?.runCatching {
-                when (record.tnf) {
-                    NdefRecord.TNF_ABSOLUTE_URI ->
-                        Uri.parse(toString(Charsets.UTF_8)).normalizeScheme().toString()
-
-                    NdefRecord.TNF_MIME_MEDIA ->
-                        Intent.normalizeMimeType(toString(Charsets.US_ASCII))
-
-                    else -> null
-                }
-            }?.getOrNull(),
-            typeHex = record.type?.takeIf { it.isNotEmpty() }?.toHexText(),
-            smartPosterUri = if (
-                record.tnf == NdefRecord.TNF_WELL_KNOWN &&
-                record.type.contentEquals(NdefRecord.RTD_SMART_POSTER)
-            ) {
-                record.toUri()
-            } else null,
-            payloadLanguage = payloadRTDText?.first,
-            payloadText = record.payload?.takeIf { it.isNotEmpty() }?.runCatching {
-                if (
-                    record.tnf == NdefRecord.TNF_EXTERNAL_TYPE &&
-                    record.type.contentEquals(NdefRTD.ANDROID_APP.value)
-                ) {
-                    record.payload.toString(Charsets.UTF_8)
-                } else if (
-                    record.tnf == NdefRecord.TNF_WELL_KNOWN &&
-                    record.type.contentEquals(NdefRecord.RTD_TEXT)
-                ) {
-                    payloadRTDText?.second
-                } else if (
-                    record.tnf == NdefRecord.TNF_MIME_MEDIA &&
-                    record.type.contentEquals("text/plain".toByteArray())
-                ) {
-                    record.payload.toString(Charsets.UTF_8)
-                } else if (
-                    record.tnf == NdefRecord.TNF_WELL_KNOWN &&
-                    record.type.contentEquals(NdefRecord.RTD_URI)
-                ) {
-                    record.toUri()?.toString()
-                } else null
-            }?.getOrNull(),
-            payloadHex = record.payload?.takeIf { it.isNotEmpty() }?.toHexText(),
-        )
-    }
-
     private suspend fun decodeXiaomiNfc(
-        ndefType: XiaomiNdefTNF,
+        ndefType: XiaomiNdefType,
         ndefBytes: ByteArray
-    ): NdefRecordUI.XiaomiNfc? {
+    ): NdefRecordUI.Xiaomi? {
         val miConnectData = runCatching { MiConnectData.parse(ndefBytes) }.getOrNull()
         if (miConnectData == null) {
             _instantMsg.emit(InstantMsg.PARSE_ERROR)
@@ -257,14 +195,7 @@ class NdefReaderViewModel : ViewModel() {
         }
 
         try {
-            return NdefRecordUI.XiaomiNfc(
-                ndefType = ndefType,
-                payload = XiaomiNfcPayloadUI(payload),
-                appData = when (val appData = payload.appData) {
-                    is HandoffAppData -> HandoffAppDataUI(appData)
-                    is NfcTagAppData -> NfcTagAppDataUI(appData, ndefType)
-                }
-            )
+            return NdefRecordUI.Xiaomi.parse(ndefType, payload)
         } catch (e: Exception) {
             // Ignore
         }

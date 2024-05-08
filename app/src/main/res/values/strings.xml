@@ -117,6 +117,8 @@
     <string name="unknown">未知</string>
     <string name="current_and_total_bytes">%1$d/%2$d 字节</string>
     <string name="info_ndef">%1$d. NDEF记录</string>
+    <string name="info_sp_ndef">%1$d. Smart Poster记录</string>
+    <string name="info_sp_field_ndef">Smart Poster属性</string>
     <string name="info_xiaomi_ndef">%1$d. 小米NDEF记录</string>
     <string name="info_nfc_tag">NFC标签</string>
     <string name="info_xiaomi_payload">小米NFC协议</string>
@@ -144,10 +146,17 @@
     <string name="nfc_field_attributes">属性</string>
     <string name="ndef_field_id" translatable="false">ID</string>
     <string name="ndef_field_tnf" translatable="false">TNF</string>
-    <string name="ndef_field_uri" translatable="false">URI</string>
     <string name="ndef_field_type">类型</string>
     <string name="ndef_field_language">语言</string>
     <string name="ndef_field_payload">数据</string>
+    <string name="ndef_sp_field_title">标题</string>
+    <string name="ndef_sp_field_language">语言：%1$s</string>
+    <string name="ndef_sp_field_uri" translatable="false">URI</string>
+    <string name="ndef_sp_field_action">行为</string>
+    <string name="ndef_sp_field_icon">图标</string>
+    <string name="ndef_sp_field_size">大小</string>
+    <string name="ndef_sp_field_size_value">%1$d字节</string>
+    <string name="ndef_sp_field_type">类型</string>
     <string name="import_text">导入</string>
     <string name="import_success">导入成功</string>
     <string name="import_failed">导出失败</string>

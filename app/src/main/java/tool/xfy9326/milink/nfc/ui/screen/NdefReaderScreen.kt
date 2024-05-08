@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.collectLatest
-import lib.xfy9326.xiaomi.nfc.XiaomiNdefTNF
+import lib.xfy9326.xiaomi.nfc.XiaomiNdefType
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.data.ui.HandoffAppDataUI
 import tool.xfy9326.milink.nfc.data.ui.NdefRecordUI
@@ -175,17 +175,24 @@ private fun NfcContent(
         }
         itemsIndexed(uiState.ndefRecords) { index, item ->
             when (item) {
-                is NdefRecordUI.Default -> DefaultNdefCard(
+                is NdefRecordUI.Simple -> SimpleNdefCard(
                     modifier = Modifier.padding(horizontal = 8.dp),
                     index = index,
-                    defaultNdef = item
+                    data = item
                 )
 
-                is NdefRecordUI.XiaomiNfc -> XiaomiNdefCard(
+                is NdefRecordUI.SmartPoster -> SmartPosterNdefCard(
                     modifier = Modifier.padding(horizontal = 8.dp),
                     index = index,
-                    xiaomiNfc = item
+                    data = item
                 )
+
+                is NdefRecordUI.Xiaomi -> XiaomiNdefCard(
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    index = index,
+                    data = item
+                )
+
             }
         }
     }
@@ -241,10 +248,10 @@ private fun NfcTagInfoCard(modifier: Modifier = Modifier, data: NfcTagInfoUI) {
 }
 
 @Composable
-private fun DefaultNdefCard(
+private fun SimpleNdefCard(
     modifier: Modifier = Modifier,
     index: Int,
-    defaultNdef: NdefRecordUI.Default
+    data: NdefRecordUI.Simple
 ) {
     OutlinedCard(modifier = modifier) {
         InfoContent(
@@ -253,21 +260,97 @@ private fun DefaultNdefCard(
                 .padding(16.dp),
             title = stringResource(id = R.string.info_ndef, index + 1),
             data = buildList {
-                defaultNdef.id?.let {
+                data.id?.let {
                     add(stringResource(id = R.string.ndef_field_id) to it)
                 }
-                add(stringResource(id = R.string.ndef_field_tnf) to defaultNdef.tnf.name)
-                defaultNdef.type?.let {
+                add(stringResource(id = R.string.ndef_field_tnf) to data.tnf.name)
+                data.type?.let {
                     add(stringResource(id = R.string.ndef_field_type) to it)
                 }
-                defaultNdef.payloadLanguage?.let {
+                data.payloadLanguage?.let {
                     add(stringResource(id = R.string.ndef_field_language) to it)
                 }
-                defaultNdef.smartPosterUri?.let {
-                    add(stringResource(id = R.string.ndef_field_uri) to it.toString())
-                }
-                defaultNdef.payload?.let {
+                data.payload?.let {
                     add(stringResource(id = R.string.ndef_field_payload) to it)
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun SmartPosterNdefCard(
+    modifier: Modifier = Modifier,
+    index: Int,
+    data: NdefRecordUI.SmartPoster
+) {
+    OutlinedCard(modifier = modifier) {
+        Column(
+            modifier = Modifier.padding(vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            InfoContent(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                title = stringResource(id = R.string.info_sp_ndef, index + 1),
+                data = listOf(
+                    stringResource(id = R.string.ndef_sp_field_uri) to data.uri.toString()
+                )
+            )
+            data.items.filterIsInstance<NdefRecordUI.SmartPosterField>().takeIf {
+                it.isNotEmpty()
+            }?.let {
+                SmartPosterFieldNdefCard(
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    data = it
+                )
+            }
+            data.items.filterIsInstance<NdefRecordUI.Simple>().forEachIndexed { index, item ->
+                SimpleNdefCard(
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    index = index,
+                    data = item
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SmartPosterFieldNdefCard(
+    modifier: Modifier = Modifier,
+    data: List<NdefRecordUI.SmartPosterField>
+) {
+    OutlinedCard(modifier = modifier) {
+        InfoContent(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            title = stringResource(id = R.string.info_sp_field_ndef),
+            data = NdefRecordUI.SmartPoster.sortFields(data).map {
+                when (it) {
+                    is NdefRecordUI.SmartPoster.Title ->
+                        stringResource(id = R.string.ndef_sp_field_title) to stringResource(
+                            id = R.string.ndef_sp_field_language,
+                            it.languageCode
+                        ) + "\n" + it.text
+
+                    is NdefRecordUI.SmartPoster.Uri ->
+                        stringResource(id = R.string.ndef_sp_field_uri) to it.uri.toString()
+
+                    is NdefRecordUI.SmartPoster.Action ->
+                        stringResource(id = R.string.ndef_sp_field_action) to it.actionType.name
+
+                    is NdefRecordUI.SmartPoster.Icon ->
+                        stringResource(id = R.string.ndef_sp_field_icon) to it.payloadHex
+
+                    is NdefRecordUI.SmartPoster.Size ->
+                        stringResource(id = R.string.ndef_sp_field_size) to
+                                stringResource(id = R.string.ndef_sp_field_size_value, it.value)
+
+                    is NdefRecordUI.SmartPoster.Type ->
+                        stringResource(id = R.string.ndef_sp_field_type) to it.mimeType
                 }
             }
         )
@@ -278,31 +361,31 @@ private fun DefaultNdefCard(
 private fun XiaomiNdefCard(
     modifier: Modifier = Modifier,
     index: Int,
-    xiaomiNfc: NdefRecordUI.XiaomiNfc
+    data: NdefRecordUI.Xiaomi
 ) {
     OutlinedCard(modifier = modifier) {
         Column(
             modifier = Modifier.padding(vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            XiaomiNdefTNFCard(
+            XiaomiNdefTypeCard(
                 modifier = Modifier.padding(horizontal = 8.dp),
                 index = index,
-                ndefType = xiaomiNfc.ndefType
+                ndefType = data.ndefType
             )
             XiaomiNfcPayloadCard(
                 modifier = Modifier.padding(horizontal = 8.dp),
-                data = xiaomiNfc.payload
+                data = data.payload
             )
-            when (xiaomiNfc.appData) {
+            when (data.appData) {
                 is HandoffAppDataUI -> HandoffAppDataCard(
                     modifier = Modifier.padding(horizontal = 8.dp),
-                    data = xiaomiNfc.appData
+                    data = data.appData
                 )
 
                 is NfcTagAppDataUI -> NfcTagAppDataCard(
                     modifier = Modifier.padding(horizontal = 8.dp),
-                    data = xiaomiNfc.appData
+                    data = data.appData
                 )
             }
         }
@@ -310,7 +393,11 @@ private fun XiaomiNdefCard(
 }
 
 @Composable
-private fun XiaomiNdefTNFCard(modifier: Modifier = Modifier, index: Int, ndefType: XiaomiNdefTNF) {
+private fun XiaomiNdefTypeCard(
+    modifier: Modifier = Modifier,
+    index: Int,
+    ndefType: XiaomiNdefType
+) {
     OutlinedCard(modifier = modifier) {
         InfoContent(
             modifier = Modifier
@@ -320,9 +407,9 @@ private fun XiaomiNdefTNFCard(modifier: Modifier = Modifier, index: Int, ndefTyp
             data = listOf(
                 stringResource(id = R.string.nfc_field_type) to stringResource(
                     id = when (ndefType) {
-                        XiaomiNdefTNF.UNKNOWN -> R.string.unknown
-                        XiaomiNdefTNF.SMART_HOME -> R.string.ndef_payload_type_smart_home
-                        XiaomiNdefTNF.MI_CONNECT_SERVICE -> R.string.ndef_payload_type_mi_connect_service
+                        XiaomiNdefType.UNKNOWN -> R.string.unknown
+                        XiaomiNdefType.SMART_HOME -> R.string.ndef_payload_type_smart_home
+                        XiaomiNdefType.MI_CONNECT_SERVICE -> R.string.ndef_payload_type_mi_connect_service
                     }
                 )
             )

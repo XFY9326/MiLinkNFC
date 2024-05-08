@@ -28,14 +28,14 @@ data class NfcTagDeviceRecord(
         fun getAppDataValueType(
             bytes: ByteArray,
             action: NfcTagActionRecord.Action,
-            ndefType: XiaomiNdefTNF
+            ndefType: XiaomiNdefType
         ): AppDataValueType {
             return if (
-                ndefType == XiaomiNdefTNF.SMART_HOME &&
+                ndefType == XiaomiNdefType.SMART_HOME &&
                 (action == NfcTagActionRecord.Action.IOT || action == NfcTagActionRecord.Action.IOT_ENV)
             ) {
                 AppDataValueType.IOT_ACTION
-            } else if (ndefType == XiaomiNdefTNF.MI_CONNECT_SERVICE && bytes.startsWith(
+            } else if (ndefType == XiaomiNdefType.MI_CONNECT_SERVICE && bytes.startsWith(
                     PREFIX_APP_DATA_MAP
                 )
             ) {
@@ -64,10 +64,10 @@ data class NfcTagDeviceRecord(
 
     fun getAllAttributesMap(
         action: NfcTagActionRecord.Action,
-        ndefType: XiaomiNdefTNF
+        ndefType: XiaomiNdefType
     ): Map<DeviceAttribute, ByteArray> =
         when (ndefType) {
-            XiaomiNdefTNF.SMART_HOME -> attributesMap.mapKeys {
+            XiaomiNdefType.SMART_HOME -> attributesMap.mapKeys {
                 when (action) {
                     NfcTagActionRecord.Action.IOT -> DeviceAttribute.parseIOT(it.key)
                     NfcTagActionRecord.Action.IOT_ENV -> DeviceAttribute.parseIOTEnv(it.key)
