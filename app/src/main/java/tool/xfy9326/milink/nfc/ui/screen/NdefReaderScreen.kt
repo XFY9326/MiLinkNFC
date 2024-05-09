@@ -42,11 +42,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.collectLatest
 import lib.xfy9326.xiaomi.nfc.XiaomiNdefType
 import tool.xfy9326.milink.nfc.R
-import tool.xfy9326.milink.nfc.data.ui.HandoffAppDataUI
-import tool.xfy9326.milink.nfc.data.ui.NdefRecordUI
-import tool.xfy9326.milink.nfc.data.ui.NfcTagAppDataUI
-import tool.xfy9326.milink.nfc.data.ui.NfcTagInfoUI
-import tool.xfy9326.milink.nfc.data.ui.XiaomiNfcPayloadUI
+import tool.xfy9326.milink.nfc.data.nfc.NdefData
+import tool.xfy9326.milink.nfc.data.nfc.NfcTag
+import tool.xfy9326.milink.nfc.data.nfc.RawNdefData
+import tool.xfy9326.milink.nfc.data.nfc.SmartPosterNdefData
+import tool.xfy9326.milink.nfc.data.nfc.XiaomiNdefData
 import tool.xfy9326.milink.nfc.ui.common.InfoContent
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.theme.LocalAppThemeTypography
@@ -174,27 +174,41 @@ private fun NfcContent(
             }
         }
         itemsIndexed(uiState.ndefRecords) { index, item ->
-            when (item) {
-                is NdefRecordUI.Simple -> SimpleNdefCard(
-                    modifier = Modifier.padding(horizontal = 8.dp),
-                    index = index,
-                    data = item
-                )
-
-                is NdefRecordUI.SmartPoster -> SmartPosterNdefCard(
-                    modifier = Modifier.padding(horizontal = 8.dp),
-                    index = index,
-                    data = item
-                )
-
-                is NdefRecordUI.Xiaomi -> XiaomiNdefCard(
-                    modifier = Modifier.padding(horizontal = 8.dp),
-                    index = index,
-                    data = item
-                )
-
-            }
+            NdefDataCard(
+                modifier = Modifier.padding(horizontal = 8.dp),
+                index = index,
+                data = item
+            )
         }
+    }
+}
+
+@Composable
+private fun NdefDataCard(
+    modifier: Modifier = Modifier,
+    index: Int,
+    data: NdefData
+) {
+    when (data) {
+        is RawNdefData -> RawNdefCard(
+            modifier = modifier,
+            index = index,
+            data = data
+        )
+
+        is SmartPosterNdefData -> SmartPosterNdefCard(
+            modifier = modifier,
+            index = index,
+            data = data
+        )
+
+        is XiaomiNdefData -> XiaomiNdefCard(
+            modifier = modifier,
+            index = index,
+            data = data
+        )
+
+        else -> {}
     }
 }
 
@@ -225,7 +239,7 @@ private fun Boolean.stringResId(): Int =
     if (this) R.string.content_true else R.string.content_false
 
 @Composable
-private fun NfcTagInfoCard(modifier: Modifier = Modifier, data: NfcTagInfoUI) {
+private fun NfcTagInfoCard(modifier: Modifier = Modifier, data: NfcTag) {
     OutlinedCard(modifier = modifier) {
         InfoContent(
             modifier = Modifier
@@ -248,10 +262,10 @@ private fun NfcTagInfoCard(modifier: Modifier = Modifier, data: NfcTagInfoUI) {
 }
 
 @Composable
-private fun SimpleNdefCard(
+private fun RawNdefCard(
     modifier: Modifier = Modifier,
     index: Int,
-    data: NdefRecordUI.Simple
+    data: RawNdefData
 ) {
     OutlinedCard(modifier = modifier) {
         InfoContent(
@@ -282,7 +296,7 @@ private fun SimpleNdefCard(
 private fun SmartPosterNdefCard(
     modifier: Modifier = Modifier,
     index: Int,
-    data: NdefRecordUI.SmartPoster
+    data: SmartPosterNdefData
 ) {
     OutlinedCard(modifier = modifier) {
         Column(
@@ -298,16 +312,18 @@ private fun SmartPosterNdefCard(
                     stringResource(id = R.string.ndef_sp_field_uri) to data.uri.toString()
                 )
             )
-            data.items.filterIsInstance<NdefRecordUI.SmartPosterField>().takeIf {
+            data.items.filterIsInstance<SmartPosterNdefData.MetaData>().takeIf {
                 it.isNotEmpty()
             }?.let {
-                SmartPosterFieldNdefCard(
+                SmartPosterMetaRecordCard(
                     modifier = Modifier.padding(horizontal = 8.dp),
                     data = it
                 )
             }
-            data.items.filterIsInstance<NdefRecordUI.Simple>().forEachIndexed { index, item ->
-                SimpleNdefCard(
+            data.items.filter {
+                it !is SmartPosterNdefData.MetaData
+            }.forEachIndexed { index, item ->
+                NdefDataCard(
                     modifier = Modifier.padding(horizontal = 8.dp),
                     index = index,
                     data = item
@@ -318,9 +334,9 @@ private fun SmartPosterNdefCard(
 }
 
 @Composable
-private fun SmartPosterFieldNdefCard(
+private fun SmartPosterMetaRecordCard(
     modifier: Modifier = Modifier,
-    data: List<NdefRecordUI.SmartPosterField>
+    data: List<SmartPosterNdefData.MetaData>
 ) {
     OutlinedCard(modifier = modifier) {
         InfoContent(
@@ -328,28 +344,28 @@ private fun SmartPosterFieldNdefCard(
                 .fillMaxWidth()
                 .padding(16.dp),
             title = stringResource(id = R.string.info_sp_field_ndef),
-            data = NdefRecordUI.SmartPoster.sortFields(data).map {
+            data = SmartPosterNdefData.sortFields(data).map {
                 when (it) {
-                    is NdefRecordUI.SmartPoster.Title ->
+                    is SmartPosterNdefData.Title ->
                         stringResource(id = R.string.ndef_sp_field_title) to stringResource(
                             id = R.string.ndef_sp_field_language,
                             it.languageCode
                         ) + "\n" + it.text
 
-                    is NdefRecordUI.SmartPoster.Uri ->
+                    is SmartPosterNdefData.Uri ->
                         stringResource(id = R.string.ndef_sp_field_uri) to it.uri.toString()
 
-                    is NdefRecordUI.SmartPoster.Action ->
-                        stringResource(id = R.string.ndef_sp_field_action) to it.actionType.name
+                    is SmartPosterNdefData.Action ->
+                        stringResource(id = R.string.ndef_sp_field_action) to stringResource(id = it.actionType.resId)
 
-                    is NdefRecordUI.SmartPoster.Icon ->
+                    is SmartPosterNdefData.Icon ->
                         stringResource(id = R.string.ndef_sp_field_icon) to it.payloadHex
 
-                    is NdefRecordUI.SmartPoster.Size ->
+                    is SmartPosterNdefData.Size ->
                         stringResource(id = R.string.ndef_sp_field_size) to
                                 stringResource(id = R.string.ndef_sp_field_size_value, it.value)
 
-                    is NdefRecordUI.SmartPoster.Type ->
+                    is SmartPosterNdefData.Type ->
                         stringResource(id = R.string.ndef_sp_field_type) to it.mimeType
                 }
             }
@@ -361,7 +377,7 @@ private fun SmartPosterFieldNdefCard(
 private fun XiaomiNdefCard(
     modifier: Modifier = Modifier,
     index: Int,
-    data: NdefRecordUI.Xiaomi
+    data: XiaomiNdefData
 ) {
     OutlinedCard(modifier = modifier) {
         Column(
@@ -378,12 +394,12 @@ private fun XiaomiNdefCard(
                 data = data.payload
             )
             when (data.appData) {
-                is HandoffAppDataUI -> HandoffAppDataCard(
+                is XiaomiNdefData.App.Handoff -> HandoffAppDataCard(
                     modifier = Modifier.padding(horizontal = 8.dp),
                     data = data.appData
                 )
 
-                is NfcTagAppDataUI -> NfcTagAppDataCard(
+                is XiaomiNdefData.App.NfcTag -> NfcTagAppDataCard(
                     modifier = Modifier.padding(horizontal = 8.dp),
                     data = data.appData
                 )
@@ -418,7 +434,7 @@ private fun XiaomiNdefTypeCard(
 }
 
 @Composable
-private fun XiaomiNfcPayloadCard(modifier: Modifier = Modifier, data: XiaomiNfcPayloadUI) {
+private fun XiaomiNfcPayloadCard(modifier: Modifier = Modifier, data: XiaomiNdefData.Payload) {
     OutlinedCard(modifier = modifier) {
         InfoContent(
             modifier = Modifier
@@ -437,7 +453,7 @@ private fun XiaomiNfcPayloadCard(modifier: Modifier = Modifier, data: XiaomiNfcP
 }
 
 @Composable
-private fun HandoffAppDataCard(modifier: Modifier = Modifier, data: HandoffAppDataUI) {
+private fun HandoffAppDataCard(modifier: Modifier = Modifier, data: XiaomiNdefData.App.Handoff) {
     OutlinedCard(modifier = modifier) {
         InfoContent(
             modifier = Modifier
@@ -468,7 +484,7 @@ private fun HandoffAppDataCard(modifier: Modifier = Modifier, data: HandoffAppDa
 }
 
 @Composable
-private fun NfcTagAppDataCard(modifier: Modifier = Modifier, data: NfcTagAppDataUI) {
+private fun NfcTagAppDataCard(modifier: Modifier = Modifier, data: XiaomiNdefData.App.NfcTag) {
     OutlinedCard(modifier = modifier) {
         InfoContent(
             modifier = Modifier

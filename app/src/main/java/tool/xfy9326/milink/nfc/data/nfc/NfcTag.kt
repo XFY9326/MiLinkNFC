@@ -1,8 +1,8 @@
-package tool.xfy9326.milink.nfc.data.ui
+package tool.xfy9326.milink.nfc.data.nfc
 
 import tool.xfy9326.milink.nfc.data.NdefReadData
 
-class NfcTagInfoUI(
+class NfcTag(
     val techList: List<String>,
     val type: String,
     val currentSize: Int,

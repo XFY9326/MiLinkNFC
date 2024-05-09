@@ -157,6 +157,10 @@
     <string name="ndef_sp_field_size">大小</string>
     <string name="ndef_sp_field_size_value">%1$d字节</string>
     <string name="ndef_sp_field_type">类型</string>
+    <string name="ndef_sp_action_do_the_action">立即执行</string>
+    <string name="ndef_sp_action_save_for_later">保存</string>
+    <string name="ndef_sp_action_open_for_editing">打开编辑</string>
+    <string name="ndef_sp_action_undefined">未定义</string>
     <string name="import_text">导入</string>
     <string name="import_success">导入成功</string>
     <string name="import_failed">导出失败</string>

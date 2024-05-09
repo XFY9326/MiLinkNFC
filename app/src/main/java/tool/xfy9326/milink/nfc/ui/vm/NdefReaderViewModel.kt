@@ -22,8 +22,9 @@ import lib.xfy9326.xiaomi.nfc.MiConnectData
 import lib.xfy9326.xiaomi.nfc.XiaomiNdefType
 import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.data.NdefReadData
-import tool.xfy9326.milink.nfc.data.ui.NdefRecordUI
-import tool.xfy9326.milink.nfc.data.ui.NfcTagInfoUI
+import tool.xfy9326.milink.nfc.data.nfc.NdefData
+import tool.xfy9326.milink.nfc.data.nfc.NfcTag
+import tool.xfy9326.milink.nfc.data.nfc.XiaomiNdefData
 import tool.xfy9326.milink.nfc.datastore.AppDataStore
 import tool.xfy9326.milink.nfc.protocol.XiaomiNfc
 import tool.xfy9326.milink.nfc.utils.NdefIO
@@ -46,8 +47,8 @@ class NdefReaderViewModel : ViewModel() {
 
     data class UiState(
         val canExportNdefBin: Boolean = false,
-        val nfcTag: NfcTagInfoUI? = null,
-        val ndefRecords: List<NdefRecordUI> = emptyList()
+        val nfcTag: NfcTag? = null,
+        val ndefRecords: List<NdefData> = emptyList()
     ) {
         val hasData: Boolean
             get() = nfcTag != null || ndefRecords.isNotEmpty()
@@ -108,7 +109,7 @@ class NdefReaderViewModel : ViewModel() {
             _uiState.update {
                 it.copy(
                     canExportNdefBin = true,
-                    nfcTag = NfcTagInfoUI(ndefReadData)
+                    nfcTag = NfcTag(ndefReadData)
                 )
             }
 
@@ -148,11 +149,7 @@ class NdefReaderViewModel : ViewModel() {
         val records = ndefMessage.records.asFlow().filterNotNull().map {
             XiaomiNfc.getXiaomiNdefType(it)?.let { tnf ->
                 decodeXiaomiNfc(tnf, it.payload)
-            } ?: runCatching {
-                if (NdefRecordUI.SmartPoster.checkType(it)) {
-                    NdefRecordUI.SmartPoster.parse(it)
-                } else null
-            }.getOrNull() ?: NdefRecordUI.Simple.parse(it)
+            } ?: NdefData.parseWellKnown(it)
         }.toList()
         _uiState.update { it.copy(ndefRecords = records) }
     }
@@ -173,7 +170,7 @@ class NdefReaderViewModel : ViewModel() {
     private suspend fun decodeXiaomiNfc(
         ndefType: XiaomiNdefType,
         ndefBytes: ByteArray
-    ): NdefRecordUI.Xiaomi? {
+    ): XiaomiNdefData? {
         val miConnectData = runCatching { MiConnectData.parse(ndefBytes) }.getOrNull()
         if (miConnectData == null) {
             _instantMsg.emit(InstantMsg.PARSE_ERROR)
@@ -195,7 +192,7 @@ class NdefReaderViewModel : ViewModel() {
         }
 
         try {
-            return NdefRecordUI.Xiaomi.parse(ndefType, payload)
+            return XiaomiNdefData.parse(ndefType, payload)
         } catch (e: Exception) {
             // Ignore
         }
