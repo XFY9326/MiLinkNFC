@@ -15,14 +15,6 @@ data class SmartPosterNdefData(
         private val SIZE_RECORD_TYPE = "s".toByteArray()
         private val TYPE_RECORD_TYPE = "t".toByteArray()
 
-        private fun ByteArray.startsWith(byteArray: ByteArray): Boolean {
-            if (this.size < byteArray.size) return false
-            for (i in indices) {
-                if (this[i] != byteArray[i]) return false
-            }
-            return true
-        }
-
         private fun ByteArray.getUIntAt(idx: Int) =
             ((this[idx].toUInt() and 0xFFu) shl 24) or
                     ((this[idx + 1].toUInt() and 0xFFu) shl 16) or
@@ -47,8 +39,9 @@ data class SmartPosterNdefData(
 
         private fun checkIconType(record: NdefRecord): Boolean =
             record.tnf == NdefRecord.TNF_MIME_MEDIA &&
-                    (record.type.startsWith("image/".toByteArray()) ||
-                            record.type.startsWith("video/".toByteArray()))
+                    record.toMimeType()?.let {
+                        it.startsWith("image/") || it.startsWith("video/")
+                    } ?: false
 
         private fun checkSizeType(record: NdefRecord): Boolean =
             record.type.contentEquals(SIZE_RECORD_TYPE)

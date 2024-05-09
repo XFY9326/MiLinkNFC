@@ -55,7 +55,7 @@ data class RawNdefData(
                         payloadRTDText?.second
                     } else if (
                         record.tnf == NdefRecord.TNF_MIME_MEDIA &&
-                        record.type.contentEquals("text/plain".toByteArray())
+                        record.toMimeType() == "text/plain"
                     ) {
                         record.payload.toString(Charsets.UTF_8)
                     } else if (
