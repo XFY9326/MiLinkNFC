@@ -108,7 +108,7 @@ class NdefReaderActivity : ComponentActivity() {
 
     private suspend fun Ndef.readNdef(): Unit = withContext(Dispatchers.IO) {
         if (requireConnect()) {
-            try {
+            runCatching {
                 val msg = ndefMessage
                 if (msg.isNullOrEmpty()) {
                     showToastInMain(R.string.nfc_empty)
@@ -126,7 +126,7 @@ class NdefReaderActivity : ComponentActivity() {
                     }
                 }
                 safeClose()
-            } catch (e: Exception) {
+            }.onFailure {
                 showToastInMain(R.string.nfc_read_failed)
                 viewModel.clearNfcReadData()
             }

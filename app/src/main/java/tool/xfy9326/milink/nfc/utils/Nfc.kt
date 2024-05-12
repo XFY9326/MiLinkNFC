@@ -56,31 +56,25 @@ fun NfcAdapter.requireEnabled(): Boolean = runCatching {
 }.getOrDefault(false)
 
 fun Context.ignoreTagUntilRemoved(tag: Tag): Boolean =
-    try {
-        NfcAdapter.getDefaultAdapter(this)?.ignore(tag, NFC_TAG_IGNORE_MILLS, null, null) ?: false
-    } catch (e: Exception) {
-        false
-    }
+    runCatching {
+        NfcAdapter.getDefaultAdapter(this)?.ignore(tag, NFC_TAG_IGNORE_MILLS, null, null)
+    }.getOrNull() ?: false
 
 val Tag.techNameList: List<String>
     get() = techList.map { str -> str.substringAfterLast(".") }
 
 fun <T : TagTechnology> T.requireConnect(): Boolean =
-    try {
+    runCatching {
         if (!isConnected) connect()
         require(isConnected)
         true
-    } catch (e: Exception) {
-        false
-    }
+    }.getOrDefault(false)
 
 fun <T : TagTechnology> T.safeClose(): Boolean =
-    try {
+    runCatching {
         close()
         true
-    } catch (e: Exception) {
-        false
-    }
+    }.getOrDefault(false)
 
 fun NdefMessage?.isNullOrEmpty(): Boolean =
     this == null || records.isEmpty() || records.all { it.tnf == NdefRecord.TNF_EMPTY }

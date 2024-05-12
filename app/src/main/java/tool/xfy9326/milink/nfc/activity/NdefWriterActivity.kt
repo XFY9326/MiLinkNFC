@@ -121,10 +121,10 @@ class NdefWriterActivity : ComponentActivity() {
 
     private suspend fun NdefFormatable.formatTag(): Unit = withContext(Dispatchers.IO) {
         if (requireConnect()) {
-            try {
+            runCatching {
                 format(null)
                 showToastInMain(R.string.nfc_ndef_format_success)
-            } catch (e: Exception) {
+            }.onFailure {
                 showToastInMain(R.string.nfc_ndef_format_failed)
             }
             if (!safeClose()) {
@@ -137,11 +137,11 @@ class NdefWriterActivity : ComponentActivity() {
 
     private suspend fun Ndef.writeTag(): Unit = withContext(Dispatchers.IO) {
         if (requireConnect()) {
-            try {
+            runCatching {
                 if (writeNdefData()) {
                     showToastInMain(R.string.nfc_write_success)
                 }
-            } catch (e: Exception) {
+            }.onFailure {
                 showToastInMain(R.string.nfc_write_failed)
             }
             if (!safeClose()) {
@@ -165,19 +165,19 @@ class NdefWriterActivity : ComponentActivity() {
             showToastInMain(R.string.nfc_write_error_max_size)
             return false
         }
-        try {
+        runCatching {
             writeNdefMessage(ndefWriteData.msg)
-        } catch (e: Exception) {
+        }.onFailure {
             showToastInMain(R.string.nfc_write_error)
             return false
         }
         if (ndefWriteData.readOnly) {
-            try {
+            runCatching {
                 if (!makeReadOnly()) {
                     showToastInMain(R.string.nfc_write_error_read_only)
                     return false
                 }
-            } catch (e: Exception) {
+            }.onFailure {
                 showToastInMain(R.string.nfc_write_error_read_only)
                 return false
             }

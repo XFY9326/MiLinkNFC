@@ -191,11 +191,8 @@ class NdefReaderViewModel : ViewModel() {
             return null
         }
 
-        try {
-            return XiaomiNdefData.parse(ndefType, payload)
-        } catch (e: Exception) {
-            // Ignore
-        }
-        return null
+        return runCatching {
+            XiaomiNdefData.parse(ndefType, payload)
+        }.getOrNull()
     }
 }

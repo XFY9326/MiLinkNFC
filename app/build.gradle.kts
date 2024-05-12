@@ -36,7 +36,8 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
-            manifestPlaceholders["ApplicationId"] = defaultConfig.applicationId + applicationIdSuffix
+            manifestPlaceholders["ApplicationId"] =
+                defaultConfig.applicationId + applicationIdSuffix
             resValue("string", "app_name", "MiLink NFC Debug")
 
             versionNameSuffix = "-debug"
@@ -46,19 +47,26 @@ android {
             matchingFallbacks += "release"
 
             applicationIdSuffix = ".beta"
-            manifestPlaceholders["ApplicationId"] = defaultConfig.applicationId + applicationIdSuffix
+            manifestPlaceholders["ApplicationId"] =
+                defaultConfig.applicationId + applicationIdSuffix
             resValue("string", "app_name", "MiLink NFC Beta")
 
             versionNameSuffix = "-beta"
 
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
 
             packaging {
                 resources.excludes += "DebugProbesKt.bin"
