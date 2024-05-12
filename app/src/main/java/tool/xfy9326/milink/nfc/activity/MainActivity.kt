@@ -17,7 +17,7 @@ import tool.xfy9326.milink.nfc.R
 import tool.xfy9326.milink.nfc.ui.screen.HomeScreen
 import tool.xfy9326.milink.nfc.ui.theme.AppTheme
 import tool.xfy9326.milink.nfc.ui.vm.MainViewModel
-import tool.xfy9326.milink.nfc.utils.BluetoothMacAddressScanner
+import tool.xfy9326.milink.nfc.utils.BluetoothMacScanner
 import tool.xfy9326.milink.nfc.utils.MIME_ALL
 import tool.xfy9326.milink.nfc.utils.showToast
 import tool.xfy9326.milink.nfc.utils.startActivity
@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
             viewModel.requestNdefBinWriteActivity(it)
         }
     }
-    private val bluetoothScanner = BluetoothMacAddressScanner(this)
+    private val bluetoothScanner by lazy { BluetoothMacScanner(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AppTheme {
                 HomeScreen(
-                    supportScanBluetoothMac = bluetoothScanner.isSupported,
+                    supportScanBluetoothMac = BluetoothMacScanner.isSupported,
                     onNavToXiaomiNfcReader = ::startReaderActivity,
                     onRequestWriteNdefBin = { readNdefBin.launch(MIME_ALL) },
                     onRequestScanBluetoothMac = ::scanBluetoothMac,

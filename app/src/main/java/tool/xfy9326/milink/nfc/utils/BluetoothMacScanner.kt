@@ -23,11 +23,18 @@ import androidx.core.content.getSystemService
 import tool.xfy9326.milink.nfc.AppContext
 import java.lang.ref.WeakReference
 
-class BluetoothMacAddressScanner(activity: ComponentActivity) {
+class BluetoothMacScanner(activity: ComponentActivity) {
+    companion object {
+        val isSupported: Boolean
+            get() = (AppContext.packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH) ||
+                    AppContext.packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) &&
+                    AppContext.packageManager.hasSystemFeature(PackageManager.FEATURE_COMPANION_DEVICE_SETUP)
+    }
+
     private val weakActivity = WeakReference(activity)
     private val nonEmptyStringPattern = "^(?!\\s*\$).+".toPattern()
     private val deviceManager by lazy {
-        weakActivity.get()?.getSystemService<CompanionDeviceManager>()
+        AppContext.getSystemService<CompanionDeviceManager>()
     }
 
     private var scannerCallback: WeakReference<(String?) -> Unit>? = null
@@ -62,11 +69,6 @@ class BluetoothMacAddressScanner(activity: ComponentActivity) {
                 }
         } else null
 
-    val isSupported: Boolean
-        get() = (AppContext.packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH) ||
-                AppContext.packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) &&
-                AppContext.packageManager.hasSystemFeature(PackageManager.FEATURE_COMPANION_DEVICE_SETUP) &&
-                deviceManager != null
 
     val isEnabled: Boolean
         get() = weakActivity.get()?.getSystemService<BluetoothManager>()?.adapter?.isEnabled
@@ -117,7 +119,7 @@ class BluetoothMacAddressScanner(activity: ComponentActivity) {
 
                 @Deprecated("Old API", ReplaceWith("onAssociationPending(chooserLauncher)"))
                 override fun onDeviceFound(intentSender: IntentSender) {
-                    this@BluetoothMacAddressScanner.scannerCallback = WeakReference(scannerCallback)
+                    this@BluetoothMacScanner.scannerCallback = WeakReference(scannerCallback)
                     intentSenderLauncher?.launch(IntentSenderRequest.Builder(intentSender).build())
                 }
 
