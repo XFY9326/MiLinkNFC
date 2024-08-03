@@ -119,7 +119,7 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.9.0")
 
     // Compose BOM
-    val composeBom = platform("androidx.compose:compose-bom:2024.05.00")
+    val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
     implementation(composeBom)
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling-preview")
@@ -132,7 +132,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-drawablepainter:$accompanist")
 
     // AndroidX Compose Lifecycle
-    val lifecycleVersion = "2.7.0"
+    val lifecycleVersion = "2.8.4"
     implementation("androidx.lifecycle:lifecycle-runtime-compose:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion")
 

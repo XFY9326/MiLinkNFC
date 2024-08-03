@@ -20,7 +20,7 @@ tasks.withType<KotlinCompile>().configureEach {
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:4.27.0"
+        artifact = "com.google.protobuf:protoc:4.27.3"
     }
 
     generateProtoTasks {
@@ -35,6 +35,6 @@ protobuf {
 }
 
 dependencies {
-    api("com.google.protobuf:protobuf-javalite:4.27.0")
+    api("com.google.protobuf:protobuf-javalite:4.27.3")
     testImplementation(kotlin("test"))
 }
