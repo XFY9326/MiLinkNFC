@@ -194,7 +194,7 @@ private fun WriteNfcFunctionCard(
                     }
                 },
                 keyboardOptions = KeyboardOptions(
-                    autoCorrect = false,
+                    autoCorrectEnabled = false,
                     keyboardType = KeyboardType.Ascii
                 ),
                 singleLine = true

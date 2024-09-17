@@ -91,9 +91,9 @@ fun MacAddressTextField(
             Text(text = if (isError) stringResource(id = R.string.invalid_mac_address) else EMPTY)
         },
         keyboardOptions = KeyboardOptions(
-            autoCorrect = false,
-            keyboardType = KeyboardType.Ascii,
-            capitalization = if (upperCase) KeyboardCapitalization.Characters else KeyboardCapitalization.None
+            capitalization = if (upperCase) KeyboardCapitalization.Characters else KeyboardCapitalization.None,
+            autoCorrectEnabled = false,
+            keyboardType = KeyboardType.Ascii
         ),
         singleLine = true
     )
