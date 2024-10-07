@@ -119,7 +119,7 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.9.2")
 
     // Compose BOM
-    val composeBom = platform("androidx.compose:compose-bom:2024.09.01")
+    val composeBom = platform("androidx.compose:compose-bom:2024.09.03")
     implementation(composeBom)
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling-preview")
@@ -132,11 +132,11 @@ dependencies {
     implementation("com.google.accompanist:accompanist-drawablepainter:$accompanist")
 
     // AndroidX Compose Lifecycle
-    val lifecycleVersion = "2.8.5"
+    val lifecycleVersion = "2.8.6"
     implementation("androidx.lifecycle:lifecycle-runtime-compose:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion")
 
-    val navVersion = "2.8.0"
+    val navVersion = "2.8.2"
     implementation("androidx.navigation:navigation-compose:$navVersion")
 
     testImplementation("junit:junit:4.13.2")
