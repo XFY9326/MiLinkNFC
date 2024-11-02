@@ -58,7 +58,7 @@ fun NfcAdapter.requireEnabled(): Boolean = runCatching {
 fun Context.ignoreTagUntilRemoved(tag: Tag): Boolean =
     runCatching {
         NfcAdapter.getDefaultAdapter(this)?.ignore(tag, NFC_TAG_IGNORE_MILLS, null, null)
-    }.getOrNull() ?: false
+    }.getOrNull() == true
 
 val Tag.techNameList: List<String>
     get() = techList.map { str -> str.substringAfterLast(".") }

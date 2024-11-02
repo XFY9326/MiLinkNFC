@@ -11,7 +11,6 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -48,11 +47,11 @@ suspend fun Context.showToastInMain(text: String, longDuration: Boolean = false)
 fun Context.safeStartActivity(intent: Intent, options: Bundle? = null) {
     val queryActivity = intent.resolveActivity(packageManager) != null
     val success = if (queryActivity) {
-        ContextCompat.startActivity(this, intent, options)
+        startActivity(intent, options)
         true
     } else {
         runCatching {
-            ContextCompat.startActivity(this, intent, options)
+            startActivity(intent, options)
         }.isSuccess
     }
     if (!success) applicationContext.showToast(R.string.activity_start_failed)

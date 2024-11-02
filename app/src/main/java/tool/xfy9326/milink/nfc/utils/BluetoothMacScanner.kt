@@ -71,8 +71,7 @@ class BluetoothMacScanner(activity: ComponentActivity) {
 
 
     val isEnabled: Boolean
-        get() = weakActivity.get()?.getSystemService<BluetoothManager>()?.adapter?.isEnabled
-            ?: false
+        get() = weakActivity.get()?.getSystemService<BluetoothManager>()?.adapter?.isEnabled == true
 
     private fun newParingRequest(): AssociationRequest =
         AssociationRequest.Builder().apply {

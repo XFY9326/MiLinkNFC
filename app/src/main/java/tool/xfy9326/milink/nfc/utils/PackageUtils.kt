@@ -14,13 +14,15 @@ fun Context.getPackageData(packageName: String): PackageData? =
             packageManager.getPackageInfo(packageName, 0)
         }
     }.getOrNull()?.runCatching {
-        PackageData(
-            applicationName = applicationInfo.loadLabel(packageManager).toString(),
-            packageName = packageName,
-            versionCode = longVersionCode,
-            versionName = versionName,
-            icon = applicationInfo.loadUnbadgedIcon(packageManager)
-        )
+        applicationInfo?.let {
+            PackageData(
+                applicationName = it.loadLabel(packageManager).toString(),
+                packageName = packageName,
+                versionCode = longVersionCode,
+                versionName = versionName,
+                icon = it.loadUnbadgedIcon(packageManager)
+            )
+        }
     }?.onFailure {
         it.printStackTrace()
     }?.getOrNull()
@@ -36,7 +38,7 @@ fun Context.getPackageMetaData(packageName: String): Bundle? =
             packageManager.getPackageInfo(packageName, PackageManager.GET_META_DATA)
         }
     }.getOrNull()?.runCatching {
-        applicationInfo.metaData
+        applicationInfo?.metaData
     }?.onFailure {
         it.printStackTrace()
     }?.getOrNull()

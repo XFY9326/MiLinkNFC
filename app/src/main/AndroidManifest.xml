@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -9,7 +10,9 @@
 
     <uses-permission android:name="com.xiaomi.mi_connect_service.permission.RECEIVE_ENDPOINT" />
 
-    <uses-feature android:name="android.hardware.nfc" />
+    <uses-feature
+        android:name="android.hardware.nfc"
+        tools:ignore="UnnecessaryRequiredFeature" />
     <uses-feature android:name="android.software.companion_device_setup" />
 
     <queries>

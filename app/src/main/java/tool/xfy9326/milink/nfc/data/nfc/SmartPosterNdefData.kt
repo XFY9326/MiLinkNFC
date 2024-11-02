@@ -41,7 +41,7 @@ data class SmartPosterNdefData(
             record.tnf == NdefRecord.TNF_MIME_MEDIA &&
                     record.toMimeType()?.let {
                         it.startsWith("image/") || it.startsWith("video/")
-                    } ?: false
+                    } == true
 
         private fun checkSizeType(record: NdefRecord): Boolean =
             record.type.contentEquals(SIZE_RECORD_TYPE)
