@@ -48,7 +48,8 @@ data class NfcTagActionRecord(
     }
 
     enum class Action(val value: Short) {
-        UNKNOWN(0),
+        UNKNOWN(-1),
+        BEGIN(0),
         IOT(1),
         MUSIC_RELAY(2),
         TEL_RELAY(3),
@@ -62,6 +63,7 @@ data class NfcTagActionRecord(
         GUEST_NETWORK(11),
         EMPTY(12),
         CUSTOM(13),
+        END(14),
         AUTO(Short.MAX_VALUE);
 
         companion object {
@@ -72,9 +74,11 @@ data class NfcTagActionRecord(
     }
 
     enum class Condition(val value: Byte) {
-        UNKNOWN(0),
+        UNKNOWN(-1),
+        BEGIN(0),
         APP_FOREGROUND(1),
         SCREEN_LOCKED(2),
+        END(3),
         AUTO(Byte.MAX_VALUE);
 
         companion object {

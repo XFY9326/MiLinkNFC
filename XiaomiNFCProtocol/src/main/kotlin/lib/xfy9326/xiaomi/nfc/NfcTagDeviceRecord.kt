@@ -109,14 +109,16 @@ data class NfcTagDeviceRecord(
     }
 
     enum class DeviceType(val value: Short) {
-        UNKNOWN(0),
+        UNKNOWN(-1),
+        BEGIN(0),
         IOT(1),
         MI_ROUTER(2),
         MI_SOUND_BOX(3),
         MI_LAPTOP(4),
         MI_TV(5),
         MI_PHONE(6),
-        IOT_USER_ENV(7);
+        IOT_USER_ENV(7),
+        END(8);
 
         companion object {
             private val valuesMap by lazy { entries.associateBy { it.value } }
@@ -126,7 +128,8 @@ data class NfcTagDeviceRecord(
     }
 
     enum class DeviceAttribute(val value: Short, val isText: Boolean? = null) {
-        UNKNOWN(0),
+        UNKNOWN(-1),
+        BEGIN(0),
         WIFI_MAC_ADDRESS(1, false),
         BLUETOOTH_MAC_ADDRESS(2, false),
         NIC_MAC_ADDRESS(3, false),
@@ -144,6 +147,7 @@ data class NfcTagDeviceRecord(
         SSID(15, true),
         PASSWORD(17, true),
         MODEL(18, true),
+        END(19),
 
         // IOT
         IOT_DEVICE_ID(6, true),

@@ -82,7 +82,7 @@ data class HandoffAppData(
     }
 
     enum class DeviceType(val value: Int) {
-        UNKNOWN(0),
+        UNKNOWN(-1),
         TV(2),
         PC(3),
         CAR(5),
@@ -96,7 +96,7 @@ data class HandoffAppData(
     }
 
     enum class PayloadKey(val value: Byte, val isText: Boolean? = null) {
-        UNKNOWN(0),
+        UNKNOWN(-1),
         ACTION_SUFFIX(101, true),
         BLUETOOTH_MAC(1, true),
         WIFI_MAC(2, true),

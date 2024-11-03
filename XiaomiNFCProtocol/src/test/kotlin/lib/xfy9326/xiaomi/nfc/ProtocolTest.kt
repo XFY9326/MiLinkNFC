@@ -29,7 +29,9 @@ class ProtocolTest {
                     attributesMap = mapOf(
                         NfcTagDeviceRecord.DeviceAttribute.WIFI_MAC_ADDRESS to ByteArray(6) { 0 },
                         NfcTagDeviceRecord.DeviceAttribute.BLUETOOTH_MAC_ADDRESS to ByteArray(6) { 0 },
-                        NfcTagDeviceRecord.DeviceAttribute.MODEL to "xiaomi.wifispeaker.x08c".toByteArray(Charsets.UTF_8)
+                        NfcTagDeviceRecord.DeviceAttribute.MODEL to "xiaomi.wifispeaker.x08c".toByteArray(
+                            Charsets.UTF_8
+                        )
                     )
                 ),
                 NfcTagActionRecord.newInstance(
