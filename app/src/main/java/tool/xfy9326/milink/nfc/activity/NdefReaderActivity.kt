@@ -52,9 +52,7 @@ class NdefReaderActivity : ComponentActivity() {
         setContent {
             AppTheme {
                 NdefReaderScreen(
-                    onNavBack = {
-                        onBackPressedDispatcher.onBackPressed()
-                    },
+                    onNavBack = onBackPressedDispatcher::onBackPressed,
                     onRequestImportNdefBin = {
                         importNdefBin.launch(MIME_ALL)
                     }

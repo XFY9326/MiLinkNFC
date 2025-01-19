@@ -147,7 +147,9 @@ class NdefReaderViewModel : ViewModel() {
 
     private suspend fun handleNdefMessage(ndefMessage: NdefMessage) {
         val records = ndefMessage.records.asFlow().filterNotNull().map {
-            XiaomiNfc.getXiaomiNdefType(it)?.let { tnf ->
+            XiaomiNfc.getXiaomiNdefType(it)?.takeIf { tnf ->
+                tnf != XiaomiNdefType.UNKNOWN
+            }?.let { tnf ->
                 decodeXiaomiNfc(tnf, it.payload)
             } ?: NdefData.parseWellKnown(it)
         }.toList()
