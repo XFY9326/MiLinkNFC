@@ -58,6 +58,8 @@ fun NfcAdapter.requireEnabled(): Boolean = runCatching {
 fun Context.ignoreTagUntilRemoved(tag: Tag): Boolean =
     runCatching {
         NfcAdapter.getDefaultAdapter(this)?.ignore(tag, NFC_TAG_IGNORE_MILLS, null, null)
+    }.onFailure {
+        it.printStackTrace()
     }.getOrNull() == true
 
 val Tag.techNameList: List<String>
@@ -68,6 +70,8 @@ fun <T : TagTechnology> T.requireConnect(): Boolean =
         if (!isConnected) connect()
         require(isConnected)
         true
+    }.onFailure {
+        it.printStackTrace()
     }.getOrDefault(false)
 
 fun <T : TagTechnology> T.safeClose(): Boolean =

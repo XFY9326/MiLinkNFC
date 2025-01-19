@@ -71,7 +71,13 @@ class NfcNotificationListenerService : NotificationListenerService() {
             val text = sbn.notification.extras.getString(Notification.EXTRA_TEXT) ?: return
             if (HuaweiHandoffNfc.hasNfcUriContent(text) && sbn.notification.actions.isNotEmpty()) {
                 val cancelStr = getString(android.R.string.cancel)
-                sbn.notification.actions.first { it.title != cancelStr }?.actionIntent?.send()
+                sbn.notification.actions.first {
+                    it.title != cancelStr
+                }?.actionIntent?.runCatching {
+                    send()
+                }?.onFailure {
+                    it.printStackTrace()
+                }
             }
         }
     }

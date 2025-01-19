@@ -127,6 +127,7 @@ class NdefReaderActivity : ComponentActivity() {
                 }
                 safeClose()
             }.onFailure {
+                it.printStackTrace()
                 showToastInMain(R.string.nfc_read_failed)
                 viewModel.clearNfcReadData()
             }

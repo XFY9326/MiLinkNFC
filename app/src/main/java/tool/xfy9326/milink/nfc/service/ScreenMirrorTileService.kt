@@ -27,6 +27,7 @@ class ScreenMirrorTileService : TileService() {
         runCatching {
             TileServiceCompat.startActivityAndCollapse(this@ScreenMirrorTileService, pendingIntent)
         }.onFailure {
+            it.printStackTrace()
             showToast(R.string.activity_start_failed)
         }
     }

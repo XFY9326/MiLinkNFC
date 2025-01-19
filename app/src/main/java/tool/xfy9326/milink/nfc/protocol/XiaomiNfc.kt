@@ -36,6 +36,8 @@ object XiaomiNfc {
         if (ndefRecord.tnf == NdefRecord.TNF_EXTERNAL_TYPE) {
             return runCatching {
                 XiaomiNdefType.parse(ndefRecord.type.toString(Charsets.US_ASCII))
+            }.onFailure {
+                it.printStackTrace()
             }.getOrNull()
         }
         return null

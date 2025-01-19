@@ -171,7 +171,11 @@ class NdefReaderViewModel : ViewModel() {
         ndefType: XiaomiNdefType,
         ndefBytes: ByteArray
     ): XiaomiNdefData? {
-        val miConnectData = runCatching { MiConnectData.parse(ndefBytes) }.getOrNull()
+        val miConnectData = runCatching {
+            MiConnectData.parse(ndefBytes)
+        }.onFailure {
+            it.printStackTrace()
+        }.getOrNull()
         if (miConnectData == null) {
             _instantMsg.emit(InstantMsg.PARSE_ERROR)
             return null
@@ -180,12 +184,20 @@ class NdefReaderViewModel : ViewModel() {
             _instantMsg.emit(InstantMsg.NOT_XIAOMI_NFC)
             return null
         }
-        val protocol = runCatching { miConnectData.getNfcProtocol() }.getOrNull()
+        val protocol = runCatching {
+            miConnectData.getNfcProtocol()
+        }.onFailure {
+            it.printStackTrace()
+        }.getOrNull()
         if (protocol == null) {
             _instantMsg.emit(InstantMsg.VERSION_ERROR)
             return null
         }
-        val payload = runCatching { miConnectData.toXiaomiNfcPayload(protocol) }.getOrNull()
+        val payload = runCatching {
+            miConnectData.toXiaomiNfcPayload(protocol)
+        }.onFailure {
+            it.printStackTrace()
+        }.getOrNull()
         if (payload == null) {
             _instantMsg.emit(InstantMsg.CONTENT_PARSE_ERROR)
             return null
@@ -193,6 +205,8 @@ class NdefReaderViewModel : ViewModel() {
 
         return runCatching {
             XiaomiNdefData.parse(ndefType, payload)
+        }.onFailure {
+            it.printStackTrace()
         }.getOrNull()
     }
 }

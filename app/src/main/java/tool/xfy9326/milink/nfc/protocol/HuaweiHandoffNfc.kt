@@ -32,5 +32,7 @@ object HuaweiHandoffNfc {
 
     private fun getBluetoothMac(payload: ByteArray): ByteArray? = runCatching {
         payload.copyOfRange(BLUETOOTH_MAC_START_IDX, BLUETOOTH_MAC_END_IDX)
+    }.onFailure {
+        it.printStackTrace()
     }.getOrNull()
 }

@@ -102,7 +102,11 @@ data class XiaomiNdefData(
                                 it.value.toHexText()
                             } else {
                                 val text =
-                                    it.value.runCatching { toString(Charsets.UTF_8) }.getOrNull()
+                                    it.value.runCatching {
+                                        toString(Charsets.UTF_8)
+                                    }.onFailure {
+                                        it.printStackTrace()
+                                    }.getOrNull()
                                 val hexText = it.value.toHexText()
                                 when (it.key.isText) {
                                     true -> text ?: hexText

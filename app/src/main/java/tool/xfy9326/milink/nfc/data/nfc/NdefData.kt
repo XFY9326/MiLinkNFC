@@ -18,6 +18,8 @@ sealed interface NdefData {
             if (!inSmartPoster && SmartPosterNdefData.checkType(record)) {
                 runCatching {
                     SmartPosterNdefData.parse(record)
+                }.onFailure {
+                    it.printStackTrace()
                 }.getOrNull()?.let { return it }
             }
             return RawNdefData.parse(record)

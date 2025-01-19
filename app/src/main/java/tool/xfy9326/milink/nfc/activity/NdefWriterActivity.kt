@@ -142,6 +142,7 @@ class NdefWriterActivity : ComponentActivity() {
                     showToastInMain(R.string.nfc_write_success)
                 }
             }.onFailure {
+                it.printStackTrace()
                 showToastInMain(R.string.nfc_write_failed)
             }
             if (!safeClose()) {
@@ -168,6 +169,7 @@ class NdefWriterActivity : ComponentActivity() {
         runCatching {
             writeNdefMessage(ndefWriteData.msg)
         }.onFailure {
+            it.printStackTrace()
             showToastInMain(R.string.nfc_write_error)
             return false
         }
@@ -178,6 +180,7 @@ class NdefWriterActivity : ComponentActivity() {
                     return false
                 }
             }.onFailure {
+                it.printStackTrace()
                 showToastInMain(R.string.nfc_write_error_read_only)
                 return false
             }

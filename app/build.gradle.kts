@@ -13,10 +13,11 @@ android {
         applicationId = "tool.xfy9326.milink.nfc"
         minSdk = 29
         targetSdk = 35
-        versionCode = 21
-        versionName = "2.0.1"
+        versionCode = 22
+        versionName = "2.0.2"
 
-        resourceConfigurations += "zh"
+        @Suppress("UnstableApiUsage")
+        androidResources.localeFilters += "zh"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -108,18 +109,18 @@ dependencies {
     implementation(project(":XiaomiNFCProtocol"))
 
     // Kotlin
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
 
     // AndroidX Core
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.core:core-splashscreen:1.0.1")
 
     // AndroidX
-    implementation("androidx.datastore:datastore-preferences:1.1.1")
-    implementation("androidx.activity:activity-compose:1.9.3")
+    implementation("androidx.datastore:datastore-preferences:1.1.2")
+    implementation("androidx.activity:activity-compose:1.10.0")
 
     // Compose BOM
-    val composeBom = platform("androidx.compose:compose-bom:2024.10.01")
+    val composeBom = platform("androidx.compose:compose-bom:2025.01.00")
     implementation(composeBom)
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling-preview")
@@ -128,7 +129,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
 
     // Compose Accompanist
-    val accompanist = "0.36.0"
+    val accompanist = "0.37.0"
     implementation("com.google.accompanist:accompanist-drawablepainter:$accompanist")
 
     // AndroidX Compose Lifecycle
@@ -136,7 +137,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion")
 
-    val navVersion = "2.8.3"
+    val navVersion = "2.8.5"
     implementation("androidx.navigation:navigation-compose:$navVersion")
 
     testImplementation("junit:junit:4.13.2")

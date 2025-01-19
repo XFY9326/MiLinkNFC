@@ -13,6 +13,8 @@ object NdefIO {
     fun readNdefMessage(bytes: ByteArray): NdefMessage? =
         runCatching {
             NdefMessage(bytes)
+        }.onFailure {
+            it.printStackTrace()
         }.getOrElse {
             readNxpNdefMessage(bytes)
         }
@@ -43,5 +45,7 @@ object NdefIO {
         } else {
             null
         }
+    }.onFailure {
+        it.printStackTrace()
     }.getOrNull()
 }

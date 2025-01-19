@@ -39,6 +39,8 @@ data class RawNdefData(
 
                         else -> null
                     }
+                }?.onFailure {
+                    it.printStackTrace()
                 }?.getOrNull(),
                 typeHex = record.type?.takeIf { it.isNotEmpty() }?.toHexText(),
                 payloadLanguage = payloadRTDText?.first,
@@ -64,6 +66,8 @@ data class RawNdefData(
                     ) {
                         record.toUri()?.toString()
                     } else null
+                }?.onFailure {
+                    it.printStackTrace()
                 }?.getOrNull(),
                 payloadHex = record.payload?.takeIf { it.isNotEmpty() }?.toHexText(),
             )

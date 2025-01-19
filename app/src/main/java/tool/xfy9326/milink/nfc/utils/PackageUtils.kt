@@ -13,6 +13,8 @@ fun Context.getPackageData(packageName: String): PackageData? =
         } else {
             packageManager.getPackageInfo(packageName, 0)
         }
+    }.onFailure {
+        it.printStackTrace()
     }.getOrNull()?.runCatching {
         applicationInfo?.let {
             PackageData(
@@ -37,6 +39,8 @@ fun Context.getPackageMetaData(packageName: String): Bundle? =
         } else {
             packageManager.getPackageInfo(packageName, PackageManager.GET_META_DATA)
         }
+    }.onFailure {
+        it.printStackTrace()
     }.getOrNull()?.runCatching {
         applicationInfo?.metaData
     }?.onFailure {
